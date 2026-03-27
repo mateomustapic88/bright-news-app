@@ -6,6 +6,7 @@ import {
   DEFAULT_INGEST_REGION_CODES,
   dedupeBySourceUrl,
   getCategoryEmoji,
+  getLocalizedCategoryQuery,
   REGION_CONFIG,
   sleep,
   upsertRawArticles,
@@ -32,42 +33,66 @@ const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 const requestDelayMs = Number(getEnv("INGEST_REQUEST_DELAY_MS") || 1500);
 const maxRetriesPerRequest = Number(getEnv("INGEST_MAX_RETRIES") || 3);
 const retryDelayMs = Number(getEnv("INGEST_RETRY_DELAY_MS") || 5000);
+const maxResultsPerPage = Math.min(100, Number(getEnv("INGEST_GNEWS_MAX_RESULTS") || 25));
+const maxPages = Math.max(1, Number(getEnv("INGEST_GNEWS_PAGES") || 1));
 const enabledRegionCodes = (getEnv("INGEST_REGION_CODES") || DEFAULT_INGEST_REGION_CODES)
   .split(",")
   .map(value => value.trim())
   .filter(Boolean);
 
 const fetchArticles = async ({ region, category }) => {
-  const params = new URLSearchParams({
-    q: category.query,
-    lang: region.lang,
-    max: "10",
-    sortby: "publishedAt",
-    apikey: gnewsApiKey,
-  });
+  const collectedArticles = [];
 
-  if (region.country) {
-    params.set("country", region.country);
-  }
+  for (let page = 1; page <= maxPages; page += 1) {
+    const params = new URLSearchParams({
+      q: getLocalizedCategoryQuery(category, region.lang),
+      lang: region.lang,
+      max: String(maxResultsPerPage),
+      page: String(page),
+      sortby: "publishedAt",
+      apikey: gnewsApiKey,
+    });
 
-  for (let attempt = 0; attempt <= maxRetriesPerRequest; attempt += 1) {
-    const response = await fetch(`${GNEWS_BASE_URL}?${params.toString()}`);
-    const payload = await response.json();
-
-    if (response.ok) {
-      return payload.articles || [];
+    if (region.country) {
+      params.set("country", region.country);
     }
 
-    const message = payload?.errors?.join(", ") || payload?.message || "Unknown error";
-    const isRateLimited = response.status === 429;
+    let pageArticles = [];
 
-    if (isRateLimited && attempt < maxRetriesPerRequest) {
-      await sleep(retryDelayMs * (attempt + 1));
-      continue;
+    for (let attempt = 0; attempt <= maxRetriesPerRequest; attempt += 1) {
+      const response = await fetch(`${GNEWS_BASE_URL}?${params.toString()}`);
+      const payload = await response.json();
+
+      if (response.ok) {
+        pageArticles = payload.articles || [];
+        break;
+      }
+
+      const message = Array.isArray(payload?.errors)
+        ? payload.errors.join(", ")
+        : payload?.errors || payload?.message || "Unknown error";
+      const isRetryable = (response.status === 429 || response.status >= 500) && attempt < maxRetriesPerRequest;
+
+      if (isRetryable) {
+        await sleep(retryDelayMs * (attempt + 1));
+        continue;
+      }
+
+      throw new Error(`GNews error ${response.status}: ${message}`);
     }
 
-    throw new Error(`GNews error ${response.status}: ${message}`);
+    collectedArticles.push(...pageArticles);
+
+    if (pageArticles.length < maxResultsPerPage) {
+      break;
+    }
+
+    if (page < maxPages) {
+      await sleep(requestDelayMs);
+    }
   }
+
+  return collectedArticles;
 };
 
 export const run = async () => {

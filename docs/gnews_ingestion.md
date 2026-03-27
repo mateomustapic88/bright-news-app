@@ -41,6 +41,7 @@ npm run refresh:news
   - fetches candidate articles from GNews for multiple regions
   - defaults to all configured regions unless `INGEST_REGION_CODES` is set
   - uses category-specific search queries
+  - supports larger batch sizes and pagination through `INGEST_GNEWS_MAX_RESULTS` and `INGEST_GNEWS_PAGES`
   - stores them in `public.raw_articles`
   - runs deterministic blocklist / heuristic filtering first
   - marks clearly bad-fit content as `rejected`
@@ -48,13 +49,17 @@ npm run refresh:news
 - `ingest:gdelt`
   - fetches open article feeds from GDELT DOC 2.0 with no API key required
   - queries a category and region matrix, then normalizes those RSS items into the BrightNews raw article shape
+  - batch size is tunable with `INGEST_GDELT_MAX_RECORDS`
   - feeds candidates into the same review and publish pipeline as the other sources
 - `ingest:newscatcher`
   - fetches candidate articles from NewsCatcher's v3 search API using the same category and region matrix
   - uses the `x-api-token` header and normalizes NewsCatcher article fields into the BrightNews raw article shape
+  - supports larger page sizes and pagination through `INGEST_NEWSCATCHER_PAGE_SIZE` and `INGEST_NEWSCATCHER_PAGES`
   - stores candidates in `public.raw_articles` for the same review/publish flow
 - `ingest:rss`
   - fetches curated positive-news RSS feeds directly
+  - now continues if one RSS feed fails instead of aborting the entire RSS run
+  - supports per-feed caps through `INGEST_RSS_MAX_ITEMS_PER_FEED`
   - maps source tags into BrightNews categories and regions
 - `review:pending`
   - sends pending candidate stories to OpenAI for a final uplifting/not-uplifting decision
@@ -64,6 +69,8 @@ npm run refresh:news
   - reads `raw_articles` with `review_status = 'approved'`
   - inserts them into `public.stories`
   - marks them as `published`
+  - enforces a live feed cap through `MAX_PUBLISHED_STORIES`
+  - prunes the oldest overflow stories out of the live feed after publish
 - `refresh:news`
   - runs `ingest:gnews`, `ingest:gdelt`, `ingest:newscatcher`, `ingest:rss`, `review:pending`, then `publish:approved`
 
@@ -72,14 +79,24 @@ npm run refresh:news
 ```env
 OPENAI_API_KEY=your-openai-api-key
 OPENAI_REVIEW_MODEL=gpt-5-mini
-OPENAI_REVIEW_LIMIT=80
+OPENAI_REVIEW_LIMIT=200
 OPENAI_REVIEW_MIN_CONFIDENCE=0.6
+HEURISTIC_AUTO_APPROVE_SCORE=0.75
+INGEST_GNEWS_MAX_RESULTS=25
+INGEST_GNEWS_PAGES=1
+INGEST_NEWSCATCHER_PAGE_SIZE=25
+INGEST_NEWSCATCHER_PAGES=1
+INGEST_GDELT_MAX_RECORDS=30
+INGEST_RSS_MAX_ITEMS_PER_FEED=40
+MAX_PUBLISHED_STORIES=150
 ```
+
+`HEURISTIC_AUTO_APPROVE_SCORE` controls how aggressive the no-OpenAI fallback is. Lower it only if you accept more noisy approvals.
 
 ## Cron example
 
 ```cron
-0 6 * * * cd /path/to/bright-news && /usr/bin/npm run refresh:news >> /tmp/bright-news-refresh.log 2>&1
+0 */12 * * * cd /path/to/bright-news && /usr/bin/npm run refresh:news >> /tmp/bright-news-refresh.log 2>&1
 ```
 
 ## Required SQL setup

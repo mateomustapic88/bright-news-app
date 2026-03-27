@@ -30,6 +30,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 const requestDelayMs = Number(getEnv("INGEST_RSS_REQUEST_DELAY_MS") || 1000);
 const maxRetriesPerRequest = Number(getEnv("INGEST_RSS_MAX_RETRIES") || 2);
 const retryDelayMs = Number(getEnv("INGEST_RSS_RETRY_DELAY_MS") || 4000);
+const maxItemsPerFeed = Number(getEnv("INGEST_RSS_MAX_ITEMS_PER_FEED") || 40);
 const enabledRegionCodes = new Set(
   (getEnv("INGEST_REGION_CODES") || REGION_CONFIG.map(region => region.code).join(","))
     .split(",")
@@ -47,6 +48,16 @@ const FEED_CONFIG = [
     vendor: "positive_news",
     sourceName: "Positive News",
     feedUrl: "https://www.positive.news/feed/",
+  },
+  {
+    vendor: "reasonstobecheerful",
+    sourceName: "Reasons to be Cheerful",
+    feedUrl: "https://reasonstobecheerful.world/feed/",
+  },
+  {
+    vendor: "goodgoodgood",
+    sourceName: "Good Good Good",
+    feedUrl: "https://www.goodgoodgood.co/feed",
   },
 ];
 
@@ -70,58 +81,71 @@ const fetchFeed = async feedUrl => {
 
 export const run = async () => {
   const fetchedArticles = [];
+  const feedErrors = [];
+  const succeededFeeds = [];
 
   for (const feed of FEED_CONFIG) {
-    const xml = await fetchFeed(feed.feedUrl);
-    const items = parseRssItems(xml);
+    try {
+      const xml = await fetchFeed(feed.feedUrl);
+      const items = parseRssItems(xml).slice(0, maxItemsPerFeed);
 
-    for (const item of items) {
-      const regionCode = resolveRegionCode({
-        title: item.title,
-        description: item.description,
-        content: item.content_encoded,
-        tags: item.categories,
-      });
+      for (const item of items) {
+        const regionCode = resolveRegionCode({
+          title: item.title,
+          description: item.description,
+          content: item.content_encoded,
+          tags: item.categories,
+          sourceUrl: item.link,
+        });
 
-      if (!enabledRegionCodes.has("world") && !enabledRegionCodes.has(regionCode)) {
-        continue;
+        if (!enabledRegionCodes.has("world") && !enabledRegionCodes.has(regionCode)) {
+          continue;
+        }
+
+        const category = resolveCategory({
+          title: item.title,
+          description: item.description,
+          content: item.content_encoded,
+          tags: item.categories,
+        });
+
+        const row = buildRawArticleRow({
+          vendor: feed.vendor,
+          sourceName: feed.sourceName,
+          article: {
+            url: item.link,
+            title: item.title,
+            description: item.description,
+            content: item.content_encoded,
+            publishedAt: item.pubDate,
+          },
+          regionCode,
+          countryCode: REGION_CONFIG.find(region => region.code === regionCode)?.country || null,
+          category,
+          emoji: getCategoryEmoji(category),
+          tags: item.categories,
+          rawPayload: {
+            title: item.title,
+            url: item.link,
+            description: item.description,
+            content: item.content_encoded,
+            publishedAt: item.pubDate,
+            categories: item.categories,
+          },
+        });
+
+        if (row) {
+          fetchedArticles.push(row);
+        }
       }
 
-      const category = resolveCategory({
-        title: item.title,
-        description: item.description,
-        content: item.content_encoded,
-        tags: item.categories,
-      });
-
-      const row = buildRawArticleRow({
-        vendor: feed.vendor,
+      succeededFeeds.push(feed.sourceName);
+    } catch (error) {
+      feedErrors.push({
         sourceName: feed.sourceName,
-        article: {
-          url: item.link,
-          title: item.title,
-          description: item.description,
-          content: item.content_encoded,
-          publishedAt: item.pubDate,
-        },
-        regionCode,
-        countryCode: REGION_CONFIG.find(region => region.code === regionCode)?.country || null,
-        category,
-        emoji: getCategoryEmoji(category),
-        tags: item.categories,
-        rawPayload: {
-          title: item.title,
-          url: item.link,
-          description: item.description,
-          content: item.content_encoded,
-          publishedAt: item.pubDate,
-          categories: item.categories,
-        },
+        feedUrl: feed.feedUrl,
+        error: error.message,
       });
-
-      if (row) {
-        fetchedArticles.push(row);
-      }
     }
 
     await sleep(requestDelayMs);
@@ -134,7 +158,8 @@ export const run = async () => {
   const rejected = dedupedRows.filter(row => row.review_status === "rejected").length;
 
   const result = {
-    feeds: FEED_CONFIG.map(feed => feed.sourceName),
+    feeds: succeededFeeds,
+    feedErrors,
     fetched: fetchedArticles.length,
     deduped: dedupedRows.length,
     written,

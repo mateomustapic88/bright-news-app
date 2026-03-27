@@ -6,6 +6,7 @@ import {
   DEFAULT_INGEST_REGION_CODES,
   dedupeBySourceUrl,
   getCategoryEmoji,
+  getLocalizedCategoryQuery,
   parseRssItems,
   REGION_CONFIG,
   resolveRegionCode,
@@ -43,11 +44,11 @@ if (!supabaseUrl) {
 }
 
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
-const requestDelayMs = Number(getEnv("INGEST_GDELT_REQUEST_DELAY_MS") || 1200);
+const requestDelayMs = Number(getEnv("INGEST_GDELT_REQUEST_DELAY_MS") || 5500);
 const maxRetriesPerRequest = Number(getEnv("INGEST_GDELT_MAX_RETRIES") || 3);
 const retryDelayMs = Number(getEnv("INGEST_GDELT_RETRY_DELAY_MS") || 5000);
 const timespan = getEnv("INGEST_GDELT_TIMESPAN") || "7d";
-const maxRecords = Number(getEnv("INGEST_GDELT_MAX_RECORDS") || 15);
+const maxRecords = Number(getEnv("INGEST_GDELT_MAX_RECORDS") || 30);
 const enabledRegionCodes = (getEnv("INGEST_REGION_CODES") || DEFAULT_INGEST_REGION_CODES)
   .split(",")
   .map(value => value.trim())
@@ -55,7 +56,8 @@ const enabledRegionCodes = (getEnv("INGEST_REGION_CODES") || DEFAULT_INGEST_REGI
 
 const buildQuery = ({ region, category }) => {
   const regionQuery = REGION_QUERY_TERMS[region.code] || "";
-  return regionQuery ? `(${category.query}) AND ${regionQuery}` : category.query;
+  const categoryQuery = getLocalizedCategoryQuery(category, region.lang);
+  return regionQuery ? `(${categoryQuery}) AND ${regionQuery}` : categoryQuery;
 };
 
 const deriveSourceName = urlValue => {
@@ -85,11 +87,14 @@ const fetchFeed = async ({ region, category }) => {
       return xml;
     }
 
-    const shouldRetry = (response.status === 429 || response.status >= 500) && attempt < maxRetriesPerRequest;
-    if (shouldRetry) {
-      await sleep(retryDelayMs * (attempt + 1));
-      continue;
-    }
+      const shouldRetry = (response.status === 429 || response.status >= 500) && attempt < maxRetriesPerRequest;
+      if (shouldRetry) {
+        const delay = response.status === 429
+          ? Math.max(requestDelayMs, retryDelayMs * (attempt + 1))
+          : retryDelayMs * (attempt + 1);
+        await sleep(delay);
+        continue;
+      }
 
     throw new Error(`GDELT error ${response.status}: ${xml.slice(0, 180)}`);
   }
@@ -115,6 +120,7 @@ export const run = async () => {
             description: item.description,
             content: item.content_encoded,
             tags: [category.category],
+            sourceUrl: item.link,
           })
           : region.code;
 

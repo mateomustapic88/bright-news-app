@@ -4,12 +4,12 @@ export const REGION_CONFIG = [
   { code: "world", country: "", lang: "en" },
   { code: "us", country: "us", lang: "en" },
   { code: "uk", country: "gb", lang: "en" },
-  { code: "hr", country: "hr", lang: "en" },
-  { code: "de", country: "de", lang: "en" },
-  { code: "fr", country: "fr", lang: "en" },
-  { code: "jp", country: "jp", lang: "en" },
+  { code: "hr", country: "hr", lang: "hr" },
+  { code: "de", country: "de", lang: "de" },
+  { code: "fr", country: "fr", lang: "fr" },
+  { code: "jp", country: "jp", lang: "ja" },
   { code: "au", country: "au", lang: "en" },
-  { code: "br", country: "br", lang: "en" },
+  { code: "br", country: "br", lang: "pt" },
   { code: "in", country: "in", lang: "en" },
 ];
 
@@ -20,37 +20,80 @@ export const CATEGORY_CONFIG = [
     category: "Environment",
     emoji: "🌿",
     query: "\"climate restoration\" OR conservation OR reforestation OR biodiversity OR reef restoration OR wildlife recovery OR clean energy success OR emissions fall",
+    localizedQueries: {
+      hr: "očuvanje prirode OR pošumljavanje OR bioraznolikost OR obnova grebena OR oporavak divljih životinja OR uspjeh čiste energije OR smanjenje emisija",
+      de: "Naturschutz OR Aufforstung OR Biodiversität OR Riffrestaurierung OR Erholung der Tierwelt OR Erfolg saubere Energie OR Emissionsrückgang",
+      fr: "conservation OR reforestation OR biodiversité OR restauration des récifs OR retour de la faune OR succès énergie propre OR baisse des émissions",
+      ja: "保全 OR 再植林 OR 生物多様性 OR サンゴ礁再生 OR 野生動物回復 OR クリーンエネルギー成功 OR 排出量減少",
+      pt: "conservação OR reflorestamento OR biodiversidade OR restauração de recifes OR recuperação da vida selvagem OR sucesso da energia limpa OR queda das emissões",
+    },
   },
   {
     category: "Science",
     emoji: "🔬",
     query: "scientists develop OR research breakthrough OR scientific advance OR new study shows progress OR discovery helps",
+    localizedQueries: {
+      hr: "znanstvenici razvili OR istraživački proboj OR znanstveni napredak OR novo istraživanje pokazuje napredak OR otkriće pomaže",
+      de: "Wissenschaftler entwickeln OR Forschungsdurchbruch OR wissenschaftlicher Fortschritt OR neue Studie zeigt Fortschritt OR Entdeckung hilft",
+      fr: "des scientifiques développent OR percée scientifique OR avancée scientifique OR une nouvelle étude montre des progrès OR une découverte aide",
+      ja: "科学者が開発 OR 研究のブレークスルー OR 科学的進歩 OR 新しい研究が進展を示す OR 発見が役立つ",
+      pt: "cientistas desenvolvem OR avanço científico OR descoberta ajuda OR nova pesquisa mostra progresso",
+    },
   },
   {
     category: "Community",
     emoji: "🤝",
     query: "volunteers help OR charity success OR community project improves OR local initiative helps OR donation drive succeeds",
+    localizedQueries: {
+      hr: "volonteri pomažu OR uspjeh dobrotvorne akcije OR projekt zajednice poboljšava OR lokalna inicijativa pomaže OR uspješna donatorska akcija",
+      de: "Freiwillige helfen OR Erfolg einer Wohltätigkeitsaktion OR Gemeinschaftsprojekt verbessert OR lokale Initiative hilft OR Spendenaktion erfolgreich",
+      fr: "des bénévoles aident OR succès caritatif OR projet communautaire améliore OR initiative locale aide OR collecte de dons réussie",
+      ja: "ボランティアが支援 OR 慈善活動の成功 OR 地域プロジェクトが改善 OR 地元の取り組みが役立つ OR 寄付活動が成功",
+      pt: "voluntários ajudam OR sucesso beneficente OR projeto comunitário melhora OR iniciativa local ajuda OR campanha de doação bem-sucedida",
+    },
   },
   {
     category: "Health",
     emoji: "💚",
     query: "health breakthrough OR treatment success OR vaccine success OR disease prevention progress OR recovery program helps",
+    localizedQueries: {
+      hr: "zdravstveni proboj OR uspjeh liječenja OR uspjeh cjepiva OR napredak u prevenciji bolesti OR program oporavka pomaže",
+      de: "medizinischer Durchbruch OR Behandlungserfolg OR Impferfolg OR Fortschritt bei der Krankheitsprävention OR Genesungsprogramm hilft",
+      fr: "percée en santé OR succès du traitement OR succès du vaccin OR progrès dans la prévention des maladies OR programme de rétablissement aide",
+      ja: "医療のブレークスルー OR 治療成功 OR ワクチン成功 OR 病気予防の進展 OR 回復プログラムが役立つ",
+      pt: "avanço na saúde OR sucesso no tratamento OR sucesso da vacina OR progresso na prevenção de doenças OR programa de recuperação ajuda",
+    },
   },
   {
     category: "Animals",
     emoji: "🐾",
     query: "animal rescue OR wildlife recovery OR species rebound OR habitat restoration helps animals OR shelter adoption success",
+    localizedQueries: {
+      hr: "spašavanje životinja OR oporavak divljih životinja OR oporavak vrste OR obnova staništa pomaže životinjama OR uspjeh udomljavanja",
+      de: "Tierrettung OR Erholung der Tierwelt OR Rückkehr einer Art OR Lebensraumrenaturierung hilft Tieren OR Tierheimvermittlung erfolgreich",
+      fr: "sauvetage animalier OR retour de la faune OR reprise d'une espèce OR restauration de l'habitat aide les animaux OR adoption en refuge réussie",
+      ja: "動物救助 OR 野生動物回復 OR 種の回復 OR 生息地の回復が動物を助ける OR 保護施設での譲渡成功",
+      pt: "resgate de animais OR recuperação da vida selvagem OR recuperação de espécie OR restauração de habitat ajuda animais OR sucesso de adoção em abrigo",
+    },
   },
   {
     category: "Innovation",
     emoji: "💡",
     query: "clean tech breakthrough OR battery breakthrough OR affordable technology helps OR startup solution improves lives OR AI helps detect",
+    localizedQueries: {
+      hr: "proboj čiste tehnologije OR proboj baterije OR pristupačna tehnologija pomaže OR startup rješenje poboljšava živote OR AI pomaže otkriti",
+      de: "Durchbruch bei sauberer Technologie OR Batteriedurchbruch OR erschwingliche Technologie hilft OR Startup-Lösung verbessert Leben OR KI hilft bei der Erkennung",
+      fr: "percée de la technologie propre OR percée des batteries OR technologie abordable aide OR solution de startup améliore des vies OR l'IA aide à détecter",
+      ja: "クリーンテックのブレークスルー OR バッテリーのブレークスルー OR 手頃な技術が役立つ OR スタートアップの解決策が生活を改善 OR AIが検出を支援",
+      pt: "avanço em tecnologia limpa OR avanço em baterias OR tecnologia acessível ajuda OR solução de startup melhora vidas OR IA ajuda a detectar",
+    },
   },
 ];
 
 export const TRUSTED_AUTO_APPROVE_VENDORS = new Set(["goodnewsnetwork", "positive_news"]);
 const MIN_POSITIVE_SCORE = 0.6;
 const hasOpenAiReviewer = Boolean(process.env.OPENAI_API_KEY);
+const HEURISTIC_AUTO_APPROVE_SCORE = Number(process.env.HEURISTIC_AUTO_APPROVE_SCORE || 0.75);
 
 const NEGATIVE_KEYWORDS = [
   "war",
@@ -216,13 +259,25 @@ const CATEGORY_KEYWORDS = {
 const REGION_HINTS = {
   us: ["united states", "usa", "u.s.", "america", "american"],
   uk: ["united kingdom", "uk", "britain", "british", "england", "scotland", "wales"],
-  hr: ["croatia", "croatian"],
-  de: ["germany", "german"],
-  fr: ["france", "french"],
-  jp: ["japan", "japanese"],
+  hr: ["croatia", "croatian", "hrvatska", "hrvatski", "zagreb", "split", "rijeka"],
+  de: ["germany", "german", "deutschland", "deutsch", "berlin", "hamburg", "munich", "münchen"],
+  fr: ["france", "french", "français", "paris", "lyon", "marseille"],
+  jp: ["japan", "japanese", "日本", "東京", "大阪", "京都"],
   au: ["australia", "australian"],
-  br: ["brazil", "brazilian"],
-  in: ["india", "indian"],
+  br: ["brazil", "brazilian", "brasil", "brasileiro", "são paulo", "rio de janeiro"],
+  in: ["india", "indian", "bharat", "delhi", "mumbai", "bengaluru", "bangalore"],
+};
+
+const DOMAIN_REGION_HINTS = {
+  ".hr": "hr",
+  ".de": "de",
+  ".fr": "fr",
+  ".jp": "jp",
+  ".br": "br",
+  ".in": "in",
+  ".co.uk": "uk",
+  ".uk": "uk",
+  ".au": "au",
 };
 
 const HTML_ENTITIES = new Map([
@@ -286,8 +341,24 @@ export const resolveCategory = ({ title, description, content = "", tags = [] })
 export const getCategoryEmoji = category =>
   CATEGORY_CONFIG.find(item => item.category === category)?.emoji || "✨";
 
-export const resolveRegionCode = ({ title, description, content = "", tags = [] }) => {
+export const getLocalizedCategoryQuery = (categoryConfig, lang = "en") =>
+  categoryConfig.localizedQueries?.[lang] || categoryConfig.query;
+
+export const resolveRegionCode = ({ title, description, content = "", tags = [], sourceUrl = "" }) => {
   const haystack = normalizeHaystack([title, description, content, tags.join(" ")]);
+
+  if (sourceUrl) {
+    try {
+      const hostname = new URL(sourceUrl).hostname.toLowerCase();
+      for (const [suffix, regionCode] of Object.entries(DOMAIN_REGION_HINTS)) {
+        if (hostname.endsWith(suffix)) {
+          return regionCode;
+        }
+      }
+    } catch {
+      // Ignore URL parse failures and continue with text hints.
+    }
+  }
 
   for (const [regionCode, hints] of Object.entries(REGION_HINTS)) {
     if (hints.some(hint => haystack.includes(hint))) {
@@ -336,6 +407,14 @@ export const inferReviewDecision = ({ vendor, title, description, content = "", 
       reviewStatus: "approved",
       rejectedReason: "",
       reviewNotes: `Auto-approved from trusted curated source without OpenAI review (${candidateScore.toFixed(2)}).`,
+    };
+  }
+
+  if (!hasOpenAiReviewer && candidateScore >= HEURISTIC_AUTO_APPROVE_SCORE) {
+    return {
+      reviewStatus: "approved",
+      rejectedReason: "",
+      reviewNotes: `Auto-approved by heuristic score without OpenAI review (${candidateScore.toFixed(2)}).`,
     };
   }
 

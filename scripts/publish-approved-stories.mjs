@@ -17,6 +17,7 @@ if (!supabaseUrl) {
 }
 
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
+const maxPublishedStories = Number(getEnv("MAX_PUBLISHED_STORIES") || 150);
 
 const toSentence = value => (value || "").replace(/\s+/g, " ").trim();
 
@@ -38,6 +39,61 @@ const buildStoryRow = rawArticle => {
     is_pinned: false,
     published_at: rawArticle.published_at || new Date().toISOString(),
     source_url: sourceUrl,
+  };
+};
+
+const prunePublishedStories = async () => {
+  const { data: publishedStories, error: storiesError } = await supabase
+    .from("stories")
+    .select("id")
+    .order("is_pinned", { ascending: false })
+    .order("published_at", { ascending: false });
+
+  if (storiesError) throw new Error(storiesError.message);
+
+  const overflowStories = (publishedStories || []).slice(maxPublishedStories);
+
+  if (overflowStories.length === 0) {
+    return { prunedStories: 0, resetRawArticles: 0 };
+  }
+
+  const overflowIds = overflowStories.map(story => story.id);
+
+  const { data: affectedRawArticles, error: rawSelectError } = await supabase
+    .from("raw_articles")
+    .select("id")
+    .in("published_story_id", overflowIds);
+
+  if (rawSelectError) throw new Error(rawSelectError.message);
+
+  const { error: rawUpdateError } = await supabase
+    .from("raw_articles")
+    .update({
+      review_status: "approved",
+      published_story_id: null,
+      review_notes: "Moved out of live feed due to published story cap.",
+    })
+    .in("published_story_id", overflowIds);
+
+  if (rawUpdateError) throw new Error(rawUpdateError.message);
+
+  const { error: deleteSavedError } = await supabase
+    .from("saved_stories")
+    .delete()
+    .in("story_id", overflowIds);
+
+  if (deleteSavedError) throw new Error(deleteSavedError.message);
+
+  const { error: deleteStoriesError } = await supabase
+    .from("stories")
+    .delete()
+    .in("id", overflowIds);
+
+  if (deleteStoriesError) throw new Error(deleteStoriesError.message);
+
+  return {
+    prunedStories: overflowIds.length,
+    resetRawArticles: (affectedRawArticles || []).length,
   };
 };
 
@@ -101,10 +157,15 @@ export const run = async () => {
     if (updateError) throw new Error(updateError.message);
   }
 
+  const pruneResult = await prunePublishedStories();
+
   const result = {
     approved: approvedRows.length,
     inserted: insertedStories.length,
     published: approvedRows.length,
+    prunedStories: pruneResult.prunedStories,
+    resetRawArticles: pruneResult.resetRawArticles,
+    maxPublishedStories,
   };
 
   console.log(JSON.stringify(result, null, 2));

@@ -6,6 +6,7 @@ import {
   DEFAULT_INGEST_REGION_CODES,
   dedupeBySourceUrl,
   getCategoryEmoji,
+  getLocalizedCategoryQuery,
   REGION_CONFIG,
   sleep,
   upsertRawArticles,
@@ -32,7 +33,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 const requestDelayMs = Number(getEnv("INGEST_NEWSCATCHER_REQUEST_DELAY_MS") || 1200);
 const maxRetriesPerRequest = Number(getEnv("INGEST_NEWSCATCHER_MAX_RETRIES") || 3);
 const retryDelayMs = Number(getEnv("INGEST_NEWSCATCHER_RETRY_DELAY_MS") || 5000);
-const pageSize = Number(getEnv("INGEST_NEWSCATCHER_PAGE_SIZE") || 10);
+const pageSize = Math.min(100, Number(getEnv("INGEST_NEWSCATCHER_PAGE_SIZE") || 25));
+const maxPages = Math.max(1, Number(getEnv("INGEST_NEWSCATCHER_PAGES") || 1));
 const fromDate = getEnv("INGEST_NEWSCATCHER_FROM") || "7 days ago";
 const enabledRegionCodes = (getEnv("INGEST_REGION_CODES") || DEFAULT_INGEST_REGION_CODES)
   .split(",")
@@ -52,42 +54,64 @@ const collectTags = (article, fallbackCategory) => {
 };
 
 const fetchArticles = async ({ region, category }) => {
-  const params = new URLSearchParams({
-    q: category.query,
-    lang: region.lang,
-    from_: fromDate,
-    sort_by: "date",
-    search_in: "title_content",
-    page_size: String(pageSize),
-    is_paid_content: "false",
-  });
+  const collectedArticles = [];
 
-  if (region.country) {
-    params.set("countries", region.country.toUpperCase());
-  }
-
-  for (let attempt = 0; attempt <= maxRetriesPerRequest; attempt += 1) {
-    const response = await fetch(`${NEWSCATCHER_BASE_URL}?${params.toString()}`, {
-      headers: {
-        "x-api-token": newsCatcherApiKey,
-      },
+  for (let page = 1; page <= maxPages; page += 1) {
+    const params = new URLSearchParams({
+      q: getLocalizedCategoryQuery(category, region.lang),
+      lang: region.lang,
+      from_: fromDate,
+      page: String(page),
+      sort_by: "date",
+      search_in: "title_content",
+      page_size: String(pageSize),
+      is_paid_content: "false",
     });
-    const payload = await response.json();
 
-    if (response.ok) {
-      return payload.articles || [];
+    if (region.country) {
+      params.set("countries", region.country.toUpperCase());
     }
 
-    const message = payload?.error?.message || payload?.message || `NewsCatcher error ${response.status}`;
-    const shouldRetry = (response.status === 429 || response.status >= 500) && attempt < maxRetriesPerRequest;
+    let pageArticles = [];
+    let totalPages = 1;
 
-    if (shouldRetry) {
-      await sleep(retryDelayMs * (attempt + 1));
-      continue;
+    for (let attempt = 0; attempt <= maxRetriesPerRequest; attempt += 1) {
+      const response = await fetch(`${NEWSCATCHER_BASE_URL}?${params.toString()}`, {
+        headers: {
+          "x-api-token": newsCatcherApiKey,
+        },
+      });
+      const payload = await response.json();
+
+      if (response.ok) {
+        pageArticles = payload.articles || [];
+        totalPages = Number(payload.total_pages || payload.totalPages || 1);
+        break;
+      }
+
+      const message = payload?.error?.message || payload?.message || `NewsCatcher error ${response.status}`;
+      const shouldRetry = (response.status === 429 || response.status >= 500) && attempt < maxRetriesPerRequest;
+
+      if (shouldRetry) {
+        await sleep(retryDelayMs * (attempt + 1));
+        continue;
+      }
+
+      throw new Error(`NewsCatcher error ${response.status}: ${message}`);
     }
 
-    throw new Error(`NewsCatcher error ${response.status}: ${message}`);
+    collectedArticles.push(...pageArticles);
+
+    if (page >= totalPages || pageArticles.length < pageSize) {
+      break;
+    }
+
+    if (page < maxPages) {
+      await sleep(requestDelayMs);
+    }
   }
+
+  return collectedArticles;
 };
 
 export const run = async () => {
