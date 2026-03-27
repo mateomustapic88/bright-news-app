@@ -1,10 +1,12 @@
 export const APP_NAME = "BrightNews";
 export const APP_ID = "com.brightnews.app";
 export const MOBILE_AUTH_SCHEME = APP_ID;
+const withBasePath = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
+
 export const LEGAL_LINKS = {
-  privacy: "/privacy-policy.html",
-  support: "/support.html",
-  deletion: "/account-deletion.html",
+  privacy: withBasePath("privacy-policy.html"),
+  support: withBasePath("support.html"),
+  deletion: withBasePath("account-deletion.html"),
 };
 
 export const getConfiguredWebAuthRedirectUrl = () => {
