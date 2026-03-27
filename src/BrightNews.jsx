@@ -26,10 +26,11 @@ import {
   getVisibleTabs,
   SAVED_STORIES_KEY,
 } from "./brightnews/constants";
-import { readSavedStories } from "./brightnews/storage";
+import { readOnboardingDismissed, readSavedStories, writeOnboardingDismissed } from "./brightnews/storage";
 import BottomNav from "./brightnews/components/BottomNav";
 import Header from "./brightnews/components/Header";
 import LoadingBar from "./brightnews/components/LoadingBar";
+import OnboardingModal from "./brightnews/components/OnboardingModal";
 import TopBar from "./brightnews/components/TopBar";
 import DiscoverTab from "./brightnews/tabs/DiscoverTab";
 import AccountTab from "./brightnews/tabs/AccountTab";
@@ -77,6 +78,7 @@ const BrightNews = () => {
   const [authError, setAuthError] = useState("");
   const [syncingSaved, setSyncingSaved] = useState(false);
   const [shareFeedback, setShareFeedback] = useState(null);
+  const [showOnboarding, setShowOnboarding] = useState(() => !readOnboardingDismissed());
   const cache = useRef({});
   const abortRef = useRef(null);
   const savedRef = useRef(saved);
@@ -215,6 +217,11 @@ const BrightNews = () => {
     const timer = window.setTimeout(() => setShareFeedback(null), 2600);
     return () => window.clearTimeout(timer);
   }, [shareFeedback]);
+
+  const handleDismissOnboarding = () => {
+    writeOnboardingDismissed(true);
+    setShowOnboarding(false);
+  };
 
   useEffect(() => {
     if (availableRegionCodes.includes(region)) return;
@@ -587,6 +594,14 @@ const BrightNews = () => {
       </div>
 
       <BottomNav tabs={tabs} tab={tab} setTab={setTab} />
+
+      {showOnboarding && (
+        <OnboardingModal
+          session={session}
+          handleDismiss={handleDismissOnboarding}
+          handleGoogleSignIn={handleGoogleSignIn}
+        />
+      )}
     </div>
   );
 };

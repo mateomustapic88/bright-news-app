@@ -36,6 +36,7 @@ export const REVIEW_FILTERS = [
 ];
 
 export const SAVED_STORIES_KEY = "brightnews.savedStories";
+export const ONBOARDING_DISMISSED_KEY = "brightnews.onboardingDismissed";
 
 export const getCategoryMeta = id =>
   CATEGORIES.find(category => category.id === id) || CATEGORIES[1];
