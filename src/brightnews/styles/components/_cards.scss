@@ -36,6 +36,14 @@
   );
 }
 
+.bn-hero-card__actions {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: inline-flex;
+  gap: 8px;
+}
+
 .bn-hero-card__emoji {
   font-size: 68px;
 }
@@ -112,6 +120,19 @@
   justify-content: space-between;
   gap: 10px;
   margin-bottom: 5px;
+}
+
+.bn-story-card__actions,
+.bn-saved-card__topline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bn-saved-card__topline {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
 }
 
 .bn-story-card__details {

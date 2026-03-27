@@ -12,11 +12,13 @@ const HomeTab = ({
   loading,
   firstLoad,
   error,
+  shareFeedback,
   stories,
   expanded,
   saved,
   setExpanded,
   toggleSave,
+  handleShareStory,
 }) => (
   <section className="bn-tab bn-home-tab">
     <div className="bn-chip-row">
@@ -40,6 +42,7 @@ const HomeTab = ({
     )}
 
     {error && <StatusMessage variant="error">⚠️ {error}</StatusMessage>}
+    {!error && shareFeedback && <StatusMessage variant={shareFeedback.variant}>{shareFeedback.message}</StatusMessage>}
 
     {!loading && !error && stories.length === 0 && (
       <EmptyState
@@ -60,6 +63,7 @@ const HomeTab = ({
             saved={saved}
             setExpanded={setExpanded}
             toggleSave={toggleSave}
+            handleShareStory={handleShareStory}
           />
         </div>
 
@@ -74,6 +78,7 @@ const HomeTab = ({
               saved={saved}
               setExpanded={setExpanded}
               toggleSave={toggleSave}
+              handleShareStory={handleShareStory}
             />
           ))}
         </div>

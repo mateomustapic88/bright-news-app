@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { App } from "@capacitor/app";
 import { Browser } from "@capacitor/browser";
+import { shareStory } from "./lib/shareStory";
 import { supabase } from "./lib/supabase";
 import {
   getAuthRedirectUrl,
@@ -75,6 +76,7 @@ const BrightNews = () => {
   const [authMessage, setAuthMessage] = useState("");
   const [authError, setAuthError] = useState("");
   const [syncingSaved, setSyncingSaved] = useState(false);
+  const [shareFeedback, setShareFeedback] = useState(null);
   const cache = useRef({});
   const abortRef = useRef(null);
   const savedRef = useRef(saved);
@@ -206,6 +208,13 @@ const BrightNews = () => {
   useEffect(() => {
     refreshAvailableRegions();
   }, [refreshAvailableRegions]);
+
+  useEffect(() => {
+    if (!shareFeedback) return undefined;
+
+    const timer = window.setTimeout(() => setShareFeedback(null), 2600);
+    return () => window.clearTimeout(timer);
+  }, [shareFeedback]);
 
   useEffect(() => {
     if (availableRegionCodes.includes(region)) return;
@@ -459,6 +468,22 @@ const BrightNews = () => {
     }
   };
 
+  const handleShareStory = async (story, event) => {
+    event?.stopPropagation();
+
+    try {
+      const result = await shareStory(story);
+      if (result) {
+        setShareFeedback(result);
+      }
+    } catch {
+      setShareFeedback({
+        variant: "error",
+        message: "Unable to share this story right now.",
+      });
+    }
+  };
+
   const handleApproveRawArticle = async rawArticleId => {
     try {
       await updateRawArticleReviewStatus(rawArticleId, "approved");
@@ -502,11 +527,13 @@ const BrightNews = () => {
             loading={loading}
             firstLoad={firstLoad}
             error={error}
+            shareFeedback={shareFeedback}
             stories={stories}
             expanded={expanded}
             saved={saved}
             setExpanded={setExpanded}
             toggleSave={toggleSave}
+            handleShareStory={handleShareStory}
           />
         )}
 
@@ -524,6 +551,8 @@ const BrightNews = () => {
             savedStories={savedStories}
             session={session}
             setTab={setTab}
+            shareFeedback={shareFeedback}
+            handleShareStory={handleShareStory}
           />
         )}
 

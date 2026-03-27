@@ -1,13 +1,18 @@
 import EmptyState from "../components/EmptyState";
 import SavedStoryCard from "../components/SavedStoryCard";
+import StatusMessage from "../components/StatusMessage";
 
 const SavedTab = ({
   savedStories,
   session,
   setTab,
+  shareFeedback,
+  handleShareStory,
 }) => (
   <section className="bn-tab bn-saved-tab">
     <h2>{session?.user ? "❤️ Saved Stories" : "❤️ Saved Stories"}</h2>
+
+    {shareFeedback && <StatusMessage variant={shareFeedback.variant}>{shareFeedback.message}</StatusMessage>}
 
     {!session?.user ? (
       <div className="bn-saved-tab__locked">
@@ -32,7 +37,7 @@ const SavedTab = ({
     ) : (
       <div className="bn-stack">
         {savedStories.map(story => (
-          <SavedStoryCard key={story.id} story={story} />
+          <SavedStoryCard key={story.id} story={story} handleShareStory={handleShareStory} />
         ))}
       </div>
     )}

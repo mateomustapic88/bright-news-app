@@ -1,9 +1,10 @@
 import { getCategoryMeta, getCategoryThemeClass } from "../constants";
 import StoryImpact from "./StoryImpact";
 import StorySaveButton from "./StorySaveButton";
+import StoryShareButton from "./StoryShareButton";
 import StorySourceLink from "./StorySourceLink";
 
-const StoryCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave }) => {
+const StoryCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave, handleShareStory }) => {
   const category = getCategoryMeta(story.category);
   const themeClass = getCategoryThemeClass(story.category);
   const isExpanded = expanded === story.id;
@@ -29,11 +30,14 @@ const StoryCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave 
             <span className="bn-category-pill">
               {category.emoji} {story.category}
             </span>
-            <StorySaveButton
-              storyId={story.id}
-              saved={saved}
-              toggleSave={toggleSave}
-            />
+            <div className="bn-story-card__actions">
+              <StoryShareButton story={story} handleShareStory={handleShareStory} />
+              <StorySaveButton
+                storyId={story.id}
+                saved={saved}
+                toggleSave={toggleSave}
+              />
+            </div>
           </div>
 
           <h3 className="bn-card-title">{story.headline}</h3>
