@@ -3,3 +3,35 @@
     margin-bottom: 16px;
   }
 }
+
+.bn-account-resources {
+  margin-top: 20px;
+  padding: 18px;
+  border: 1px solid var(--bn-border);
+  border-radius: var(--bn-radius-xl);
+  background: linear-gradient(180deg, rgba(124, 58, 237, 0.06), rgba(255, 255, 255, 0.96));
+  box-shadow: var(--bn-shadow-card);
+
+  h3 {
+    margin: 0 0 10px;
+    font-size: 1rem;
+    color: var(--bn-text-strong);
+  }
+
+  p {
+    margin: 0;
+    color: var(--bn-text-muted);
+    line-height: 1.5;
+  }
+}
+
+.bn-account-resources__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+
+  .bn-button {
+    text-decoration: none;
+  }
+}
