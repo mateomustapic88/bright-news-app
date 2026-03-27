@@ -1,5 +1,5 @@
 import AuthPanel from "../components/AuthPanel";
-import { LEGAL_LINKS } from "../../lib/appConfig";
+import { LEGAL_LINKS, SUPPORT_EMAIL, SUPPORT_MAILTO } from "../../lib/appConfig";
 
 const AccountTab = ({
   session,
@@ -32,6 +32,9 @@ const AccountTab = ({
       <p>
         BrightNews already exposes the support, privacy, and account-deletion links that app stores
         ask for. Keep these pages updated before wider beta rollout.
+      </p>
+      <p>
+        Support email: <a href={SUPPORT_MAILTO}>{SUPPORT_EMAIL}</a>
       </p>
       <div className="bn-account-resources__actions">
         <a className="bn-button bn-button--secondary" href={LEGAL_LINKS.support} target="_blank" rel="noreferrer">
