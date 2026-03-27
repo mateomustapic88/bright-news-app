@@ -1,0 +1,6 @@
+{
+  "appId": "com.brightnews.app",
+  "appName": "BrightNews",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

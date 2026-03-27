@@ -1,0 +1,91 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap");
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: #dfe6f3;
+  color: #0f172a;
+}
+
+.bright-news {
+  --bn-font: "Montserrat", sans-serif;
+  --bn-shell-width: 430px;
+
+  --bn-bg: #f4f4f8;
+  --bn-surface: #ffffff;
+  --bn-surface-alt: #f8fafc;
+  --bn-surface-soft: #f1f5f9;
+  --bn-border: #ececf3;
+  --bn-border-strong: #cbd5e1;
+
+  --bn-text-strong: #0f172a;
+  --bn-text-muted: #64748b;
+  --bn-text-subtle: #94a3b8;
+
+  --bn-accent: #7c3aed;
+  --bn-accent-strong: #6d28d9;
+  --bn-accent-bg: #ede9fe;
+  --bn-link: #2563eb;
+
+  --bn-info: #0284c7;
+  --bn-info-bg: #eff6ff;
+  --bn-error: #dc2626;
+  --bn-error-bg: #fef2f2;
+  --bn-error-border: #fecaca;
+  --bn-success: #15803d;
+  --bn-success-bg: #dcfce7;
+  --bn-danger: #b91c1c;
+  --bn-danger-bg: #fee2e2;
+
+  --bn-radius-sm: 10px;
+  --bn-radius-md: 12px;
+  --bn-radius-lg: 18px;
+  --bn-radius-xl: 20px;
+  --bn-radius-2xl: 22px;
+  --bn-radius-pill: 999px;
+
+  --bn-shadow-shell: 0 0 80px rgba(0, 0, 0, 0.18);
+  --bn-shadow-card: 0 2px 10px rgba(0, 0, 0, 0.06);
+  --bn-shadow-card-hover: 0 6px 24px rgba(0, 0, 0, 0.1);
+  --bn-shadow-card-strong: 0 6px 28px rgba(0, 0, 0, 0.1);
+  --bn-shadow-chip: 0 1px 6px rgba(0, 0, 0, 0.05);
+
+  --bn-transition: 0.15s ease;
+}
+
+.bn-theme--all {
+  --bn-category-color: #7c3aed;
+  --bn-category-bg: #ede9fe;
+}
+
+.bn-theme--environment {
+  --bn-category-color: #059669;
+  --bn-category-bg: #d1fae5;
+}
+
+.bn-theme--science {
+  --bn-category-color: #2563eb;
+  --bn-category-bg: #dbeafe;
+}
+
+.bn-theme--community {
+  --bn-category-color: #d97706;
+  --bn-category-bg: #fef3c7;
+}
+
+.bn-theme--health {
+  --bn-category-color: #db2777;
+  --bn-category-bg: #fce7f3;
+}
+
+.bn-theme--animals {
+  --bn-category-color: #7c3aed;
+  --bn-category-bg: #ede9fe;
+}
+
+.bn-theme--innovation {
+  --bn-category-color: #0284c7;
+  --bn-category-bg: #e0f2fe;
+}

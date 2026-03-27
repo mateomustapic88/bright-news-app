@@ -1,0 +1,19 @@
+.bn-saved-tab {
+  h2 {
+    margin-bottom: 16px;
+  }
+
+  .bn-saved-tab__locked {
+    display: grid;
+    gap: 14px;
+  }
+
+  .bn-empty-state {
+    color: var(--bn-text-subtle);
+  }
+
+  .bn-empty-state__icon {
+    font-size: 52px;
+    margin-bottom: 14px;
+  }
+}

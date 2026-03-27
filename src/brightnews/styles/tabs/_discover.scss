@@ -1,0 +1,42 @@
+.bn-discover-tab {
+  h2 {
+    margin-bottom: 4px;
+  }
+
+  p {
+    margin-bottom: 18px;
+    font-weight: 500;
+  }
+}
+
+.bn-region-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.bn-discover-region {
+  border: 1.5px solid var(--bn-border);
+  border-radius: var(--bn-radius-xl);
+  background: var(--bn-surface);
+  padding: 22px 16px;
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--bn-transition);
+
+  &.is-active {
+    border-color: var(--bn-text-strong);
+    background: var(--bn-text-strong);
+    color: var(--bn-surface);
+  }
+}
+
+.bn-discover-region__flag {
+  margin-bottom: 8px;
+  font-size: 34px;
+}
+
+.bn-discover-region__label {
+  font-size: 13px;
+  font-weight: 800;
+}

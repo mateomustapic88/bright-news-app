@@ -1,0 +1,216 @@
+@use "../mixins" as *;
+
+.bn-loading-bar {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  z-index: 200;
+  width: 100%;
+  max-width: var(--bn-shell-width);
+  height: 3px;
+  transform: translateX(-50%);
+  background: var(--bn-accent-bg);
+}
+
+.bn-loading-bar__inner {
+  height: 100%;
+  background: linear-gradient(90deg, #7c3aed, #4f46e5, #7c3aed);
+  background-size: 200% 100%;
+  animation: bn-slide 1.2s linear infinite;
+}
+
+.bn-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 44px;
+  padding: 0 22px;
+  background: var(--bn-surface);
+}
+
+.bn-account-button {
+  @include button-reset;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--bn-radius-md);
+  background: var(--bn-surface-alt);
+  color: var(--bn-text-strong);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.bn-account-button__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-size: 14px;
+}
+
+.bn-account-button__avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.bn-account-button__avatar--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.bn-header {
+  padding: 10px 20px 0;
+  border-bottom: 1px solid var(--bn-border);
+  background: var(--bn-surface);
+}
+
+.bn-header__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.bn-brand {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.bn-brand__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--bn-radius-sm);
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  box-shadow: 0 3px 10px rgba(251, 191, 36, 0.45);
+  font-size: 17px;
+}
+
+.bn-brand__name {
+  color: var(--bn-text-strong);
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -1px;
+}
+
+.bn-brand__meta {
+  margin: 3px 0 0;
+  color: var(--bn-text-subtle);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.bn-refresh-button {
+  @include button-reset;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--bn-radius-md);
+  background: var(--bn-bg);
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.bn-region-row {
+  @include scroll-row;
+
+  padding-bottom: 12px;
+}
+
+.bn-region-button {
+  @include button-reset;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 7px 13px;
+  border-radius: 20px;
+  background: var(--bn-bg);
+  color: var(--bn-text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all var(--bn-transition);
+
+  &.is-active {
+    background: var(--bn-text-strong);
+    color: var(--bn-surface);
+    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.25);
+  }
+}
+
+.bn-region-button__flag {
+  font-size: 14px;
+}
+
+.bn-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  z-index: 100;
+  display: flex;
+  width: 100%;
+  max-width: var(--bn-shell-width);
+  padding: 8px 0 18px;
+  transform: translateX(-50%);
+  border-top: 1px solid var(--bn-border);
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(20px);
+}
+
+.bn-bottom-nav__item {
+  @include button-reset;
+
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 0;
+  cursor: pointer;
+}
+
+.bn-bottom-nav__icon {
+  font-size: 21px;
+}
+
+.bn-bottom-nav__label {
+  color: var(--bn-text-subtle);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.bn-bottom-nav__item.is-active .bn-bottom-nav__label {
+  color: var(--bn-accent);
+}
+
+.bn-bottom-nav__indicator {
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--bn-accent);
+}

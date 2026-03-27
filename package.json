@@ -1,0 +1,47 @@
+{
+  "name": "bright-news",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "mobile:build": "npm run build && npx cap sync",
+    "cap:sync": "npx cap sync",
+    "cap:open:ios": "npx cap open ios",
+    "cap:open:android": "npx cap open android",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "ingest:gnews": "node --env-file=.env scripts/ingest-gnews.mjs",
+    "ingest:gdelt": "node --env-file=.env scripts/ingest-gdelt.mjs",
+    "ingest:newscatcher": "node --env-file=.env scripts/ingest-newscatcher.mjs",
+    "ingest:rss": "node --env-file=.env scripts/ingest-rss.mjs",
+    "review:pending": "node --env-file=.env scripts/review-pending-with-openai.mjs",
+    "publish:approved": "node --env-file=.env scripts/publish-approved-stories.mjs",
+    "backfill:source-urls": "node --env-file=.env scripts/backfill-source-urls.mjs",
+    "refresh:news": "node --env-file=.env scripts/refresh-news.mjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.3.0",
+    "@capacitor/app": "^8.1.0",
+    "@capacitor/browser": "^8.0.3",
+    "@capacitor/cli": "^8.3.0",
+    "@capacitor/core": "^8.3.0",
+    "@capacitor/ios": "^8.3.0",
+    "@supabase/supabase-js": "^2.100.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.4.0",
+    "sass": "^1.98.0",
+    "vite": "^8.0.1"
+  }
+}

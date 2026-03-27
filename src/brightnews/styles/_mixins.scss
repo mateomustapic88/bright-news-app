@@ -1,0 +1,25 @@
+@mixin scroll-row($gap: 7px) {
+  display: flex;
+  gap: $gap;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@mixin surface-card($padding: 14px, $radius: var(--bn-radius-lg), $shadow: var(--bn-shadow-card)) {
+  background: var(--bn-surface);
+  border-radius: $radius;
+  padding: $padding;
+  box-shadow: $shadow;
+}
+
+@mixin button-reset {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+}
