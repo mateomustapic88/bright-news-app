@@ -5,8 +5,8 @@ This project now has Capacitor shells for both iOS and Android.
 ## Current native identity
 
 - App name: `BrightNews`
-- App ID / custom scheme: `com.brightnews.app`
-- Native auth callback: `com.brightnews.app://auth/callback`
+- App ID / custom scheme: `com.mateomustapic.brightnews`
+- Native auth callback: `com.mateomustapic.brightnews://auth/callback`
 - Beta version: `0.1.0`
 
 ## Commands
@@ -28,7 +28,7 @@ npm run cap:open:android
 In `Authentication -> URL Configuration`, allow:
 
 - `http://localhost:5173`
-- `com.brightnews.app://auth/callback`
+- `com.mateomustapic.brightnews://auth/callback`
 
 For hosted web later, also add the production site URL and set:
 
@@ -119,7 +119,7 @@ Then:
 
 1. Install Xcode and sign in with the Apple developer account.
 2. Open `ios/App/App.xcodeproj`.
-3. Confirm signing for bundle ID `com.brightnews.app`.
+3. Confirm signing for bundle ID `com.mateomustapic.brightnews`.
 4. Archive and upload the build to App Store Connect.
 5. Create an internal TestFlight group first.
 6. Add the processed build to internal testing.

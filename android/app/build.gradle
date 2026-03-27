@@ -16,10 +16,10 @@ def releaseKeyPassword = keystoreProperties['keyPassword'] ?: System.getenv('AND
 def hasReleaseSigning = releaseStoreFilePath && releaseStorePassword && releaseKeyAlias && releaseKeyPassword
 
 android {
-    namespace = "com.brightnews.app"
+    namespace = "com.mateomustapic.brightnews"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.brightnews.app"
+        applicationId "com.mateomustapic.brightnews"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -1,5 +1,5 @@
 {
-  "appId": "com.brightnews.app",
+  "appId": "com.mateomustapic.brightnews",
   "appName": "BrightNews",
   "webDir": "dist",
   "bundledWebRuntime": false

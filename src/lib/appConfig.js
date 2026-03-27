@@ -1,5 +1,5 @@
 export const APP_NAME = "BrightNews";
-export const APP_ID = "com.brightnews.app";
+export const APP_ID = "com.mateomustapic.brightnews";
 export const MOBILE_AUTH_SCHEME = APP_ID;
 export const SUPPORT_EMAIL = "brightnews.global@gmail.com";
 export const SUPPORT_MAILTO = `mailto:${SUPPORT_EMAIL}`;

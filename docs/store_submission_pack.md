@@ -5,7 +5,7 @@ Last updated: March 27, 2026
 ## Current app identity
 
 - App name: `BrightNews`
-- Bundle/application ID: `com.brightnews.app`
+- Bundle/application ID: `com.mateomustapic.brightnews`
 - Version: `0.1.0`
 
 ## Google Play

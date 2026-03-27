@@ -65,8 +65,8 @@ Brand assets are generated from:
 
 Mobile auth currently uses:
 
-- app scheme: `com.brightnews.app`
-- callback: `com.brightnews.app://auth/callback`
+- app scheme: `com.mateomustapic.brightnews`
+- callback: `com.mateomustapic.brightnews://auth/callback`
 
 See [docs/mobile_beta_setup.md](docs/mobile_beta_setup.md) for the current mobile checklist.
 

@@ -1,4 +1,4 @@
-package com.brightnews.app;
+package com.mateomustapic.brightnews;
 
 import com.getcapacitor.BridgeActivity;
 
