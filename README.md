@@ -80,6 +80,16 @@ After the first push:
 2. Set `Source` to `GitHub Actions`
 3. Push to `main`
 
+Repository variables required for the Pages build:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- optional: `VITE_WEB_AUTH_REDIRECT_URL`
+
+Add them in:
+
+- `Settings -> Secrets and variables -> Actions -> Variables`
+
 The deployed site will then be available at:
 
 - `https://mateomustapic88.github.io/bright-news-app/`
