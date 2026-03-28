@@ -28,6 +28,7 @@ NEWSCATCHER_API_KEY=your-newscatcher-api-key
 ```bash
 npm run ingest:gnews
 npm run ingest:gdelt
+npm run ingest:google-news-rss
 npm run ingest:newscatcher
 npm run ingest:rss
 npm run review:pending
@@ -51,6 +52,12 @@ npm run refresh:news
   - queries a category and region matrix, then normalizes those RSS items into the BrightNews raw article shape
   - batch size is tunable with `INGEST_GDELT_MAX_RECORDS`
   - feeds candidates into the same review and publish pipeline as the other sources
+- `ingest:google-news-rss`
+  - fetches localized Google News RSS headline feeds for each configured region
+  - requires no API key
+  - helps widen regional coverage when paid/news APIs are limited
+  - strips the Google source suffix from headlines and retries transient fetch failures
+  - uses the same review and publish pipeline as the other sources
 - `ingest:newscatcher`
   - fetches candidate articles from NewsCatcher's v3 search API using the same category and region matrix
   - uses the `x-api-token` header and normalizes NewsCatcher article fields into the BrightNews raw article shape
@@ -58,6 +65,7 @@ npm run refresh:news
   - stores candidates in `public.raw_articles` for the same review/publish flow
 - `ingest:rss`
   - fetches curated positive-news RSS feeds directly
+  - includes additional curated German and Croatian feeds for stronger regional coverage
   - now continues if one RSS feed fails instead of aborting the entire RSS run
   - supports per-feed caps through `INGEST_RSS_MAX_ITEMS_PER_FEED`
   - maps source tags into BrightNews categories and regions
@@ -72,7 +80,7 @@ npm run refresh:news
   - enforces a live feed cap through `MAX_PUBLISHED_STORIES`
   - prunes the oldest overflow stories out of the live feed after publish
 - `refresh:news`
-  - runs `ingest:gnews`, `ingest:gdelt`, `ingest:newscatcher`, `ingest:rss`, `review:pending`, then `publish:approved`
+  - runs `ingest:gnews`, `ingest:gdelt`, `ingest:google-news-rss`, `ingest:newscatcher`, `ingest:rss`, `review:pending`, then `publish:approved`
 
 ## Optional OpenAI env vars
 
@@ -84,14 +92,17 @@ OPENAI_REVIEW_MIN_CONFIDENCE=0.6
 HEURISTIC_AUTO_APPROVE_SCORE=0.75
 INGEST_GNEWS_MAX_RESULTS=25
 INGEST_GNEWS_PAGES=1
+INGEST_GOOGLE_NEWS_RSS_MAX_ITEMS=25
+INGEST_GOOGLE_NEWS_RSS_MAX_RETRIES=2
 INGEST_NEWSCATCHER_PAGE_SIZE=25
 INGEST_NEWSCATCHER_PAGES=1
 INGEST_GDELT_MAX_RECORDS=30
 INGEST_RSS_MAX_ITEMS_PER_FEED=40
+INGEST_RSS_MAX_RETRIES=2
 MAX_PUBLISHED_STORIES=150
 ```
 
-`HEURISTIC_AUTO_APPROVE_SCORE` controls how aggressive the no-OpenAI fallback is. Lower it only if you accept more noisy approvals.
+`HEURISTIC_AUTO_APPROVE_SCORE` controls how aggressive the no-OpenAI fallback is. The current code default is `0.66`, which is tuned to let through stronger regional science/health stories without broadly opening the floodgates.
 
 ## Cron example
 
@@ -109,7 +120,7 @@ Run these SQL files in Supabase:
 
 ## Review workflow
 
-1. Run `npm run ingest:gnews`, `npm run ingest:gdelt`, and/or `npm run ingest:newscatcher`
+1. Run `npm run ingest:gnews`, `npm run ingest:gdelt`, `npm run ingest:google-news-rss`, and/or `npm run ingest:newscatcher`
 2. Run `npm run ingest:rss`
 3. Run `npm run review:pending`
 4. Inspect `public.raw_articles` in Supabase only for borderline rows that remain `pending`

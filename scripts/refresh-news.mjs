@@ -1,6 +1,7 @@
 import { pathToFileURL } from "node:url";
 import { run as runGnewsIngest } from "./ingest-gnews.mjs";
 import { run as runGdeltIngest } from "./ingest-gdelt.mjs";
+import { run as runGoogleNewsRssIngest } from "./ingest-google-news-rss.mjs";
 import { run as runNewsCatcherIngest } from "./ingest-newscatcher.mjs";
 import { run as runRssIngest } from "./ingest-rss.mjs";
 import { run as runOpenAiReview } from "./review-pending-with-openai.mjs";
@@ -9,6 +10,7 @@ import { run as runPublishApproved } from "./publish-approved-stories.mjs";
 export const run = async () => {
   const gnews = { skipped: false };
   const gdelt = { skipped: false };
+  const googleNewsRss = { skipped: false };
   const newscatcher = { skipped: false };
   const rss = { skipped: false };
   const openai = { skipped: false };
@@ -25,6 +27,13 @@ export const run = async () => {
   } catch (error) {
     gdelt.skipped = true;
     gdelt.error = error.message;
+  }
+
+  try {
+    Object.assign(googleNewsRss, await runGoogleNewsRssIngest());
+  } catch (error) {
+    googleNewsRss.skipped = true;
+    googleNewsRss.error = error.message;
   }
 
   try {
@@ -50,7 +59,7 @@ export const run = async () => {
 
   const published = await runPublishApproved();
 
-  const result = { gnews, gdelt, newscatcher, rss, openai, published };
+  const result = { gnews, gdelt, googleNewsRss, newscatcher, rss, openai, published };
   console.log(JSON.stringify(result, null, 2));
   return result;
 };

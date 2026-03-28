@@ -59,23 +59,67 @@ const FEED_CONFIG = [
     sourceName: "Good Good Good",
     feedUrl: "https://www.goodgoodgood.co/feed",
   },
+  {
+    vendor: "index_znanost",
+    sourceName: "Index Znanost",
+    feedUrl: "https://www.index.hr/rss/vijesti-znanost",
+    regionCode: "hr",
+    category: "Science",
+  },
+  {
+    vendor: "index_ljubimci",
+    sourceName: "Index Ljubimci",
+    feedUrl: "https://www.index.hr/rss/ljubimci",
+    regionCode: "hr",
+    category: "Animals",
+  },
+  {
+    vendor: "tagesschau_forschung",
+    sourceName: "tagesschau Forschung",
+    feedUrl: "https://www.tagesschau.de/wissen/forschung/index~rss2.xml",
+    regionCode: "de",
+    category: "Science",
+  },
+  {
+    vendor: "tagesschau_klima",
+    sourceName: "tagesschau Klima",
+    feedUrl: "https://www.tagesschau.de/wissen/klima/index~rss2.xml",
+    regionCode: "de",
+    category: "Environment",
+  },
+  {
+    vendor: "tagesschau_gesundheit",
+    sourceName: "tagesschau Gesundheit",
+    feedUrl: "https://www.tagesschau.de/wissen/gesundheit/index~rss2.xml",
+    regionCode: "de",
+    category: "Health",
+  },
 ];
 
 const fetchFeed = async feedUrl => {
   for (let attempt = 0; attempt <= maxRetriesPerRequest; attempt += 1) {
-    const response = await fetch(feedUrl);
-    const xml = await response.text();
+    try {
+      const response = await fetch(feedUrl);
+      const xml = await response.text();
 
-    if (response.ok) {
-      return xml;
+      if (response.ok) {
+        return xml;
+      }
+
+      if (attempt < maxRetriesPerRequest) {
+        await sleep(retryDelayMs * (attempt + 1));
+        continue;
+      }
+
+      throw new Error(`RSS error ${response.status}: ${feedUrl}`);
+    } catch (error) {
+      if (attempt < maxRetriesPerRequest) {
+        await sleep(retryDelayMs * (attempt + 1));
+        continue;
+      }
+
+      throw error;
     }
-
-    if (attempt < maxRetriesPerRequest) {
-      await sleep(retryDelayMs * (attempt + 1));
-      continue;
-    }
-
-    throw new Error(`RSS error ${response.status}: ${feedUrl}`);
   }
 };
 
@@ -85,12 +129,16 @@ export const run = async () => {
   const succeededFeeds = [];
 
   for (const feed of FEED_CONFIG) {
+    if (feed.regionCode && !enabledRegionCodes.has("world") && !enabledRegionCodes.has(feed.regionCode)) {
+      continue;
+    }
+
     try {
       const xml = await fetchFeed(feed.feedUrl);
       const items = parseRssItems(xml).slice(0, maxItemsPerFeed);
 
       for (const item of items) {
-        const regionCode = resolveRegionCode({
+        const regionCode = feed.regionCode || resolveRegionCode({
           title: item.title,
           description: item.description,
           content: item.content_encoded,
@@ -102,7 +150,7 @@ export const run = async () => {
           continue;
         }
 
-        const category = resolveCategory({
+        const category = feed.category || resolveCategory({
           title: item.title,
           description: item.description,
           content: item.content_encoded,

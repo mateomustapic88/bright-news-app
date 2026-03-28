@@ -17,6 +17,7 @@
     "preview": "vite preview",
     "ingest:gnews": "node --env-file=.env scripts/ingest-gnews.mjs",
     "ingest:gdelt": "node --env-file=.env scripts/ingest-gdelt.mjs",
+    "ingest:google-news-rss": "node --env-file=.env scripts/ingest-google-news-rss.mjs",
     "ingest:newscatcher": "node --env-file=.env scripts/ingest-newscatcher.mjs",
     "ingest:rss": "node --env-file=.env scripts/ingest-rss.mjs",
     "review:pending": "node --env-file=.env scripts/review-pending-with-openai.mjs",

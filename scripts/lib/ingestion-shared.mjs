@@ -93,19 +93,34 @@ export const CATEGORY_CONFIG = [
 export const TRUSTED_AUTO_APPROVE_VENDORS = new Set(["goodnewsnetwork", "positive_news"]);
 const MIN_POSITIVE_SCORE = 0.6;
 const hasOpenAiReviewer = Boolean(process.env.OPENAI_API_KEY);
-const HEURISTIC_AUTO_APPROVE_SCORE = Number(process.env.HEURISTIC_AUTO_APPROVE_SCORE || 0.75);
+const HEURISTIC_AUTO_APPROVE_SCORE = Number(process.env.HEURISTIC_AUTO_APPROVE_SCORE || 0.66);
+const BLOCKED_SOURCE_HOSTS = [
+  "facebook.com",
+  "instagram.com",
+  "tiktok.com",
+  "x.com",
+  "twitter.com",
+  "youtube.com",
+  "youtu.be",
+  "spotify.com",
+  "podcasts.apple.com",
+];
 
 const NEGATIVE_KEYWORDS = [
   "war",
   "killed",
   "attack",
   "dead",
+  "injured",
+  "stranded",
   "disaster",
   "crash",
   "fraud",
   "scandal",
   "bomb",
   "shooting",
+  "missile",
+  "strike",
   "layoffs",
   "earthquake",
   "flood",
@@ -120,6 +135,57 @@ const NEGATIVE_KEYWORDS = [
   "protest",
   "riot",
   "opinion",
+  "krieg",
+  "katastrophe",
+  "hochwasser",
+  "wahl",
+  "politik",
+  "skandal",
+  "krise",
+  "konflikt",
+  "unfall",
+  "verletzt",
+  "gestrandet",
+  "guerre",
+  "catastrophe",
+  "inondation",
+  "élection",
+  "politique",
+  "scandale",
+  "crise",
+  "conflit",
+  "accident",
+  "rat",
+  "ubijen",
+  "poginuo",
+  "katastrofa",
+  "poplava",
+  "izbori",
+  "politika",
+  "skandal",
+  "kriza",
+  "sukob",
+  "nesreća",
+  "guerra",
+  "morto",
+  "mortos",
+  "desastre",
+  "enchente",
+  "eleição",
+  "política",
+  "escândalo",
+  "crise",
+  "conflito",
+  "acidente",
+  "戦争",
+  "死亡",
+  "災害",
+  "洪水",
+  "選挙",
+  "政治",
+  "危機",
+  "紛争",
+  "事故",
 ];
 
 const BLOCKED_TOPIC_TAGS = new Set([
@@ -151,6 +217,8 @@ const POSITIVE_KEYWORDS = [
   "success",
   "succeeds",
   "breakthrough",
+  "discovered",
+  "new species",
   "progress",
   "record low",
   "historic low",
@@ -174,6 +242,106 @@ const POSITIVE_KEYWORDS = [
   "adoption",
   "reforestation",
   "healthy",
+  "protects",
+  "benefit",
+  "benefits",
+  "effective",
+  "first success",
+  "first successes",
+  "uspjeh",
+  "napredak",
+  "oporavak",
+  "spašavanje",
+  "spašeni",
+  "pomaže",
+  "pomažu",
+  "volonteri",
+  "očuvanje",
+  "obnova",
+  "liječenje",
+  "prevencija",
+  "štiti",
+  "koristi",
+  "otkriće",
+  "otkriven",
+  "otkrivena",
+  "otkrivene",
+  "udomljavanje",
+  "nova prilika",
+  "sretan kraj",
+  "čista energija",
+  "poboljšava",
+  "smanjenje",
+  "erfolg",
+  "erfolge",
+  "fortschritt",
+  "erholung",
+  "rettung",
+  "gerettet",
+  "hilft",
+  "helfen",
+  "gesund",
+  "gesünder",
+  "vorbeugung",
+  "vorbeugen",
+  "schützt",
+  "wirksam",
+  "wirkung",
+  "steigert",
+  "erste erfolge",
+  "behandlungserfolg",
+  "freiwillige",
+  "naturschutz",
+  "behandlung",
+  "entdeckung",
+  "entdeckt",
+  "saubere energie",
+  "verbessert",
+  "rückgang",
+  "succès",
+  "progrès",
+  "rétablissement",
+  "sauvetage",
+  "sauvé",
+  "aide",
+  "protège",
+  "prévention",
+  "efficace",
+  "bénéfice",
+  "bénévoles",
+  "conservation",
+  "traitement",
+  "découverte",
+  "énergie propre",
+  "améliore",
+  "baisse",
+  "sucesso",
+  "progresso",
+  "recuperação",
+  "resgate",
+  "salvo",
+  "ajuda",
+  "prevenção",
+  "protege",
+  "eficaz",
+  "voluntários",
+  "conservação",
+  "descoberta",
+  "energia limpa",
+  "melhora",
+  "queda",
+  "成功",
+  "進展",
+  "回復",
+  "救助",
+  "救出",
+  "助ける",
+  "ボランティア",
+  "保全",
+  "発見",
+  "クリーンエネルギー",
+  "改善",
+  "減少",
 ];
 
 const CATEGORY_KEYWORDS = {
@@ -291,7 +459,26 @@ const HTML_ENTITIES = new Map([
   ["&hellip;", "..."],
 ]);
 
+const extractTagAttributes = (block, tagName) => {
+  const match = block.match(new RegExp(`<${tagName}\\b([^>]*)>`, "i"));
+  if (!match) return {};
+
+  return Object.fromEntries(
+    Array.from(match[1].matchAll(/([\w:-]+)="([^"]*)"/g)).map(([, key, value]) => [key, value]),
+  );
+};
+
 export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+const chunkArray = (items, size) => {
+  const chunks = [];
+
+  for (let index = 0; index < items.length; index += size) {
+    chunks.push(items.slice(index, index + size));
+  }
+
+  return chunks;
+};
 
 const decodeHtmlEntities = value => {
   let result = value;
@@ -304,6 +491,26 @@ const decodeHtmlEntities = value => {
   result = result.replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCharCode(Number.parseInt(code, 16)));
 
   return result;
+};
+
+const escapeRegex = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const keywordPatternCache = new Map();
+
+const matchesKeyword = (haystack, keyword) => {
+  if (!haystack || !keyword) return false;
+
+  if (/^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]+$/u.test(keyword)) {
+    return haystack.includes(keyword);
+  }
+
+  let pattern = keywordPatternCache.get(keyword);
+  if (!pattern) {
+    pattern = new RegExp(`(^|[^\\p{L}\\p{N}])${escapeRegex(keyword)}(?=$|[^\\p{L}\\p{N}])`, "iu");
+    keywordPatternCache.set(keyword, pattern);
+  }
+
+  return pattern.test(haystack);
 };
 
 export const stripHtml = value =>
@@ -325,7 +532,7 @@ const normalizeHaystack = values =>
     .join(" ");
 
 const countKeywordHits = (haystack, keywords) =>
-  keywords.reduce((count, keyword) => (haystack.includes(keyword) ? count + 1 : count), 0);
+  keywords.reduce((count, keyword) => (matchesKeyword(haystack, keyword) ? count + 1 : count), 0);
 
 export const resolveCategory = ({ title, description, content = "", tags = [] }) => {
   const haystack = normalizeHaystack([title, description, content, tags.join(" ")]);
@@ -373,6 +580,7 @@ export const inferReviewDecision = ({ vendor, title, description, content = "", 
   const haystack = normalizeHaystack([title, description, content, tags.join(" ")]);
   const normalizedTags = tags.map(tag => toSentence(tag).toLowerCase());
   const normalizedTitle = toSentence(title).toLowerCase();
+  const normalizedSourceUrl = normalizeExternalUrl(tags.find(tag => tag.startsWith?.("http")) || "");
 
   if (NON_NEWS_TITLE_PATTERNS.some(pattern => pattern.test(normalizedTitle))) {
     return {
@@ -382,7 +590,7 @@ export const inferReviewDecision = ({ vendor, title, description, content = "", 
     };
   }
 
-  if (NEGATIVE_KEYWORDS.some(keyword => haystack.includes(keyword))) {
+  if (NEGATIVE_KEYWORDS.some(keyword => matchesKeyword(haystack, keyword))) {
     return {
       reviewStatus: "rejected",
       rejectedReason: "auto_negative_keyword_filter",
@@ -396,6 +604,21 @@ export const inferReviewDecision = ({ vendor, title, description, content = "", 
       rejectedReason: "auto_blocked_topic_tag",
       reviewNotes: "Rejected because the source tagged it as politics/opinion/conflict.",
     };
+  }
+
+  if (normalizedSourceUrl) {
+    try {
+      const hostname = new URL(normalizedSourceUrl).hostname.toLowerCase();
+      if (BLOCKED_SOURCE_HOSTS.some(blockedHost => hostname.includes(blockedHost))) {
+        return {
+          reviewStatus: "rejected",
+          rejectedReason: "auto_blocked_source_host",
+          reviewNotes: "Rejected because the source host is not a normal article publisher.",
+        };
+      }
+    } catch {
+      // Ignore invalid source URLs here.
+    }
   }
 
   const positiveScore = countKeywordHits(haystack, POSITIVE_KEYWORDS);
@@ -457,7 +680,7 @@ export const buildRawArticleRow = ({
     title,
     description,
     content,
-    tags,
+    tags: [...tags, sourceUrl],
   });
 
   return {
@@ -505,13 +728,23 @@ export const dedupeBySourceUrl = rows =>
 export const upsertRawArticles = async (supabase, rows) => {
   if (rows.length === 0) return 0;
 
+  const existingLookupChunkSize = 10;
+  const upsertChunkSize = 150;
   const sourceUrls = rows.map(row => row.source_url);
-  const { data: existingRows, error: existingError } = await supabase
-    .from("raw_articles")
-    .select("source_url, review_status, review_notes, rejected_reason, published_story_id")
-    .in("source_url", sourceUrls);
+  const existingRows = [];
 
-  if (existingError) throw new Error(existingError.message);
+  for (const sourceUrlChunk of chunkArray(sourceUrls, existingLookupChunkSize)) {
+    const { data, error: existingError } = await supabase
+      .from("raw_articles")
+      .select("source_url, review_status, review_notes, rejected_reason, published_story_id")
+      .in("source_url", sourceUrlChunk);
+
+    if (existingError) {
+      throw new Error(existingError.message || JSON.stringify(existingError));
+    }
+
+    existingRows.push(...(data || []));
+  }
 
   const existingBySourceUrl = new Map((existingRows || []).map(row => [row.source_url, row]));
   const rowsToUpsert = rows.map(row => {
@@ -529,6 +762,14 @@ export const upsertRawArticles = async (supabase, rows) => {
     }
 
     if (existing.review_status === "rejected") {
+      const isAutoRejected = String(existing.rejected_reason || "").startsWith("auto_");
+      if (isAutoRejected && row.review_status !== "rejected") {
+        return {
+          ...row,
+          published_story_id: existing.published_story_id || null,
+        };
+      }
+
       return {
         ...row,
         review_status: "rejected",
@@ -556,11 +797,13 @@ export const upsertRawArticles = async (supabase, rows) => {
     };
   });
 
-  const { error } = await supabase
-    .from("raw_articles")
-    .upsert(rowsToUpsert, { onConflict: "source_url" });
+  for (const rowsChunk of chunkArray(rowsToUpsert, upsertChunkSize)) {
+    const { error } = await supabase
+      .from("raw_articles")
+      .upsert(rowsChunk, { onConflict: "source_url" });
 
-  if (error) throw new Error(error.message);
+    if (error) throw new Error(error.message || JSON.stringify(error));
+  }
 
   return rowsToUpsert.length;
 };
@@ -578,6 +821,8 @@ const extractTagValues = (block, tagName) =>
 export const parseRssItems = xml =>
   Array.from(xml.matchAll(/<item\b[\s\S]*?<\/item>/gi)).map(match => {
     const block = match[0];
+    const sourceAttributes = extractTagAttributes(block, "source");
+
     return {
       title: extractTagValue(block, "title"),
       link: extractTagValue(block, "link"),
@@ -585,5 +830,7 @@ export const parseRssItems = xml =>
       content_encoded: extractTagValue(block, "content:encoded"),
       pubDate: extractTagValue(block, "pubDate"),
       categories: extractTagValues(block, "category"),
+      source: extractTagValue(block, "source"),
+      source_url: sourceAttributes.url || "",
     };
   });
