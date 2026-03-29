@@ -110,6 +110,46 @@ MAX_PUBLISHED_STORIES=150
 0 */12 * * * cd /path/to/bright-news && /usr/bin/npm run refresh:news >> /tmp/bright-news-refresh.log 2>&1
 ```
 
+## GitHub Actions automation
+
+The repo now includes a scheduled GitHub Actions workflow at
+`.github/workflows/refresh-news.yml`.
+
+By default it runs:
+
+- every 12 hours
+- and manually through `Actions -> Refresh News -> Run workflow`
+
+Set these GitHub repository secrets before relying on it:
+
+- `VITE_SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+Optional GitHub repository secrets:
+
+- `GNEWS_API_KEY`
+- `NEWSCATCHER_API_KEY`
+- `OPENAI_API_KEY`
+
+Optional GitHub repository variables:
+
+- `OPENAI_REVIEW_MODEL`
+- `OPENAI_REVIEW_LIMIT`
+- `OPENAI_REVIEW_MIN_CONFIDENCE`
+- `HEURISTIC_AUTO_APPROVE_SCORE`
+- `INGEST_GNEWS_MAX_RESULTS`
+- `INGEST_GNEWS_PAGES`
+- `INGEST_GOOGLE_NEWS_RSS_MAX_ITEMS`
+- `INGEST_GOOGLE_NEWS_RSS_MAX_RETRIES`
+- `INGEST_NEWSCATCHER_PAGE_SIZE`
+- `INGEST_NEWSCATCHER_PAGES`
+- `INGEST_GDELT_MAX_RECORDS`
+- `INGEST_RSS_MAX_ITEMS_PER_FEED`
+- `INGEST_RSS_MAX_RETRIES`
+- `MAX_PUBLISHED_STORIES`
+
+If you do not set the optional values, the script falls back to the defaults in code.
+
 ## Required SQL setup
 
 Run these SQL files in Supabase:

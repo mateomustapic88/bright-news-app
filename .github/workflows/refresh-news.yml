@@ -1,0 +1,61 @@
+name: Refresh News
+
+on:
+  schedule:
+    - cron: "0 */12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: refresh-news
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate required refresh environment variables
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          test -n "$VITE_SUPABASE_URL" || (echo "Missing repository secret: VITE_SUPABASE_URL" && exit 1)
+          test -n "$SUPABASE_SERVICE_ROLE_KEY" || (echo "Missing repository secret: SUPABASE_SERVICE_ROLE_KEY" && exit 1)
+
+      - name: Refresh BrightNews stories
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
+          NEWSCATCHER_API_KEY: ${{ secrets.NEWSCATCHER_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_REVIEW_MODEL: ${{ vars.OPENAI_REVIEW_MODEL }}
+          OPENAI_REVIEW_LIMIT: ${{ vars.OPENAI_REVIEW_LIMIT }}
+          OPENAI_REVIEW_MIN_CONFIDENCE: ${{ vars.OPENAI_REVIEW_MIN_CONFIDENCE }}
+          HEURISTIC_AUTO_APPROVE_SCORE: ${{ vars.HEURISTIC_AUTO_APPROVE_SCORE }}
+          INGEST_GNEWS_MAX_RESULTS: ${{ vars.INGEST_GNEWS_MAX_RESULTS }}
+          INGEST_GNEWS_PAGES: ${{ vars.INGEST_GNEWS_PAGES }}
+          INGEST_GOOGLE_NEWS_RSS_MAX_ITEMS: ${{ vars.INGEST_GOOGLE_NEWS_RSS_MAX_ITEMS }}
+          INGEST_GOOGLE_NEWS_RSS_MAX_RETRIES: ${{ vars.INGEST_GOOGLE_NEWS_RSS_MAX_RETRIES }}
+          INGEST_NEWSCATCHER_PAGE_SIZE: ${{ vars.INGEST_NEWSCATCHER_PAGE_SIZE }}
+          INGEST_NEWSCATCHER_PAGES: ${{ vars.INGEST_NEWSCATCHER_PAGES }}
+          INGEST_GDELT_MAX_RECORDS: ${{ vars.INGEST_GDELT_MAX_RECORDS }}
+          INGEST_RSS_MAX_ITEMS_PER_FEED: ${{ vars.INGEST_RSS_MAX_ITEMS_PER_FEED }}
+          INGEST_RSS_MAX_RETRIES: ${{ vars.INGEST_RSS_MAX_RETRIES }}
+          MAX_PUBLISHED_STORIES: ${{ vars.MAX_PUBLISHED_STORIES }}
+        run: npm run refresh:news
