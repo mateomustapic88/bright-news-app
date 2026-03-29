@@ -6,7 +6,14 @@ create table if not exists public.saved_stories (
   unique (user_id, story_id)
 );
 
+alter table public.saved_stories
+alter column user_id set default auth.uid();
+
 alter table public.saved_stories enable row level security;
+
+drop policy if exists "Users can read their saved stories" on public.saved_stories;
+drop policy if exists "Users can insert their saved stories" on public.saved_stories;
+drop policy if exists "Users can delete their saved stories" on public.saved_stories;
 
 create policy "Users can read their saved stories"
 on public.saved_stories
@@ -25,3 +32,5 @@ on public.saved_stories
 for delete
 to authenticated
 using (auth.uid() = user_id);
+
+grant select, insert, delete on public.saved_stories to authenticated;
