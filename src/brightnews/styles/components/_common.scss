@@ -44,6 +44,10 @@
   margin-bottom: 14px;
 }
 
+.bn-chip-row--subtle {
+  margin-top: -4px;
+}
+
 .bn-stack {
   display: flex;
   flex-direction: column;
@@ -87,6 +91,18 @@
     border-color: var(--bn-text-strong);
     background: #e2e8f0;
     color: var(--bn-text-strong);
+  }
+}
+
+.bn-chip--language {
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--bn-text-subtle);
+
+  &.is-active {
+    border-color: rgba(124, 58, 237, 0.24);
+    background: rgba(124, 58, 237, 0.1);
+    color: var(--bn-accent);
   }
 }
 

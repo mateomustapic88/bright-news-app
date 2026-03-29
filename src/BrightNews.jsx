@@ -22,7 +22,12 @@ import {
   updateRawArticleReviewStatus,
   upsertProfile,
 } from "./brightnews/api";
-import { getRegionsForCodes, getVisibleTabs, SAVED_STORIES_KEY } from "./brightnews/constants";
+import {
+  getLanguageFiltersForStories,
+  getRegionsForCodes,
+  getVisibleTabs,
+  SAVED_STORIES_KEY,
+} from "./brightnews/constants";
 import { readOnboardingDismissed, readSavedStories, writeOnboardingDismissed } from "./brightnews/storage";
 import BottomNav from "./brightnews/components/BottomNav";
 import Header from "./brightnews/components/Header";
@@ -59,6 +64,7 @@ const BrightNews = () => {
   const [region, setRegion]       = useState("world");
   const [availableRegionCodes, setAvailableRegionCodes] = useState(["world"]);
   const [category, setCategory]   = useState("all");
+  const [languageFilter, setLanguageFilter] = useState("en");
   const [expanded, setExpanded]   = useState(null);
   const [error, setError]         = useState(null);
   const [saved, setSaved]         = useState(readSavedStories);
@@ -233,6 +239,16 @@ const BrightNews = () => {
       setRegion(availableRegionCodes[0]);
     }
   }, [availableRegionCodes, region]);
+
+  const languageFilters = getLanguageFiltersForStories(stories);
+  const visibleStories = stories.filter(story => (
+    languageFilter === "all" || story.languageCode === languageFilter
+  ));
+
+  useEffect(() => {
+    if (languageFilters.some(item => item.id === languageFilter)) return;
+    setLanguageFilter("all");
+  }, [languageFilter, languageFilters]);
 
   useEffect(() => {
     if (!session?.user) return;
@@ -513,7 +529,13 @@ const BrightNews = () => {
     <div className="bright-news">
       {loading ? <LoadingBar /> : null}
 
-      <TopBar session={session} setTab={setTab} />
+      <TopBar
+        session={session}
+        setTab={setTab}
+        languageFilter={languageFilter}
+        languageFilters={languageFilters}
+        setLanguageFilter={setLanguageFilter}
+      />
       <Header
         region={region}
         regions={availableRegions}
@@ -535,7 +557,7 @@ const BrightNews = () => {
             firstLoad={firstLoad}
             error={error}
             shareFeedback={shareFeedback}
-            stories={stories}
+            stories={visibleStories}
             expanded={expanded}
             saved={saved}
             setExpanded={setExpanded}

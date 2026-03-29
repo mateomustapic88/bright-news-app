@@ -11,6 +11,29 @@ export const REGIONS = [
   { code: "in", flag: "🇮🇳", label: "India" },
 ];
 
+export const LANGUAGE_META = {
+  all: { id: "all", label: "All languages", shortLabel: "All", emoji: "🌐" },
+  en: { id: "en", label: "English", shortLabel: "English", emoji: "🇬🇧" },
+  hr: { id: "hr", label: "Croatian", shortLabel: "Croatian", emoji: "🇭🇷" },
+  de: { id: "de", label: "German", shortLabel: "German", emoji: "🇩🇪" },
+  fr: { id: "fr", label: "French", shortLabel: "French", emoji: "🇫🇷" },
+  ja: { id: "ja", label: "Japanese", shortLabel: "Japanese", emoji: "🇯🇵" },
+  pt: { id: "pt", label: "Portuguese", shortLabel: "Portuguese", emoji: "🇧🇷" },
+};
+
+export const REGION_LANGUAGE_BY_CODE = {
+  world: "en",
+  us: "en",
+  uk: "en",
+  hr: "hr",
+  de: "de",
+  fr: "fr",
+  jp: "ja",
+  au: "en",
+  br: "pt",
+  in: "en",
+};
+
 export const CATEGORIES = [
   { id: "all", label: "All", emoji: "✨", theme: "all" },
   { id: "Environment", label: "Planet", emoji: "🌿", theme: "environment" },
@@ -56,4 +79,19 @@ export const getVisibleTabs = (session, profile) => {
 export const getRegionsForCodes = regionCodes => {
   const allowed = new Set(regionCodes);
   return REGIONS.filter(region => allowed.has(region.code));
+};
+
+export const getLanguageForRegionCode = regionCode =>
+  REGION_LANGUAGE_BY_CODE[regionCode] || "en";
+
+export const getLanguageFiltersForStories = stories => {
+  const languageIds = new Set(["all"]);
+
+  for (const story of stories) {
+    languageIds.add(story.languageCode || getLanguageForRegionCode(story.regionCode));
+  }
+
+  return Array.from(languageIds)
+    .map(languageId => LANGUAGE_META[languageId])
+    .filter(Boolean);
 };

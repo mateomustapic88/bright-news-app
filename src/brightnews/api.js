@@ -1,5 +1,6 @@
 import { supabase } from "../lib/supabase";
 import { normalizeExternalUrl } from "../lib/urls";
+import { getLanguageForRegionCode } from "./constants";
 
 const mapStoryRow = story => ({
   id: story.id,
@@ -11,6 +12,8 @@ const mapStoryRow = story => ({
   impact: story.impact,
   readTime: story.read_time || "1 min read",
   sourceUrl: normalizeExternalUrl(story.source_url),
+  regionCode: story.region_code || "world",
+  languageCode: getLanguageForRegionCode(story.region_code || "world"),
 });
 
 export const loadStories = async (regionCode, categoryId) => {
