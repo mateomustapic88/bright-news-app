@@ -246,9 +246,10 @@ const BrightNews = () => {
   ));
 
   useEffect(() => {
+    if (loading || stories.length === 0) return;
     if (languageFilters.some(item => item.id === languageFilter)) return;
     setLanguageFilter("all");
-  }, [languageFilter, languageFilters]);
+  }, [languageFilter, languageFilters, loading, stories.length]);
 
   useEffect(() => {
     if (!session?.user) return;
