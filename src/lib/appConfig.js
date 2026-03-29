@@ -11,6 +11,28 @@ export const LEGAL_LINKS = {
   deletion: withBasePath("account-deletion.html"),
 };
 
+export const buildBetaFeedbackMailto = () => {
+  const subject = `${APP_NAME} beta feedback`;
+  const body = [
+    "Hi,",
+    "",
+    "Here is my beta feedback for BrightNews:",
+    "",
+    "Device:",
+    "OS version:",
+    "What happened:",
+    "What I expected:",
+    "",
+    "Additional notes:",
+    "",
+    typeof navigator !== "undefined" ? `User agent: ${navigator.userAgent}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  return `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+};
+
 export const getConfiguredWebAuthRedirectUrl = () => {
   const configuredUrl = import.meta.env.VITE_WEB_AUTH_REDIRECT_URL?.trim();
   return configuredUrl || null;

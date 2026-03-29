@@ -1,4 +1,4 @@
-const Header = ({ region, regions, setRegion, onRefresh }) => {
+const Header = ({ region, regions, setRegion, onRefresh, feedbackHref, showRegions = true }) => {
   const todayLabel = new Date().toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
@@ -16,24 +16,31 @@ const Header = ({ region, regions, setRegion, onRefresh }) => {
           </div>
         </div>
 
-        <button type="button" onClick={onRefresh} className="bn-refresh-button" aria-label="Refresh stories">
-          🔄
-        </button>
+        <div className="bn-header__actions">
+          <a className="bn-header__feedback" href={feedbackHref}>
+            Beta feedback
+          </a>
+          <button type="button" onClick={onRefresh} className="bn-refresh-button" aria-label="Refresh stories">
+            🔄
+          </button>
+        </div>
       </div>
 
-      <div className="bn-region-row">
-        {regions.map(item => (
-          <button
-            key={item.code}
-            type="button"
-            onClick={() => setRegion(item.code)}
-            className={`bn-region-button${region === item.code ? " is-active" : ""}`}
-          >
-            <span className="bn-region-button__flag">{item.flag}</span>
-            <span>{item.label}</span>
-          </button>
-        ))}
-      </div>
+      {showRegions ? (
+        <div className="bn-region-row">
+          {regions.map(item => (
+            <button
+              key={item.code}
+              type="button"
+              onClick={() => setRegion(item.code)}
+              className={`bn-region-button${region === item.code ? " is-active" : ""}`}
+            >
+              <span className="bn-region-button__flag">{item.flag}</span>
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+      ) : null}
     </header>
   );
 };

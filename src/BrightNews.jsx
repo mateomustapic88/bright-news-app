@@ -3,6 +3,7 @@ import { App } from "@capacitor/app";
 import { Browser } from "@capacitor/browser";
 import { shareStory } from "./lib/shareStory";
 import { supabase } from "./lib/supabase";
+import { buildBetaFeedbackMailto } from "./lib/appConfig";
 import {
   getAuthRedirectUrl,
   isMobileAuthCallback,
@@ -21,11 +22,7 @@ import {
   updateRawArticleReviewStatus,
   upsertProfile,
 } from "./brightnews/api";
-import {
-  getRegionsForCodes,
-  getVisibleTabs,
-  SAVED_STORIES_KEY,
-} from "./brightnews/constants";
+import { getRegionsForCodes, getVisibleTabs, SAVED_STORIES_KEY } from "./brightnews/constants";
 import { readOnboardingDismissed, readSavedStories, writeOnboardingDismissed } from "./brightnews/storage";
 import BottomNav from "./brightnews/components/BottomNav";
 import Header from "./brightnews/components/Header";
@@ -79,6 +76,7 @@ const BrightNews = () => {
   const [syncingSaved, setSyncingSaved] = useState(false);
   const [shareFeedback, setShareFeedback] = useState(null);
   const [showOnboarding, setShowOnboarding] = useState(() => !readOnboardingDismissed());
+  const betaFeedbackHref = buildBetaFeedbackMailto();
   const cache = useRef({});
   const abortRef = useRef(null);
   const savedRef = useRef(saved);
@@ -520,6 +518,8 @@ const BrightNews = () => {
         region={region}
         regions={availableRegions}
         setRegion={setRegion}
+        feedbackHref={betaFeedbackHref}
+        showRegions={tab !== "account"}
         onRefresh={async () => {
           await refreshAvailableRegions();
           await fetchNews(region, category, true);

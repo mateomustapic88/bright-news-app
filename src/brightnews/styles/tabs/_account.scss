@@ -20,6 +20,7 @@
 
   p {
     margin: 0;
+    font-size: 0.93rem;
     color: var(--bn-text-muted);
     line-height: 1.5;
   }
@@ -34,4 +35,9 @@
   .bn-button {
     text-decoration: none;
   }
+}
+
+.bn-account-resources__hint {
+  margin-top: 14px !important;
+  font-size: 0.92rem;
 }
