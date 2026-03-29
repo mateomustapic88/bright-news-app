@@ -58,4 +58,4 @@ jobs:
           INGEST_RSS_MAX_ITEMS_PER_FEED: ${{ vars.INGEST_RSS_MAX_ITEMS_PER_FEED }}
           INGEST_RSS_MAX_RETRIES: ${{ vars.INGEST_RSS_MAX_RETRIES }}
           MAX_PUBLISHED_STORIES: ${{ vars.MAX_PUBLISHED_STORIES }}
-        run: npm run refresh:news
+        run: node scripts/refresh-news.mjs
