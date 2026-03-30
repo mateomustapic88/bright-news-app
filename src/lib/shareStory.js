@@ -25,6 +25,7 @@ export const shareStory = async story => {
     try {
       await navigator.share({ title, text, url });
       return {
+        action: "shared",
         variant: "info",
         message: "Story shared.",
       };
@@ -38,12 +39,14 @@ export const shareStory = async story => {
   if (navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(`${text}\n\n${url}`);
     return {
+      action: "copied_link",
       variant: "info",
       message: "Story link copied.",
     };
   }
 
   return {
+    action: "unsupported",
     variant: "error",
     message: "Sharing is not supported on this device.",
   };

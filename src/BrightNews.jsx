@@ -1,6 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { App } from "@capacitor/app";
 import { Browser } from "@capacitor/browser";
+import {
+  enableAnalytics,
+  setAnalyticsUserId,
+  setAnalyticsUserProperty,
+  trackEvent,
+  trackScreenView,
+} from "./lib/analytics";
 import { shareStory } from "./lib/shareStory";
 import { supabase } from "./lib/supabase";
 import { buildBetaFeedbackMailto } from "./lib/appConfig";
@@ -86,6 +93,9 @@ const BrightNews = () => {
   const cache = useRef({});
   const abortRef = useRef(null);
   const savedRef = useRef(saved);
+  const regionInitializedRef = useRef(false);
+  const categoryInitializedRef = useRef(false);
+  const languageInitializedRef = useRef(false);
 
   useEffect(() => {
     window.localStorage.setItem(SAVED_STORIES_KEY, JSON.stringify(saved));
@@ -94,6 +104,10 @@ const BrightNews = () => {
   useEffect(() => {
     savedRef.current = saved;
   }, [saved]);
+
+  useEffect(() => {
+    enableAnalytics();
+  }, []);
 
   useEffect(() => {
     if (!supabase) return undefined;
@@ -118,6 +132,16 @@ const BrightNews = () => {
       if (event === "SIGNED_IN") {
         setAuthMessage("Signed in successfully.");
         setAuthError("");
+        trackEvent("sign_in_success", {
+          provider: "google",
+          platform: isNativeApp() ? "native" : "web",
+        });
+      }
+
+      if (event === "SIGNED_OUT") {
+        trackEvent("sign_out", {
+          platform: isNativeApp() ? "native" : "web",
+        });
       }
 
       setAuthLoading(false);
@@ -222,9 +246,79 @@ const BrightNews = () => {
     return () => window.clearTimeout(timer);
   }, [shareFeedback]);
 
+  useEffect(() => {
+    trackScreenView(tab);
+  }, [tab]);
+
+  useEffect(() => {
+    if (!regionInitializedRef.current) {
+      regionInitializedRef.current = true;
+      setAnalyticsUserProperty("selected_region", region);
+      return;
+    }
+
+    trackEvent("region_change", { region });
+    setAnalyticsUserProperty("selected_region", region);
+  }, [region]);
+
+  useEffect(() => {
+    if (!categoryInitializedRef.current) {
+      categoryInitializedRef.current = true;
+      setAnalyticsUserProperty("selected_category", category);
+      return;
+    }
+
+    trackEvent("category_change", { category });
+    setAnalyticsUserProperty("selected_category", category);
+  }, [category]);
+
+  useEffect(() => {
+    if (!languageInitializedRef.current) {
+      languageInitializedRef.current = true;
+      setAnalyticsUserProperty("language_filter", languageFilter);
+      return;
+    }
+
+    trackEvent("language_change", { language: languageFilter });
+    setAnalyticsUserProperty("language_filter", languageFilter);
+  }, [languageFilter]);
+
+  useEffect(() => {
+    if (!expanded) return;
+
+    const story = stories.find(item => item.id === expanded);
+    if (!story) return;
+
+    trackEvent("story_open", {
+      category: story.category,
+      region: story.regionCode,
+      language: story.languageCode,
+    });
+  }, [expanded, stories]);
+
+  useEffect(() => {
+    if (!session?.user) {
+      setAnalyticsUserId(null);
+      return;
+    }
+
+    setAnalyticsUserId(session.user.id);
+  }, [session?.user]);
+
+  useEffect(() => {
+    if (!session?.user) return;
+
+    setAnalyticsUserProperty("signed_in", "true");
+    setAnalyticsUserProperty("plan", profile?.plan || "free");
+    setAnalyticsUserProperty("is_admin", profile?.is_admin ? "true" : "false");
+  }, [profile?.is_admin, profile?.plan, session?.user]);
+
   const handleDismissOnboarding = () => {
     writeOnboardingDismissed(true);
     setShowOnboarding(false);
+    trackEvent("onboarding_dismiss", {
+      signed_in: Boolean(session?.user),
+    });
   };
 
   useEffect(() => {
@@ -421,6 +515,10 @@ const BrightNews = () => {
     setAuthLoading(true);
     setAuthError("");
     setAuthMessage("");
+    trackEvent("sign_in_start", {
+      provider: "google",
+      platform: isNativeApp() ? "native" : "web",
+    });
 
     try {
       const { data, error: signInError } = await supabase.auth.signInWithOAuth({
@@ -474,8 +572,15 @@ const BrightNews = () => {
     e?.stopPropagation();
     const isSaved = saved.includes(id);
     const nextSaved = isSaved ? saved.filter(item => item !== id) : [...saved, id];
+    const story = stories.find(item => item.id === id) || savedStories.find(item => item.id === id);
 
     setSaved(nextSaved);
+    trackEvent(isSaved ? "story_unsave" : "story_save", {
+      category: story?.category,
+      region: story?.regionCode,
+      language: story?.languageCode,
+      signed_in: Boolean(session?.user),
+    });
 
     if (!session?.user) return;
 
@@ -497,6 +602,14 @@ const BrightNews = () => {
       const result = await shareStory(story);
       if (result) {
         setShareFeedback(result);
+        if (result.action !== "unsupported") {
+          trackEvent("story_share", {
+            method: result.action,
+            category: story.category,
+            region: story.regionCode,
+            language: story.languageCode,
+          });
+        }
       }
     } catch {
       setShareFeedback({
@@ -524,6 +637,13 @@ const BrightNews = () => {
     }
   };
 
+  const handleFeedbackClick = () => {
+    trackEvent("feedback_click", {
+      tab,
+      signed_in: Boolean(session?.user),
+    });
+  };
+
   const tabs = getVisibleTabs(session, profile);
 
   return (
@@ -542,8 +662,10 @@ const BrightNews = () => {
         regions={availableRegions}
         setRegion={setRegion}
         feedbackHref={betaFeedbackHref}
+        onFeedbackClick={handleFeedbackClick}
         showRegions={tab !== "account"}
         onRefresh={async () => {
+          trackEvent("feed_refresh", { region, category, language: languageFilter });
           await refreshAvailableRegions();
           await fetchNews(region, category, true);
         }}
@@ -597,6 +719,7 @@ const BrightNews = () => {
             syncingSaved={syncingSaved}
             handleSignOut={handleSignOut}
             handleGoogleSignIn={handleGoogleSignIn}
+            handleFeedbackClick={handleFeedbackClick}
           />
         )}
 

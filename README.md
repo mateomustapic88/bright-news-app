@@ -69,6 +69,7 @@ Mobile auth currently uses:
 - callback: `com.mateomustapic.brightnews://auth/callback`
 
 See [docs/mobile_beta_setup.md](docs/mobile_beta_setup.md) for the current mobile checklist.
+For beta usage tracking, see [docs/firebase_analytics.md](docs/firebase_analytics.md).
 
 ## GitHub Pages deploy
 

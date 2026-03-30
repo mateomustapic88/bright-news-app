@@ -1,4 +1,12 @@
-const Header = ({ region, regions, setRegion, onRefresh, feedbackHref, showRegions = true }) => {
+const Header = ({
+  region,
+  regions,
+  setRegion,
+  onRefresh,
+  feedbackHref,
+  onFeedbackClick,
+  showRegions = true,
+}) => {
   const todayLabel = new Date().toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
@@ -17,7 +25,7 @@ const Header = ({ region, regions, setRegion, onRefresh, feedbackHref, showRegio
         </div>
 
         <div className="bn-header__actions">
-          <a className="bn-header__feedback" href={feedbackHref}>
+          <a className="bn-header__feedback" href={feedbackHref} onClick={onFeedbackClick}>
             Beta feedback
           </a>
           <button type="button" onClick={onRefresh} className="bn-refresh-button" aria-label="Refresh stories">

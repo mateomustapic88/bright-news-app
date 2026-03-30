@@ -112,6 +112,11 @@ Then:
 - Test Google sign-in on both native platforms
 - Verify saved-story sync after native auth
 - Prepare store screenshots and metadata
+- Add Firebase Analytics config files if you want usage tracking in beta
+
+See also:
+
+- [docs/firebase_analytics.md](./firebase_analytics.md)
 
 ## Fastest beta path
 

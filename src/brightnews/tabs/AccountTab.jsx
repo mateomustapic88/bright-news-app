@@ -16,6 +16,7 @@ const AccountTab = ({
   syncingSaved,
   handleGoogleSignIn,
   handleSignOut,
+  handleFeedbackClick,
 }) => {
   const feedbackMailto = buildBetaFeedbackMailto();
 
@@ -45,7 +46,7 @@ const AccountTab = ({
           Support email: <a href={SUPPORT_MAILTO}>{SUPPORT_EMAIL}</a>
         </p>
         <div className="bn-account-resources__actions">
-          <a className="bn-button bn-button--primary" href={feedbackMailto}>
+          <a className="bn-button bn-button--primary" href={feedbackMailto} onClick={handleFeedbackClick}>
             Send beta feedback
           </a>
           <a className="bn-button bn-button--secondary" href={LEGAL_LINKS.support} target="_blank" rel="noreferrer">
