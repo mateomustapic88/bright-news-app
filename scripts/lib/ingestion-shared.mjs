@@ -613,6 +613,8 @@ const DOMAIN_REGION_HINTS = {
 
 const HTML_ENTITIES = new Map([
   ["&amp;", "&"],
+  ["&lt;", "<"],
+  ["&gt;", ">"],
   ["&quot;", "\""],
   ["&#39;", "'"],
   ["&apos;", "'"],
@@ -656,6 +658,18 @@ const decodeHtmlEntities = value => {
   return result;
 };
 
+const decodeHtmlEntitiesDeep = value => {
+  let result = String(value || "");
+
+  for (let index = 0; index < 3; index += 1) {
+    const decoded = decodeHtmlEntities(result);
+    if (decoded === result) break;
+    result = decoded;
+  }
+
+  return result;
+};
+
 const escapeRegex = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const keywordPatternCache = new Map();
@@ -684,7 +698,7 @@ export const stripHtml = value =>
     .trim();
 
 export const toSentence = value =>
-  decodeHtmlEntities(stripHtml(value || ""))
+  decodeHtmlEntitiesDeep(stripHtml(decodeHtmlEntitiesDeep(value || "")))
     .replace(/\s+/g, " ")
     .trim();
 
