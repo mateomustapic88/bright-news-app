@@ -241,6 +241,9 @@ const NON_NEWS_TITLE_PATTERNS = [
   /(orkanska bura|oluja|nevrijeme|promet otežan|trajekti .* ne voze|bez vode|ne rade semafori)/i,
   /(partner hoda ispred vas|intimnim odnosima)/i,
   /(klikni i tucaj jaja|besplatnu pretplatu na oranž)/i,
+  /sperma/i,
+  /kultni .* film/i,
+  /zaradio preko .* milijuna dolara/i,
 ];
 
 const POSITIVE_KEYWORDS = [
