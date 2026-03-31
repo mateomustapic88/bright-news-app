@@ -693,14 +693,25 @@ const matchesKeyword = (haystack, keyword) => {
 export const stripHtml = value =>
   String(value || "")
     .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
+    .replace(/&lt;\/?[a-z][\w:-]*(?:[\s\S]*?)&gt;/gi, " ")
     .replace(/<[^>]*>/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 
-export const toSentence = value =>
-  decodeHtmlEntitiesDeep(stripHtml(decodeHtmlEntitiesDeep(value || "")))
-    .replace(/\s+/g, " ")
-    .trim();
+export const toSentence = value => {
+  let result = String(value || "");
+
+  for (let index = 0; index < 4; index += 1) {
+    const next = stripHtml(decodeHtmlEntitiesDeep(result))
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (next === result) break;
+    result = next;
+  }
+
+  return result.replace(/\s+/g, " ").trim();
+};
 
 const normalizeHaystack = values =>
   values

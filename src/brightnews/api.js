@@ -1,15 +1,16 @@
 import { supabase } from "../lib/supabase";
+import { sanitizeText } from "../lib/text";
 import { normalizeExternalUrl } from "../lib/urls";
 import { getLanguageForRegionCode } from "./constants";
 
 const mapStoryRow = story => ({
   id: story.id,
-  headline: story.headline,
-  summary: story.summary,
+  headline: sanitizeText(story.headline),
+  summary: sanitizeText(story.summary),
   category: story.category,
-  location: story.location,
+  location: sanitizeText(story.location),
   emoji: story.emoji,
-  impact: story.impact,
+  impact: sanitizeText(story.impact),
   readTime: story.read_time || "1 min read",
   sourceUrl: normalizeExternalUrl(story.source_url),
   regionCode: story.region_code || "world",
@@ -128,7 +129,12 @@ export const loadRawArticles = async reviewStatus => {
 
   if (error) throw new Error(error.message);
 
-  return data || [];
+  return (data || []).map(article => ({
+    ...article,
+    title: sanitizeText(article.title),
+    description: sanitizeText(article.description),
+    content: sanitizeText(article.content),
+  }));
 };
 
 export const updateRawArticleReviewStatus = async (
