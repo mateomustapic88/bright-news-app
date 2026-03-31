@@ -1,4 +1,4 @@
-import { ONBOARDING_DISMISSED_KEY, SAVED_STORIES_KEY } from "./constants";
+import { ONBOARDING_DISMISSED_KEY, PREFERRED_REGION_KEY, SAVED_STORIES_KEY } from "./constants";
 
 export const readSavedStories = () => {
   if (typeof window === "undefined") return [];
@@ -29,5 +29,30 @@ export const writeOnboardingDismissed = value => {
     window.localStorage.setItem(ONBOARDING_DISMISSED_KEY, String(Boolean(value)));
   } catch {
     // Keep onboarding non-blocking if storage is unavailable.
+  }
+};
+
+export const readPreferredRegion = () => {
+  if (typeof window === "undefined") return null;
+
+  try {
+    return window.localStorage.getItem(PREFERRED_REGION_KEY);
+  } catch {
+    return null;
+  }
+};
+
+export const writePreferredRegion = regionCode => {
+  if (typeof window === "undefined") return;
+
+  try {
+    if (!regionCode) {
+      window.localStorage.removeItem(PREFERRED_REGION_KEY);
+      return;
+    }
+
+    window.localStorage.setItem(PREFERRED_REGION_KEY, regionCode);
+  } catch {
+    // Keep region preference non-blocking if storage is unavailable.
   }
 };

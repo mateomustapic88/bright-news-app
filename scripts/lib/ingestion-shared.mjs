@@ -94,6 +94,10 @@ export const TRUSTED_AUTO_APPROVE_VENDORS = new Set(["goodnewsnetwork", "positiv
 const MIN_POSITIVE_SCORE = 0.6;
 const hasOpenAiReviewer = Boolean(process.env.OPENAI_API_KEY);
 const HEURISTIC_AUTO_APPROVE_SCORE = Number(process.env.HEURISTIC_AUTO_APPROVE_SCORE || 0.66);
+const LOCAL_POSITIVE_MIN_SCORE = Number(process.env.LOCAL_POSITIVE_MIN_SCORE || 0.45);
+const LOCAL_POSITIVE_AUTO_APPROVE_SCORE = Number(process.env.LOCAL_POSITIVE_AUTO_APPROVE_SCORE || 0.5);
+const LOCAL_POSITIVE_SCORE_BOOST = Number(process.env.LOCAL_POSITIVE_SCORE_BOOST || 0.5);
+const LOCAL_INFORMATIVE_SCORE_BOOST = Number(process.env.LOCAL_INFORMATIVE_SCORE_BOOST || 1.5);
 const BLOCKED_SOURCE_HOSTS = [
   "facebook.com",
   "instagram.com",
@@ -231,6 +235,12 @@ const NON_NEWS_TITLE_PATTERNS = [
   /^good news in history\b/i,
   /horoscope/i,
   /free will astrology/i,
+  /horoskop/i,
+  /cijena nafte/i,
+  /parking .*eura po satu/i,
+  /(orkanska bura|oluja|nevrijeme|promet otežan|trajekti .* ne voze|bez vode|ne rade semafori)/i,
+  /(partner hoda ispred vas|intimnim odnosima)/i,
+  /(klikni i tucaj jaja|besplatnu pretplatu na oranž)/i,
 ];
 
 const POSITIVE_KEYWORDS = [
@@ -281,6 +291,36 @@ const POSITIVE_KEYWORDS = [
   "oporavak",
   "spašavanje",
   "spašeni",
+  "humanitarna",
+  "humanitarni",
+  "humanitarno",
+  "donacija",
+  "donacije",
+  "stipendija",
+  "stipendije",
+  "otvoren",
+  "otvorena",
+  "otvoreno",
+  "otvara se",
+  "obnovljen",
+  "obnovljena",
+  "obnovljeno",
+  "uređen",
+  "uređena",
+  "uređeno",
+  "besplatan",
+  "besplatna",
+  "besplatno",
+  "nagrada",
+  "nagradu",
+  "osvojio",
+  "osvojila",
+  "osvojili",
+  "volonterska akcija",
+  "prikupljena sredstva",
+  "prikupljeno",
+  "inicijativa",
+  "nova usluga",
   "pomaže",
   "pomažu",
   "volonteri",
@@ -370,6 +410,98 @@ const POSITIVE_KEYWORDS = [
   "クリーンエネルギー",
   "改善",
   "減少",
+];
+
+const LOCAL_POSITIVE_LEAN_VENDORS = new Set([
+  "index_znanost",
+  "index_zagreb",
+  "index_ljubimci",
+  "index_tech_gadget",
+  "index_fit",
+  "index_food",
+  "index_chill",
+  "24sata_lifestyle",
+  "24sata_tech",
+  "miss7_zdrava",
+  "bug_hr",
+  "poslovni_hr",
+  "zadarski_list",
+  "zagrebancija",
+  "zg_magazin",
+  "01portal",
+  "cityportal",
+  "dalmacija_danas",
+  "dubrovniknet",
+  "istra24",
+  "regional_express",
+  "sib_hr",
+]);
+
+const COMMUNITY_POSITIVE_HINTS = [
+  "humanitar",
+  "donacij",
+  "stipend",
+  "otvoren",
+  "otvorena",
+  "otvoreno",
+  "obnovljen",
+  "obnovljena",
+  "obnovljeno",
+  "uređen",
+  "uređena",
+  "uređeno",
+  "besplatan",
+  "besplatna",
+  "besplatno",
+  "volonter",
+  "inicijativa",
+  "projekt pomaže",
+  "nova usluga",
+  "nagrada",
+  "osvojio",
+  "osvojila",
+  "osvojili",
+];
+
+const INFORMATIVE_POSITIVE_CATEGORY_TAGS = new Set(["science", "animals", "innovation", "health"]);
+
+const LOCAL_INFORMATIVE_KEYWORDS = [
+  "znanstvenik",
+  "znanstvenika",
+  "znanstvenici",
+  "znanstvenica",
+  "istraživanje",
+  "studija",
+  "otkriće",
+  "otkrio",
+  "otkrila",
+  "otkriven",
+  "otkrivena",
+  "mozak",
+  "neuron",
+  "gen",
+  "vrsta",
+  "dinosaur",
+  "kompjuter",
+  "računalo",
+  "tehnologija",
+  "aplikacija",
+  "galaxy",
+  "quick share",
+  "airdrop",
+  "pas",
+  "pasa",
+  "psi",
+  "ljubimac",
+  "ljubimci",
+  "životinja",
+  "životinje",
+  "zdravlje",
+  "prevencija",
+  "liječenje",
+  "simptomi",
+  "navika",
+  "ponašanja",
 ];
 
 const CATEGORY_KEYWORDS = {
@@ -650,8 +782,22 @@ export const inferReviewDecision = ({ vendor, title, description, content = "", 
   }
 
   const positiveScore = countKeywordHits(haystack, POSITIVE_KEYWORDS);
-  const candidateScore = Math.min(1, positiveScore / 3);
+  const hasCommunityPositiveHint = COMMUNITY_POSITIVE_HINTS.some(keyword => matchesKeyword(haystack, keyword));
+  const isLocalPositiveLeanVendor = LOCAL_POSITIVE_LEAN_VENDORS.has(vendor);
+  const hasInformativePositiveCategory = normalizedTags.some(tag => INFORMATIVE_POSITIVE_CATEGORY_TAGS.has(tag));
+  const informativeScore = countKeywordHits(haystack, LOCAL_INFORMATIVE_KEYWORDS);
+  const adjustedPositiveScore =
+    positiveScore +
+    (isLocalPositiveLeanVendor && hasCommunityPositiveHint ? LOCAL_POSITIVE_SCORE_BOOST : 0) +
+    (isLocalPositiveLeanVendor && hasInformativePositiveCategory && informativeScore > 0
+      ? LOCAL_INFORMATIVE_SCORE_BOOST
+      : 0);
+  const candidateScore = Math.min(1, adjustedPositiveScore / 3);
   const isTrustedVendor = TRUSTED_AUTO_APPROVE_VENDORS.has(vendor);
+  const minPositiveScore = isLocalPositiveLeanVendor ? LOCAL_POSITIVE_MIN_SCORE : MIN_POSITIVE_SCORE;
+  const autoApproveScore = isLocalPositiveLeanVendor
+    ? LOCAL_POSITIVE_AUTO_APPROVE_SCORE
+    : HEURISTIC_AUTO_APPROVE_SCORE;
 
   if (isTrustedVendor && !hasOpenAiReviewer) {
     return {
@@ -661,7 +807,7 @@ export const inferReviewDecision = ({ vendor, title, description, content = "", 
     };
   }
 
-  if (!hasOpenAiReviewer && candidateScore >= HEURISTIC_AUTO_APPROVE_SCORE) {
+  if (!hasOpenAiReviewer && candidateScore >= autoApproveScore) {
     return {
       reviewStatus: "approved",
       rejectedReason: "",
@@ -669,7 +815,7 @@ export const inferReviewDecision = ({ vendor, title, description, content = "", 
     };
   }
 
-  if (!isTrustedVendor && candidateScore < MIN_POSITIVE_SCORE) {
+  if (!isTrustedVendor && candidateScore < minPositiveScore) {
     return {
       reviewStatus: "rejected",
       rejectedReason: "auto_low_positive_score",

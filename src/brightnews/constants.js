@@ -60,6 +60,7 @@ export const REVIEW_FILTERS = [
 
 export const SAVED_STORIES_KEY = "brightnews.savedStories";
 export const ONBOARDING_DISMISSED_KEY = "brightnews.onboardingDismissed";
+export const PREFERRED_REGION_KEY = "brightnews.preferredRegion";
 
 export const getCategoryMeta = id =>
   CATEGORIES.find(category => category.id === id) || CATEGORIES[1];
@@ -83,6 +84,63 @@ export const getRegionsForCodes = regionCodes => {
 
 export const getLanguageForRegionCode = regionCode =>
   REGION_LANGUAGE_BY_CODE[regionCode] || "en";
+
+const COUNTRY_TO_REGION_CODE = {
+  au: "au",
+  br: "br",
+  de: "de",
+  fr: "fr",
+  gb: "uk",
+  hr: "hr",
+  in: "in",
+  jp: "jp",
+  uk: "uk",
+  us: "us",
+};
+
+const TIMEZONE_TO_REGION_CODE = {
+  "Europe/Berlin": "de",
+  "Europe/London": "uk",
+  "Europe/Paris": "fr",
+  "Europe/Zagreb": "hr",
+  "Asia/Kolkata": "in",
+  "Asia/Tokyo": "jp",
+  "Australia/Adelaide": "au",
+  "Australia/Brisbane": "au",
+  "Australia/Darwin": "au",
+  "Australia/Hobart": "au",
+  "Australia/Melbourne": "au",
+  "Australia/Perth": "au",
+  "Australia/Sydney": "au",
+  "America/Sao_Paulo": "br",
+  "America/Fortaleza": "br",
+  "America/Manaus": "br",
+  "America/Recife": "br",
+};
+
+export const inferPreferredRegionCode = () => {
+  if (typeof navigator !== "undefined") {
+    const localeCandidates = [navigator.language, ...(navigator.languages || [])]
+      .filter(Boolean);
+
+    for (const locale of localeCandidates) {
+      const [, countryCode] = String(locale).split(/[-_]/);
+      const regionCode = COUNTRY_TO_REGION_CODE[String(countryCode || "").toLowerCase()];
+      if (regionCode) {
+        return regionCode;
+      }
+    }
+  }
+
+  if (typeof Intl !== "undefined") {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (timezone && TIMEZONE_TO_REGION_CODE[timezone]) {
+      return TIMEZONE_TO_REGION_CODE[timezone];
+    }
+  }
+
+  return "world";
+};
 
 export const getLanguageFiltersForStories = stories => {
   const languageIds = new Set(["all"]);

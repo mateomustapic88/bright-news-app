@@ -1,8 +1,9 @@
 import { getCategoryMeta, getCategoryThemeClass } from "../constants";
+import StorySaveButton from "./StorySaveButton";
 import StoryShareButton from "./StoryShareButton";
 import StorySourceLink from "./StorySourceLink";
 
-const SavedStoryCard = ({ story, handleShareStory }) => {
+const SavedStoryCard = ({ story, saved, toggleSave, handleShareStory }) => {
   const category = getCategoryMeta(story.category);
   const themeClass = getCategoryThemeClass(story.category);
 
@@ -15,7 +16,14 @@ const SavedStoryCard = ({ story, handleShareStory }) => {
           <span className="bn-category-pill">
             {category.emoji} {story.category}
           </span>
-          <StoryShareButton story={story} handleShareStory={handleShareStory} />
+          <div className="bn-story-card__actions">
+            <StoryShareButton story={story} handleShareStory={handleShareStory} />
+            <StorySaveButton
+              storyId={story.id}
+              saved={saved}
+              toggleSave={toggleSave}
+            />
+          </div>
         </div>
         <h3 className="bn-card-title">{story.headline}</h3>
         <span className="bn-card-location">📍 {story.location}</span>

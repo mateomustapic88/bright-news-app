@@ -4,9 +4,11 @@ import StatusMessage from "../components/StatusMessage";
 
 const SavedTab = ({
   savedStories,
+  saved,
   session,
   setTab,
   shareFeedback,
+  toggleSave,
   handleShareStory,
 }) => (
   <section className="bn-tab bn-saved-tab">
@@ -37,7 +39,13 @@ const SavedTab = ({
     ) : (
       <div className="bn-stack">
         {savedStories.map(story => (
-          <SavedStoryCard key={story.id} story={story} handleShareStory={handleShareStory} />
+          <SavedStoryCard
+            key={story.id}
+            story={story}
+            saved={saved}
+            toggleSave={toggleSave}
+            handleShareStory={handleShareStory}
+          />
         ))}
       </div>
     )}

@@ -19,12 +19,14 @@ const ONBOARDING_POINTS = [
 const OnboardingModal = ({ session, handleDismiss, handleGoogleSignIn }) => (
   <div className="bn-onboarding" role="dialog" aria-modal="true" aria-labelledby="bn-onboarding-title">
     <div className="bn-onboarding__surface">
-      <p className="bn-onboarding__eyebrow">Welcome to BrightNews</p>
-      <h2 id="bn-onboarding-title">A calmer way to stay informed</h2>
-      <p className="bn-onboarding__intro">
-        BrightNews surfaces credible positive stories from around the world. Start with the world
-        feed, switch regions and categories, and save the stories worth keeping.
-      </p>
+      <div className="bn-onboarding__hero">
+        <p className="bn-onboarding__eyebrow">Welcome to BrightNews</p>
+        <h2 id="bn-onboarding-title">A calmer way to stay informed</h2>
+        <p className="bn-onboarding__intro">
+          BrightNews surfaces credible positive stories from around the world. Start with the world
+          feed, switch regions and categories, and save the stories worth keeping.
+        </p>
+      </div>
 
       <div className="bn-onboarding__grid">
         {ONBOARDING_POINTS.map(item => (
@@ -46,6 +48,8 @@ const OnboardingModal = ({ session, handleDismiss, handleGoogleSignIn }) => (
           Start reading
         </button>
       </div>
+
+      <p className="bn-onboarding__hint">You can change region, category, and language later.</p>
     </div>
   </div>
 );

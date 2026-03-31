@@ -30,6 +30,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 const requestDelayMs = Number(getEnv("INGEST_RSS_REQUEST_DELAY_MS") || 1000);
 const maxRetriesPerRequest = Number(getEnv("INGEST_RSS_MAX_RETRIES") || 2);
 const retryDelayMs = Number(getEnv("INGEST_RSS_RETRY_DELAY_MS") || 4000);
+const fetchTimeoutMs = Number(getEnv("INGEST_RSS_FETCH_TIMEOUT_MS") || 8000);
 const maxItemsPerFeed = Number(getEnv("INGEST_RSS_MAX_ITEMS_PER_FEED") || 40);
 const enabledRegionCodes = new Set(
   (getEnv("INGEST_REGION_CODES") || REGION_CONFIG.map(region => region.code).join(","))
@@ -67,11 +68,172 @@ const FEED_CONFIG = [
     category: "Science",
   },
   {
+    vendor: "index_hrvatska",
+    sourceName: "Index Hrvatska",
+    feedUrl: "https://www.index.hr/rss/vijesti-hrvatska",
+    regionCode: "hr",
+  },
+  {
+    vendor: "index_zagreb",
+    sourceName: "Index Zagreb",
+    feedUrl: "https://www.index.hr/rss/vijesti-zagreb",
+    regionCode: "hr",
+    category: "Community",
+  },
+  {
+    vendor: "index_regija",
+    sourceName: "Index Regija",
+    feedUrl: "https://www.index.hr/rss/vijesti-regija",
+    regionCode: "hr",
+  },
+  {
     vendor: "index_ljubimci",
     sourceName: "Index Ljubimci",
     feedUrl: "https://www.index.hr/rss/ljubimci",
     regionCode: "hr",
     category: "Animals",
+  },
+  {
+    vendor: "index_tech_gadget",
+    sourceName: "Index Tech & Gadget",
+    feedUrl: "https://www.index.hr/rss/magazin-tech-gadget",
+    regionCode: "hr",
+    category: "Innovation",
+  },
+  {
+    vendor: "index_fit",
+    sourceName: "Index Fit",
+    feedUrl: "https://www.index.hr/rss/fit",
+    regionCode: "hr",
+    category: "Health",
+  },
+  {
+    vendor: "index_food",
+    sourceName: "Index Food",
+    feedUrl: "https://www.index.hr/rss/food",
+    regionCode: "hr",
+    category: "Health",
+  },
+  {
+    vendor: "index_chill",
+    sourceName: "Index Chill",
+    feedUrl: "https://www.index.hr/rss/chill",
+    regionCode: "hr",
+    category: "Community",
+  },
+  {
+    vendor: "24sata_aktualno",
+    sourceName: "24sata Aktualno",
+    feedUrl: "https://www.24sata.hr/feeds/aktualno.xml",
+    regionCode: "hr",
+  },
+  {
+    vendor: "24sata_news",
+    sourceName: "24sata News",
+    feedUrl: "https://www.24sata.hr/feeds/news.xml",
+    regionCode: "hr",
+  },
+  {
+    vendor: "24sata_lifestyle",
+    sourceName: "24sata Lifestyle",
+    feedUrl: "https://www.24sata.hr/feeds/lifestyle.xml",
+    regionCode: "hr",
+    category: "Health",
+  },
+  {
+    vendor: "24sata_tech",
+    sourceName: "24sata Tech",
+    feedUrl: "https://www.24sata.hr/feeds/tech.xml",
+    regionCode: "hr",
+    category: "Innovation",
+  },
+  {
+    vendor: "miss7_zdrava",
+    sourceName: "Miss7 Zdrava",
+    feedUrl: "https://miss7zdrava.24sata.hr/feeds/axiom_feed",
+    regionCode: "hr",
+    category: "Health",
+  },
+  {
+    vendor: "bug_hr",
+    sourceName: "Bug.hr",
+    feedUrl: "https://www.bug.hr/rss/",
+    regionCode: "hr",
+  },
+  {
+    vendor: "poslovni_hr",
+    sourceName: "Poslovni dnevnik",
+    feedUrl: "https://www.poslovni.hr/feed",
+    regionCode: "hr",
+  },
+  {
+    vendor: "zadarski_list",
+    sourceName: "Zadarski list",
+    feedUrl: "https://zadarskilist.novilist.hr/feed/",
+    regionCode: "hr",
+  },
+  {
+    vendor: "zagrebancija",
+    sourceName: "Zagrebancija",
+    feedUrl: "https://www.zagrebancija.com/feed/",
+    regionCode: "hr",
+    category: "Community",
+  },
+  {
+    vendor: "zg_magazin",
+    sourceName: "ZG-magazin",
+    feedUrl: "https://zg-magazin.com.hr/feed/",
+    regionCode: "hr",
+    category: "Community",
+  },
+  {
+    vendor: "01portal",
+    sourceName: "01Portal",
+    feedUrl: "https://01portal.hr/feed/",
+    regionCode: "hr",
+    category: "Community",
+  },
+  {
+    vendor: "cityportal",
+    sourceName: "Cityportal",
+    feedUrl: "https://cityportal.hr/feed/",
+    regionCode: "hr",
+    category: "Community",
+  },
+  {
+    vendor: "dalmacija_danas",
+    sourceName: "Dalmacija Danas",
+    feedUrl: "https://www.dalmacijadanas.hr/feed/",
+    regionCode: "hr",
+    category: "Community",
+  },
+  {
+    vendor: "dubrovniknet",
+    sourceName: "DubrovnikNet",
+    feedUrl: "https://www.dubrovniknet.hr/feed/",
+    regionCode: "hr",
+    category: "Community",
+  },
+  {
+    vendor: "istra24",
+    sourceName: "Istra24",
+    feedUrl: "https://www.istra24.hr/rss/feed",
+    regionCode: "hr",
+    category: "Community",
+  },
+  {
+    vendor: "regional_express",
+    sourceName: "Regional Express",
+    feedUrl: "https://www.regionalexpress.hr/rss/feed",
+    regionCode: "hr",
+    category: "Community",
+  },
+  {
+    vendor: "sib_hr",
+    sourceName: "SiB.hr",
+    feedUrl: "https://sib.net.hr/feed/",
+    regionCode: "hr",
+    category: "Community",
   },
   {
     vendor: "tagesschau_forschung",
@@ -99,7 +261,9 @@ const FEED_CONFIG = [
 const fetchFeed = async feedUrl => {
   for (let attempt = 0; attempt <= maxRetriesPerRequest; attempt += 1) {
     try {
-      const response = await fetch(feedUrl);
+      const response = await fetch(feedUrl, {
+        signal: AbortSignal.timeout(fetchTimeoutMs),
+      });
       const xml = await response.text();
 
       if (response.ok) {

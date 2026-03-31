@@ -13,13 +13,13 @@
 }
 
 .bn-screen {
-  height: calc(100vh - 176px);
+  height: calc(100vh - 154px);
   overflow-y: auto;
-  padding-bottom: 88px;
+  padding-bottom: 76px;
 }
 
 .bn-tab {
-  padding: 14px;
+  padding: 12px 14px 16px;
 
   h2 {
     margin: 0 0 6px;
@@ -41,7 +41,7 @@
 .bn-chip-row {
   @include scroll-row;
 
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .bn-chip-row--subtle {
@@ -51,7 +51,7 @@
 .bn-stack {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 9px;
 }
 
 .bn-chip {
@@ -110,7 +110,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 9px;
+  margin-bottom: 8px;
 
   span:last-child {
     color: var(--bn-text-subtle);
@@ -214,8 +214,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 14px;
-  margin-bottom: 14px;
+  padding: 11px 13px;
+  margin-bottom: 12px;
   border-radius: var(--bn-radius-md);
   font-size: 12px;
   font-weight: 700;

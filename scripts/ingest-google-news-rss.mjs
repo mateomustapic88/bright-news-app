@@ -10,6 +10,7 @@ import {
   resolveCategory,
   resolveRegionCode,
   sleep,
+  toSentence,
   upsertRawArticles,
 } from "./lib/ingestion-shared.mjs";
 
@@ -125,6 +126,36 @@ const deriveSourceName = item => {
   }
 };
 
+const ENGLISH_STOPWORDS = [
+  "the",
+  "and",
+  "are",
+  "with",
+  "will",
+  "after",
+  "from",
+  "this",
+  "that",
+  "into",
+  "over",
+  "under",
+  "concerns",
+  "government",
+];
+
+const isLikelyEnglishHeadline = value => {
+  const headline = toSentence(value).toLowerCase();
+  if (!headline) return false;
+
+  if (/[\u0100-\u024f\u0400-\u04ff\u3040-\u30ff\u3400-\u9fff]/u.test(headline)) {
+    return false;
+  }
+
+  const words = headline.match(/[a-z]+/g) || [];
+  const stopwordHits = words.filter(word => ENGLISH_STOPWORDS.includes(word)).length;
+  return words.length >= 5 && stopwordHits >= 2;
+};
+
 export const run = async () => {
   const fetchedArticles = [];
   const regionErrors = [];
@@ -142,6 +173,11 @@ export const run = async () => {
 
       for (const item of items) {
         const { title, sourceName } = splitHeadlineAndSource(item.title, deriveSourceName(item));
+
+        if (region.lang !== "en" && isLikelyEnglishHeadline(title)) {
+          continue;
+        }
+
         const category = resolveCategory({
           title,
           description: item.description,

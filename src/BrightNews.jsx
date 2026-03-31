@@ -30,12 +30,19 @@ import {
   upsertProfile,
 } from "./brightnews/api";
 import {
+  inferPreferredRegionCode,
   getLanguageFiltersForStories,
   getRegionsForCodes,
   getVisibleTabs,
   SAVED_STORIES_KEY,
 } from "./brightnews/constants";
-import { readOnboardingDismissed, readSavedStories, writeOnboardingDismissed } from "./brightnews/storage";
+import {
+  readOnboardingDismissed,
+  readPreferredRegion,
+  readSavedStories,
+  writeOnboardingDismissed,
+  writePreferredRegion,
+} from "./brightnews/storage";
 import BottomNav from "./brightnews/components/BottomNav";
 import Header from "./brightnews/components/Header";
 import LoadingBar from "./brightnews/components/LoadingBar";
@@ -68,7 +75,7 @@ const BrightNews = () => {
   const [savedStories, setSavedStories] = useState([]);
   const [loading, setLoading]     = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
-  const [region, setRegion]       = useState("world");
+  const [region, setRegion]       = useState(() => readPreferredRegion() || inferPreferredRegionCode());
   const [availableRegionCodes, setAvailableRegionCodes] = useState(["world"]);
   const [category, setCategory]   = useState("all");
   const [languageFilter, setLanguageFilter] = useState("en");
@@ -104,6 +111,10 @@ const BrightNews = () => {
   useEffect(() => {
     savedRef.current = saved;
   }, [saved]);
+
+  useEffect(() => {
+    writePreferredRegion(region);
+  }, [region]);
 
   useEffect(() => {
     enableAnalytics();
@@ -701,9 +712,11 @@ const BrightNews = () => {
         {tab === "saved" && (
           <SavedTab
             savedStories={savedStories}
+            saved={saved}
             session={session}
             setTab={setTab}
             shareFeedback={shareFeedback}
+            toggleSave={toggleSave}
             handleShareStory={handleShareStory}
           />
         )}

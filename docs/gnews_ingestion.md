@@ -18,6 +18,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 ```env
 GNEWS_API_KEY=your-gnews-api-key
+NEWSDATA_API_KEY=your-newsdata-api-key
 NEWSCATCHER_API_KEY=your-newscatcher-api-key
 ```
 
@@ -29,6 +30,7 @@ NEWSCATCHER_API_KEY=your-newscatcher-api-key
 npm run ingest:gnews
 npm run ingest:gdelt
 npm run ingest:google-news-rss
+npm run ingest:newsdata
 npm run ingest:newscatcher
 npm run ingest:rss
 npm run review:pending
@@ -63,9 +65,14 @@ npm run refresh:news
   - uses the `x-api-token` header and normalizes NewsCatcher article fields into the BrightNews raw article shape
   - supports larger page sizes and pagination through `INGEST_NEWSCATCHER_PAGE_SIZE` and `INGEST_NEWSCATCHER_PAGES`
   - stores candidates in `public.raw_articles` for the same review/publish flow
+- `ingest:newsdata`
+  - fetches candidate articles from NewsData.io's latest endpoint using the same category and region matrix
+  - uses `country`, `language`, and localized keyword queries for stronger national/local coverage
+  - supports pagination through `INGEST_NEWSDATA_PAGES`
+  - optionally uses `timeframe` when your NewsData plan supports it
+  - stores candidates in `public.raw_articles` for the same review/publish flow
 - `ingest:rss`
   - fetches curated positive-news RSS feeds directly
-  - includes additional curated German and Croatian feeds for stronger regional coverage
   - now continues if one RSS feed fails instead of aborting the entire RSS run
   - supports per-feed caps through `INGEST_RSS_MAX_ITEMS_PER_FEED`
   - maps source tags into BrightNews categories and regions
@@ -94,6 +101,8 @@ INGEST_GNEWS_MAX_RESULTS=25
 INGEST_GNEWS_PAGES=1
 INGEST_GOOGLE_NEWS_RSS_MAX_ITEMS=25
 INGEST_GOOGLE_NEWS_RSS_MAX_RETRIES=2
+INGEST_NEWSDATA_PAGES=1
+INGEST_NEWSDATA_TIMEFRAME=
 INGEST_NEWSCATCHER_PAGE_SIZE=25
 INGEST_NEWSCATCHER_PAGES=1
 INGEST_GDELT_MAX_RECORDS=30
@@ -128,6 +137,7 @@ Set these GitHub repository secrets before relying on it:
 Optional GitHub repository secrets:
 
 - `GNEWS_API_KEY`
+- `NEWSDATA_API_KEY`
 - `NEWSCATCHER_API_KEY`
 - `OPENAI_API_KEY`
 
@@ -141,6 +151,8 @@ Optional GitHub repository variables:
 - `INGEST_GNEWS_PAGES`
 - `INGEST_GOOGLE_NEWS_RSS_MAX_ITEMS`
 - `INGEST_GOOGLE_NEWS_RSS_MAX_RETRIES`
+- `INGEST_NEWSDATA_PAGES`
+- `INGEST_NEWSDATA_TIMEFRAME`
 - `INGEST_NEWSCATCHER_PAGE_SIZE`
 - `INGEST_NEWSCATCHER_PAGES`
 - `INGEST_GDELT_MAX_RECORDS`
@@ -160,7 +172,7 @@ Run these SQL files in Supabase:
 
 ## Review workflow
 
-1. Run `npm run ingest:gnews`, `npm run ingest:gdelt`, `npm run ingest:google-news-rss`, and/or `npm run ingest:newscatcher`
+1. Run `npm run ingest:gnews`, `npm run ingest:gdelt`, `npm run ingest:google-news-rss`, `npm run ingest:newsdata`, and/or `npm run ingest:newscatcher`
 2. Run `npm run ingest:rss`
 3. Run `npm run review:pending`
 4. Inspect `public.raw_articles` in Supabase only for borderline rows that remain `pending`
@@ -172,6 +184,7 @@ Run these SQL files in Supabase:
 - this is an MVP ingestion path, not a perfect editorial system
 - positivity filtering is partly heuristic before the final AI review
 - region and category mapping are approximate
+- local/national coverage quality depends heavily on available source coverage inside each upstream API
 - stories can still remain `pending` for manual review when the model is not confident enough
 - cron deployment is not installed automatically by the repo
 
