@@ -14,6 +14,7 @@ const mapStoryRow = story => ({
   sourceUrl: normalizeExternalUrl(story.source_url),
   regionCode: story.region_code || "world",
   languageCode: getLanguageForRegionCode(story.region_code || "world"),
+  savedCount: Number(story.saved_count || 0),
 });
 
 export const loadStories = async (regionCode, categoryId) => {

@@ -104,6 +104,14 @@ const BrightNews = () => {
   const categoryInitializedRef = useRef(false);
   const languageInitializedRef = useRef(false);
 
+  const adjustSavedCount = useCallback((items, storyId, delta) => (
+    items.map(story => (
+      story.id === storyId
+        ? { ...story, savedCount: Math.max(0, Number(story.savedCount || 0) + delta) }
+        : story
+    ))
+  ), []);
+
   useEffect(() => {
     window.localStorage.setItem(SAVED_STORIES_KEY, JSON.stringify(saved));
   }, [saved]);
@@ -584,8 +592,14 @@ const BrightNews = () => {
     const isSaved = saved.includes(id);
     const nextSaved = isSaved ? saved.filter(item => item !== id) : [...saved, id];
     const story = stories.find(item => item.id === id) || savedStories.find(item => item.id === id);
+    const delta = isSaved ? -1 : 1;
 
     setSaved(nextSaved);
+    setStories(current => adjustSavedCount(current, id, delta));
+    setSavedStories(current => adjustSavedCount(current, id, delta));
+    Object.keys(cache.current).forEach(cacheKey => {
+      cache.current[cacheKey] = adjustSavedCount(cache.current[cacheKey] || [], id, delta);
+    });
     trackEvent(isSaved ? "story_unsave" : "story_save", {
       category: story?.category,
       region: story?.regionCode,
@@ -602,6 +616,12 @@ const BrightNews = () => {
         await createSavedStory(session.user.id, id);
       }
     } catch (saveError) {
+      setSaved(saved);
+      setStories(current => adjustSavedCount(current, id, -delta));
+      setSavedStories(current => adjustSavedCount(current, id, -delta));
+      Object.keys(cache.current).forEach(cacheKey => {
+        cache.current[cacheKey] = adjustSavedCount(cache.current[cacheKey] || [], id, -delta);
+      });
       setAuthError(saveError.message || "Saved story sync failed.");
     }
   };

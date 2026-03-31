@@ -19,6 +19,11 @@ const DiscoverTab = ({ region, regions, setRegion, setTab }) => (
         </button>
       ))}
     </div>
+
+    <div className="bn-discover-note">
+      <strong>More countries and richer local coverage are on the way.</strong>
+      <span>We&apos;re expanding source quality region by region.</span>
+    </div>
   </section>
 );
 

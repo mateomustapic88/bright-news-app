@@ -19,60 +19,54 @@ const HomeTab = ({
   setExpanded,
   toggleSave,
   handleShareStory,
-}) => (
-  <section className="bn-tab bn-home-tab">
-    <div className="bn-chip-row">
-      {CATEGORIES.map(item => (
-        <Chip
-          key={item.id}
-          active={category === item.id}
-          onClick={() => setCategory(item.id)}
-          className={`bn-chip--category ${getCategoryThemeClass(item.id)}`}
-        >
-          <span>{item.emoji}</span>
-          <span>{item.label}</span>
-        </Chip>
-      ))}
-    </div>
+}) => {
+  const featuredStory = stories.reduce((best, story) => {
+    if (!best) return story;
+    if ((story.savedCount || 0) > (best.savedCount || 0)) return story;
+    return best;
+  }, null);
 
-    {loading && firstLoad && (
-      <StatusMessage variant="accent" showDot>
-        Loading today&apos;s good news...
-      </StatusMessage>
-    )}
+  const remainingStories = stories.filter(story => story.id !== featuredStory?.id);
 
-    {error && <StatusMessage variant="error">⚠️ {error}</StatusMessage>}
-    {!error && shareFeedback && <StatusMessage variant={shareFeedback.variant}>{shareFeedback.message}</StatusMessage>}
+  return (
+    <section className="bn-tab bn-home-tab">
+      <div className="bn-chip-row">
+        {CATEGORIES.map(item => (
+          <Chip
+            key={item.id}
+            active={category === item.id}
+            onClick={() => setCategory(item.id)}
+            className={`bn-chip--category ${getCategoryThemeClass(item.id)}`}
+          >
+            <span>{item.emoji}</span>
+            <span>{item.label}</span>
+          </Chip>
+        ))}
+      </div>
 
-    {!loading && !error && stories.length === 0 && (
-      <EmptyState
-        icon="🗞️"
-        title="No stories found"
-        description="There are no positive stories for this region and category yet. Try another filter or add more stories in Supabase."
-      />
-    )}
+      {loading && firstLoad && (
+        <StatusMessage variant="accent" showDot>
+          Loading today&apos;s good news...
+        </StatusMessage>
+      )}
 
-    {stories.length > 0 && (
-      <>
-        <SectionLabel icon="📌" label="Top Story" />
-        <div className="bn-home-tab__hero">
-          <HeroCard
-            story={stories[0]}
-            expanded={expanded}
-            firstLoad={firstLoad}
-            saved={saved}
-            setExpanded={setExpanded}
-            toggleSave={toggleSave}
-            handleShareStory={handleShareStory}
-          />
-        </div>
+      {error && <StatusMessage variant="error">⚠️ {error}</StatusMessage>}
+      {!error && shareFeedback && <StatusMessage variant={shareFeedback.variant}>{shareFeedback.message}</StatusMessage>}
 
-        <SectionLabel icon="🌟" label="More Good News" />
-        <div className="bn-stack">
-          {stories.slice(1).map(story => (
-            <StoryCard
-              key={story.id}
-              story={story}
+      {!loading && !error && stories.length === 0 && (
+        <EmptyState
+          icon="🗞️"
+          title="No stories found"
+          description="There are no positive stories for this region and category yet. Try another filter or add more stories in Supabase."
+        />
+      )}
+
+      {featuredStory && (
+        <>
+          <SectionLabel icon="📌" label="Top Story" />
+          <div className="bn-home-tab__hero">
+            <HeroCard
+              story={featuredStory}
               expanded={expanded}
               firstLoad={firstLoad}
               saved={saved}
@@ -80,11 +74,27 @@ const HomeTab = ({
               toggleSave={toggleSave}
               handleShareStory={handleShareStory}
             />
-          ))}
-        </div>
-      </>
-    )}
-  </section>
-);
+          </div>
+
+          <SectionLabel icon="🌟" label="More Good News" />
+          <div className="bn-stack">
+            {remainingStories.map(story => (
+              <StoryCard
+                key={story.id}
+                story={story}
+                expanded={expanded}
+                firstLoad={firstLoad}
+                saved={saved}
+                setExpanded={setExpanded}
+                toggleSave={toggleSave}
+                handleShareStory={handleShareStory}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </section>
+  );
+};
 
 export default HomeTab;

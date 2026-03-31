@@ -9,6 +9,32 @@
   }
 }
 
+.bn-discover-note {
+  margin-top: 16px;
+  border: 1px solid rgba(224, 163, 66, 0.22);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 245, 214, 0.92), rgba(255, 250, 237, 0.9));
+  padding: 14px 16px;
+  color: var(--bn-text);
+
+  strong,
+  span {
+    display: block;
+  }
+
+  strong {
+    margin-bottom: 4px;
+    color: var(--bn-text-strong);
+    font-size: 13px;
+  }
+
+  span {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--bn-text-soft);
+  }
+}
+
 .bn-region-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
