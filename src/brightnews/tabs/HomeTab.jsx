@@ -3,6 +3,7 @@ import { getCategoryLabel } from "../i18n";
 import Chip from "../components/Chip";
 import EmptyState from "../components/EmptyState";
 import HeroCard from "../components/HeroCard";
+import SectionLabel from "../components/SectionLabel";
 import StatusMessage from "../components/StatusMessage";
 import StoryCard from "../components/StoryCard";
 
@@ -32,7 +33,7 @@ const HomeTab = ({
 
   return (
     <section className="bn-tab bn-home-tab">
-      <div className="bn-home-tab__filters-surface">
+      <div className="bn-home-tab__filters-surface bn-home-tab__filters-surface--desktop">
         <div className="bn-home-tab__filters-copy">
           <span className="bn-home-tab__filters-kicker">{t("home.exploreFeed")}</span>
           <p>{t("home.exploreDescription")}</p>
@@ -55,6 +56,22 @@ const HomeTab = ({
         </div>
       </div>
 
+      <div className="bn-home-tab__filters-mobile">
+        <div className="bn-chip-row">
+          {CATEGORIES.map(item => (
+            <Chip
+              key={item.id}
+              active={category === item.id}
+              onClick={() => setCategory(item.id)}
+              className={`bn-chip--category ${getCategoryThemeClass(item.id)}`}
+            >
+              <span>{item.emoji}</span>
+              <span>{getCategoryLabel(item.id, uiLanguage)}</span>
+            </Chip>
+          ))}
+        </div>
+      </div>
+
       {loading && firstLoad && (
         <StatusMessage variant="accent" showDot>
           {t("home.loading")}
@@ -74,7 +91,7 @@ const HomeTab = ({
 
       {featuredStory && (
         <>
-          <div className="bn-home-tab__intro">
+          <div className="bn-home-tab__intro bn-home-tab__intro--desktop">
             <div>
               <span className="bn-home-tab__kicker">{t("home.highlights")}</span>
               <h2>{t("home.title")}</h2>
@@ -82,7 +99,7 @@ const HomeTab = ({
             </div>
           </div>
 
-          <div className="bn-home-tab__story-grid">
+          <div className="bn-home-tab__story-grid bn-home-tab__story-grid--desktop">
             <div className="bn-home-tab__lead">
               <HeroCard
                 story={featuredStory}
@@ -112,6 +129,41 @@ const HomeTab = ({
                 />
               </div>
             ))}
+          </div>
+
+          <div className="bn-home-tab__mobile-flow">
+            <SectionLabel icon="📌" label={t("home.topStory")} />
+            <div className="bn-home-tab__hero">
+              <HeroCard
+                story={featuredStory}
+                expanded={expanded}
+                firstLoad={firstLoad}
+                saved={saved}
+                setExpanded={setExpanded}
+                toggleSave={toggleSave}
+                handleShareStory={handleShareStory}
+                t={t}
+                uiLanguage={uiLanguage}
+              />
+            </div>
+
+            {remainingStories.length > 0 ? <SectionLabel icon="🌟" label={t("home.moreGoodNews")} /> : null}
+            <div className="bn-stack">
+              {remainingStories.map(story => (
+                <StoryCard
+                  key={story.id}
+                  story={story}
+                  expanded={expanded}
+                  firstLoad={firstLoad}
+                  saved={saved}
+                  setExpanded={setExpanded}
+                  toggleSave={toggleSave}
+                  handleShareStory={handleShareStory}
+                  t={t}
+                  uiLanguage={uiLanguage}
+                />
+              ))}
+            </div>
           </div>
         </>
       )}

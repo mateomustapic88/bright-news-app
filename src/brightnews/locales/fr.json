@@ -68,6 +68,8 @@
   "home": {
     "exploreFeed": "Explorer le flux",
     "exploreDescription": "Choisissez un sujet, puis faites défiler un seul flux d'articles.",
+    "topStory": "À la une",
+    "moreGoodNews": "Plus de bonnes nouvelles",
     "highlights": "Les temps forts du jour",
     "title": "Un flux calme de bonnes nouvelles.",
     "description": "Commencez par l'histoire la plus forte, puis explorez le reste du flux ci-dessous.",

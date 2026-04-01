@@ -20,7 +20,7 @@ const Header = ({
   return (
     <header className="bn-header">
       <div className="bn-header__row">
-        <div className="bn-brand">
+        <div className="bn-brand bn-brand--desktop">
           <div>
             <div className="bn-brand__eyebrow">{t("header.eyebrow")}</div>
             <div className="bn-brand__name">{t("header.title")}</div>
@@ -28,6 +28,14 @@ const Header = ({
             <p className="bn-brand__lede">
               {t("header.lede")}
             </p>
+          </div>
+        </div>
+
+        <div className="bn-brand bn-brand--mobile">
+          <div className="bn-brand__icon">☀️</div>
+          <div>
+            <div className="bn-brand__name">BrightNews</div>
+            <p className="bn-brand__meta">{t("header.meta", { date: todayLabel })}</p>
           </div>
         </div>
 

@@ -68,6 +68,8 @@
   "home": {
     "exploreFeed": "フィードを探す",
     "exploreDescription": "トピックを選び、1つの流れでストーリーを追いましょう。",
+    "topStory": "トップストーリー",
+    "moreGoodNews": "さらに良いニュース",
     "highlights": "今日のハイライト",
     "title": "穏やかな良いニュースの流れ。",
     "description": "まずは最も強いストーリーから始めて、その下に続くフィードを読んでください。",

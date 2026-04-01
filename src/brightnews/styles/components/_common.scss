@@ -529,6 +529,79 @@
 }
 
 @media (max-width: 768px) {
+  .bright-news {
+    border: none;
+    border-radius: 0;
+    background: var(--bn-bg);
+    box-shadow: none;
+    backdrop-filter: none;
+
+    &::before {
+      display: none;
+    }
+  }
+
+  .bn-screen {
+    height: calc(100vh - 154px);
+    padding-bottom: 76px;
+  }
+
+  .bn-tab {
+    padding: 12px 14px 16px;
+
+    h2 {
+      font-family: var(--bn-font);
+      font-size: 20px;
+      font-weight: 900;
+      line-height: 1.2;
+      letter-spacing: normal;
+    }
+  }
+
+  .bn-tab-note,
+  .bn-tab > p {
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .bn-chip-row {
+    margin-bottom: 12px;
+  }
+
+  .bn-stack {
+    gap: 9px;
+  }
+
+  .bn-chip {
+    padding: 7px 13px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .bn-chip--category {
+    border: 2px solid transparent;
+    background: var(--bn-surface);
+  }
+
+  .bn-save-button--hero {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--bn-radius-sm);
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: none;
+  }
+
+  .bn-share-button--hero {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--bn-radius-sm);
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 768px) {
   .bn-card-meta,
   .bn-card-location {
     font-size: 11px;

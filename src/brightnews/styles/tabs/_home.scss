@@ -2,6 +2,11 @@
   padding-top: 16px;
 }
 
+.bn-home-tab__filters-mobile,
+.bn-home-tab__mobile-flow {
+  display: none;
+}
+
 .bn-home-tab__filters-surface {
   margin-bottom: 24px;
   padding: 18px 20px;
@@ -96,21 +101,18 @@
     padding-top: 14px;
   }
 
-  .bn-home-tab__filters-surface {
-    padding: 14px;
-    margin-bottom: 18px;
+  .bn-home-tab__filters-surface--desktop,
+  .bn-home-tab__intro--desktop,
+  .bn-home-tab__story-grid--desktop {
+    display: none;
   }
 
-  .bn-home-tab__filters-copy {
-    margin-bottom: 10px;
-
-    p {
-      font-size: 13px;
-      line-height: 1.55;
-    }
+  .bn-home-tab__filters-mobile,
+  .bn-home-tab__mobile-flow {
+    display: block;
   }
 
-  .bn-home-tab__intro {
+  .bn-home-tab__hero {
     margin-bottom: 14px;
   }
 }
