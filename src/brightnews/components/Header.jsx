@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { formatUiDate, getRegionLabel } from "../i18n";
 
 const Header = ({
@@ -12,6 +13,9 @@ const Header = ({
   uiLanguage,
 }) => {
   const todayLabel = formatUiDate(new Date(), uiLanguage);
+  const [isRegionPickerOpen, setIsRegionPickerOpen] = useState(false);
+  const currentRegion = regions.find(item => item.code === region) || regions[0];
+  const currentRegionLabel = getRegionLabel(region, uiLanguage);
 
   return (
     <header className="bn-header">
@@ -40,6 +44,43 @@ const Header = ({
       {showRegions ? (
         <div className="bn-region-context">
           <span className="bn-region-context__label">{t("header.edition")}</span>
+          <div className="bn-region-context__desktop">
+            <button
+              type="button"
+              className={`bn-globe-selector${isRegionPickerOpen ? " is-open" : ""}`}
+              onClick={() => setIsRegionPickerOpen(open => !open)}
+              aria-expanded={isRegionPickerOpen}
+              aria-haspopup="dialog"
+            >
+              <span className="bn-globe-selector__icon" aria-hidden="true">{currentRegion?.flag || "🌍"}</span>
+              <span className="bn-globe-selector__copy">
+                <strong>{currentRegionLabel}</strong>
+                <span>Switch country coverage</span>
+              </span>
+              <span className="bn-globe-selector__chevron" aria-hidden="true">
+                {isRegionPickerOpen ? "−" : "+"}
+              </span>
+            </button>
+
+            {isRegionPickerOpen ? (
+              <div className="bn-globe-selector__panel" role="dialog" aria-label={t("header.edition")}>
+                {regions.map(item => (
+                  <button
+                    key={item.code}
+                    type="button"
+                    onClick={() => {
+                      setRegion(item.code);
+                      setIsRegionPickerOpen(false);
+                    }}
+                    className={`bn-globe-selector__option${region === item.code ? " is-active" : ""}`}
+                  >
+                    <span>{item.flag}</span>
+                    <span>{getRegionLabel(item.code, uiLanguage)}</span>
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
           <div className="bn-region-row">
             {regions.map(item => (
               <button
