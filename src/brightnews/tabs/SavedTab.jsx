@@ -10,9 +10,11 @@ const SavedTab = ({
   shareFeedback,
   toggleSave,
   handleShareStory,
+  t,
+  uiLanguage,
 }) => (
   <section className="bn-tab bn-saved-tab">
-    <h2>{session?.user ? "❤️ Saved Stories" : "❤️ Saved Stories"}</h2>
+    <h2>{t("saved.title")}</h2>
 
     {shareFeedback && <StatusMessage variant={shareFeedback.variant}>{shareFeedback.message}</StatusMessage>}
 
@@ -20,21 +22,21 @@ const SavedTab = ({
       <div className="bn-saved-tab__locked">
         <EmptyState
           icon="🔐"
-          title="Sign in to view saved stories"
-          description="Your saved list lives in your account now. Open Account to sign in with Google and sync it across devices."
+          title={t("saved.signInTitle")}
+          description={t("saved.signInDescription")}
         />
         <button
           type="button"
           onClick={() => setTab("account")}
           className="bn-button bn-button--primary"
         >
-          Open Account
+          {t("saved.openAccount")}
         </button>
       </div>
     ) : savedStories.length === 0 ? (
       <EmptyState
         icon="🤍"
-        description="No saved stories yet. Tap ❤️ on any story to save it."
+        description={t("saved.emptyDescription")}
       />
     ) : (
       <div className="bn-stack">
@@ -45,6 +47,8 @@ const SavedTab = ({
             saved={saved}
             toggleSave={toggleSave}
             handleShareStory={handleShareStory}
+            t={t}
+            uiLanguage={uiLanguage}
           />
         ))}
       </div>

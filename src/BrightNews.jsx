@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { App } from "@capacitor/app";
 import { Browser } from "@capacitor/browser";
 import {
@@ -36,6 +36,11 @@ import {
   getVisibleTabs,
   SAVED_STORIES_KEY,
 } from "./brightnews/constants";
+import {
+  createTranslator,
+  getTabLabel,
+  getUiLanguage,
+} from "./brightnews/i18n";
 import {
   readOnboardingDismissed,
   readPreferredRegion,
@@ -103,6 +108,8 @@ const BrightNews = () => {
   const regionInitializedRef = useRef(false);
   const categoryInitializedRef = useRef(false);
   const languageInitializedRef = useRef(false);
+  const uiLanguage = getUiLanguage(languageFilter);
+  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
 
   const adjustSavedCount = useCallback((items, storyId, delta) => (
     items.map(story => (
@@ -149,7 +156,7 @@ const BrightNews = () => {
       }
 
       if (event === "SIGNED_IN") {
-        setAuthMessage("Signed in successfully.");
+        setAuthMessage(t("feedback.signInSuccess"));
         setAuthError("");
         trackEvent("sign_in_success", {
           provider: "google",
@@ -170,7 +177,7 @@ const BrightNews = () => {
       active = false;
       data.subscription.unsubscribe();
     };
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (!supabase || !isNativeApp()) return undefined;
@@ -322,7 +329,7 @@ const BrightNews = () => {
     }
 
     setAnalyticsUserId(session.user.id);
-  }, [session?.user]);
+  }, [session?.user, t]);
 
   useEffect(() => {
     if (!session?.user) return;
@@ -381,7 +388,7 @@ const BrightNews = () => {
         }
       } catch (profileError) {
         if (active) {
-          setAuthError(profileError.message || "Unable to load your account.");
+          setAuthError(profileError.message || t("feedback.loadAccountError"));
         }
       } finally {
         if (active) {
@@ -411,11 +418,11 @@ const BrightNews = () => {
 
         if (active) {
           setSaved(mergedSaved);
-          setAuthMessage("Saved stories are synced to your account.");
+          setAuthMessage(t("feedback.savedSynced"));
         }
       } catch (syncError) {
         if (active) {
-          setAuthError(syncError.message || "Unable to sync saved stories.");
+          setAuthError(syncError.message || t("feedback.syncSavedError"));
         }
       } finally {
         if (active) {
@@ -430,7 +437,7 @@ const BrightNews = () => {
     return () => {
       active = false;
     };
-  }, [session?.user]);
+  }, [session?.user, t]);
 
   useEffect(() => {
     let active = true;
@@ -475,11 +482,11 @@ const BrightNews = () => {
       const result = await loadRawArticles(currentFilter);
       setRawArticles(result);
     } catch (loadError) {
-      setRawError(loadError.message || "Unable to load review queue.");
+      setRawError(loadError.message || t("feedback.loadReviewError"));
     } finally {
       setRawLoading(false);
     }
-  }, [session?.user, profile?.is_admin]);
+  }, [session?.user, profile?.is_admin, t]);
 
   useEffect(() => {
     if (tab !== "review" || !session?.user || !profile?.is_admin) return;
@@ -564,11 +571,11 @@ const BrightNews = () => {
           presentationStyle: "fullscreen",
         });
 
-        setAuthMessage("Opening Google sign-in...");
+        setAuthMessage(t("auth.redirecting"));
         return;
       }
 
-      setAuthMessage("Redirecting to Google...");
+      setAuthMessage(t("auth.redirecting"));
     } catch (submitError) {
       setAuthLoading(false);
       setAuthError(getReadableAuthError(submitError));
@@ -584,7 +591,7 @@ const BrightNews = () => {
       return;
     }
 
-    setAuthMessage("Signed out.");
+    setAuthMessage(t("auth.signOut"));
   };
 
   const toggleSave = async (id, e) => {
@@ -622,7 +629,7 @@ const BrightNews = () => {
       Object.keys(cache.current).forEach(cacheKey => {
         cache.current[cacheKey] = adjustSavedCount(cache.current[cacheKey] || [], id, -delta);
       });
-      setAuthError(saveError.message || "Saved story sync failed.");
+      setAuthError(saveError.message || t("feedback.saveSyncError"));
     }
   };
 
@@ -645,7 +652,7 @@ const BrightNews = () => {
     } catch {
       setShareFeedback({
         variant: "error",
-        message: "Unable to share this story right now.",
+        message: t("feedback.shareError"),
       });
     }
   };
@@ -655,7 +662,7 @@ const BrightNews = () => {
       await updateRawArticleReviewStatus(rawArticleId, "approved");
       await fetchRawArticles(reviewFilter);
     } catch (reviewError) {
-      setRawError(reviewError.message || "Unable to approve article.");
+      setRawError(reviewError.message || t("feedback.approveError"));
     }
   };
 
@@ -664,7 +671,7 @@ const BrightNews = () => {
       await updateRawArticleReviewStatus(rawArticleId, "rejected", "manual_review");
       await fetchRawArticles(reviewFilter);
     } catch (reviewError) {
-      setRawError(reviewError.message || "Unable to reject article.");
+      setRawError(reviewError.message || t("feedback.rejectError"));
     }
   };
 
@@ -676,6 +683,10 @@ const BrightNews = () => {
   };
 
   const tabs = getVisibleTabs(session, profile);
+  const localizedTabs = tabs.map(item => ({
+    ...item,
+    label: getTabLabel(item.id, uiLanguage),
+  }));
 
   return (
     <div className="bright-news">
@@ -683,10 +694,14 @@ const BrightNews = () => {
 
       <TopBar
         session={session}
+        tab={tab}
+        tabs={localizedTabs}
         setTab={setTab}
         languageFilter={languageFilter}
         languageFilters={languageFilters}
         setLanguageFilter={setLanguageFilter}
+        t={t}
+        uiLanguage={uiLanguage}
       />
       <Header
         region={region}
@@ -694,12 +709,14 @@ const BrightNews = () => {
         setRegion={setRegion}
         feedbackHref={betaFeedbackHref}
         onFeedbackClick={handleFeedbackClick}
-        showRegions={tab !== "account"}
+        showRegions={tab === "home"}
         onRefresh={async () => {
           trackEvent("feed_refresh", { region, category, language: languageFilter });
           await refreshAvailableRegions();
           await fetchNews(region, category, true);
         }}
+        t={t}
+        uiLanguage={uiLanguage}
       />
 
       <div className="bn-screen">
@@ -717,6 +734,8 @@ const BrightNews = () => {
             setExpanded={setExpanded}
             toggleSave={toggleSave}
             handleShareStory={handleShareStory}
+            t={t}
+            uiLanguage={uiLanguage}
           />
         )}
 
@@ -726,6 +745,8 @@ const BrightNews = () => {
             regions={availableRegions}
             setRegion={setRegion}
             setTab={setTab}
+            t={t}
+            uiLanguage={uiLanguage}
           />
         )}
 
@@ -738,6 +759,8 @@ const BrightNews = () => {
             shareFeedback={shareFeedback}
             toggleSave={toggleSave}
             handleShareStory={handleShareStory}
+            t={t}
+            uiLanguage={uiLanguage}
           />
         )}
 
@@ -753,6 +776,7 @@ const BrightNews = () => {
             handleSignOut={handleSignOut}
             handleGoogleSignIn={handleGoogleSignIn}
             handleFeedbackClick={handleFeedbackClick}
+            t={t}
           />
         )}
 
@@ -768,17 +792,20 @@ const BrightNews = () => {
             handleRefreshRawArticles={() => fetchRawArticles(reviewFilter)}
             handleApproveRawArticle={handleApproveRawArticle}
             handleRejectRawArticle={handleRejectRawArticle}
+            t={t}
+            uiLanguage={uiLanguage}
           />
         )}
       </div>
 
-      <BottomNav tabs={tabs} tab={tab} setTab={setTab} />
+      <BottomNav tabs={localizedTabs} tab={tab} setTab={setTab} />
 
       {showOnboarding && (
         <OnboardingModal
           session={session}
           handleDismiss={handleDismissOnboarding}
           handleGoogleSignIn={handleGoogleSignIn}
+          t={t}
         />
       )}
     </div>

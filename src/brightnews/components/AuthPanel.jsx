@@ -16,13 +16,14 @@ const AuthPanel = ({
   syncingSaved,
   handleGoogleSignIn,
   handleSignOut,
+  t,
 }) => {
   const displayName =
     profile?.display_name ||
     session?.user?.user_metadata?.full_name ||
     session?.user?.user_metadata?.name ||
     session?.user?.email ||
-    "BrightNews reader";
+    t("auth.defaultReader");
   const email = session?.user?.email || "";
   const avatarUrl = session?.user?.user_metadata?.avatar_url || "";
   const planLabel = (profile?.plan || "free").toUpperCase();
@@ -31,17 +32,17 @@ const AuthPanel = ({
     <section className="bn-auth-panel">
       <div className="bn-auth-panel__header">
         <div>
-          <h3>{session?.user ? "Google sync is active" : "Sign in with Google"}</h3>
+          <h3>{session?.user ? t("auth.activeTitle") : t("auth.signInTitle")}</h3>
           <p>
             {session?.user
-              ? "Your saved stories now follow you across devices."
-              : "Use your Google account to sync saves, reading history, and future preferences."}
+              ? t("auth.activeDescription")
+              : t("auth.signInDescription")}
           </p>
         </div>
 
         {session?.user && (
           <button type="button" onClick={handleSignOut} className="bn-button bn-button--secondary">
-            Sign out
+            {t("auth.signOut")}
           </button>
         )}
       </div>
@@ -59,32 +60,30 @@ const AuthPanel = ({
 
             <div>
               <p className="bn-account-summary__name">
-                {profileLoading ? "Loading account..." : displayName}
+                {profileLoading ? t("auth.loadingAccount") : displayName}
               </p>
               {email ? <p className="bn-account-summary__email">{email}</p> : null}
-              <p className="bn-account-summary__plan">Plan: {planLabel}</p>
+              <p className="bn-account-summary__plan">{t("auth.plan", { plan: planLabel })}</p>
             </div>
           </div>
 
           <div className="bn-account-summary__status">
             <div className="bn-account-summary__badge">
-              {profile?.onboarding_completed ? "READY" : "SETUP"}
+              {profile?.onboarding_completed ? t("auth.ready") : t("auth.setup")}
             </div>
-            <p className="bn-account-summary__status-text">Google account connected</p>
+            <p className="bn-account-summary__status-text">{t("auth.connected")}</p>
           </div>
         </div>
       )}
 
       {!session?.user && (
         <div className="bn-auth-help">
-          <p className="bn-auth-help__eyebrow">Google Sync</p>
-          <p className="bn-auth-help__text">
-            Sign in once and keep your good-news collection synced everywhere you read.
-          </p>
+          <p className="bn-auth-help__eyebrow">{t("auth.googleSync")}</p>
+          <p className="bn-auth-help__text">{t("auth.helpText")}</p>
           <div className="bn-auth-help__benefits">
-            <span className="bn-auth-help__benefit">Cross-device saves</span>
-            <span className="bn-auth-help__benefit">Cleaner beta login</span>
-            <span className="bn-auth-help__benefit">Future personalized briefings</span>
+            <span className="bn-auth-help__benefit">{t("auth.benefitCrossDevice")}</span>
+            <span className="bn-auth-help__benefit">{t("auth.benefitCleanerLogin")}</span>
+            <span className="bn-auth-help__benefit">{t("auth.benefitFutureBriefings")}</span>
           </div>
           <button
             type="button"
@@ -112,12 +111,12 @@ const AuthPanel = ({
                 />
               </svg>
             </span>
-            <span>{authLoading ? "Redirecting..." : "Continue with Google"}</span>
+            <span>{authLoading ? t("auth.redirecting") : t("auth.continueWithGoogle")}</span>
           </button>
         </div>
       )}
 
-      {syncingSaved && <p className="bn-feedback bn-feedback--accent">Syncing saved stories...</p>}
+      {syncingSaved && <p className="bn-feedback bn-feedback--accent">{t("auth.syncingSaved")}</p>}
       {authMessage && <p className="bn-feedback bn-feedback--info">{authMessage}</p>}
       {authError && <p className="bn-feedback bn-feedback--error">{authError}</p>}
     </section>

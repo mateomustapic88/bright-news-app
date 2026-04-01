@@ -1,0 +1,171 @@
+{
+  "tabs": {
+    "home": "Start",
+    "discover": "Entdecken",
+    "saved": "Gespeichert",
+    "account": "Konto",
+    "review": "Prüfung"
+  },
+  "categories": {
+    "all": "Alle",
+    "Environment": "Planet",
+    "Science": "Wissenschaft",
+    "Community": "Menschen",
+    "Health": "Gesundheit",
+    "Animals": "Tiere",
+    "Innovation": "Technik"
+  },
+  "regions": {
+    "world": "Welt",
+    "us": "USA",
+    "uk": "UK",
+    "hr": "Kroatien",
+    "de": "Deutschland",
+    "fr": "Frankreich",
+    "jp": "Japan",
+    "au": "Australien",
+    "br": "Brasilien",
+    "in": "Indien"
+  },
+  "languages": {
+    "all": "Alle Sprachen",
+    "en": "Englisch",
+    "hr": "Kroatisch",
+    "de": "Deutsch",
+    "fr": "Französisch",
+    "ja": "Japanisch",
+    "pt": "Portugiesisch"
+  },
+  "languageShort": {
+    "all": "Alle",
+    "en": "Englisch",
+    "hr": "Kroatisch",
+    "de": "Deutsch",
+    "fr": "Französisch",
+    "ja": "Japanisch",
+    "pt": "Portugiesisch"
+  },
+  "reviewFilters": {
+    "pending": "Ausstehend",
+    "approved": "Genehmigt",
+    "rejected": "Abgelehnt",
+    "all": "Alle"
+  },
+  "topbar": {
+    "account": "Konto",
+    "signIn": "Anmelden",
+    "language": "Sprache"
+  },
+  "header": {
+    "eyebrow": "Tagesüberblick",
+    "title": "Gute Nachrichten, ohne Negativität.",
+    "meta": "Positive Geschichten aus aller Welt · {date}",
+    "lede": "Ein ruhigerer Blick auf das, was sich verbessert, aufbaut, heilt und vorankommt.",
+    "betaFeedback": "Beta-Feedback",
+    "refreshStories": "Stories aktualisieren",
+    "edition": "Ausgabe"
+  },
+  "home": {
+    "exploreFeed": "Feed erkunden",
+    "exploreDescription": "Wähle ein Thema und scrolle dann durch einen einzigen Story-Flow.",
+    "highlights": "Heutige Highlights",
+    "title": "Ein ruhiger Strom guter Nachrichten.",
+    "description": "Beginne mit der stärksten Story und erkunde dann den Rest des Feeds darunter.",
+    "loading": "Die guten Nachrichten von heute werden geladen...",
+    "noStoriesTitle": "Keine Stories gefunden",
+    "noStoriesDescription": "Für diese Region und Kategorie gibt es noch keine positiven Stories. Probiere einen anderen Filter oder füge mehr Stories in Supabase hinzu.",
+    "readMore": "MEHR LESEN ↓",
+    "showLess": "WENIGER ANZEIGEN ↑"
+  },
+  "discover": {
+    "title": "🌍 Regionen entdecken",
+    "description": "Tippe auf eine Region, um ihre guten Nachrichten zu entdecken",
+    "moreCountriesTitle": "Weitere Länder und stärkere lokale Abdeckung folgen bald.",
+    "moreCountriesText": "Wir erweitern die Quellenqualität Region für Region."
+  },
+  "saved": {
+    "title": "❤️ Gespeicherte Stories",
+    "signInTitle": "Melde dich an, um gespeicherte Stories zu sehen",
+    "signInDescription": "Deine gespeicherte Liste lebt jetzt in deinem Konto. Öffne Konto, melde dich mit Google an und synchronisiere sie geräteübergreifend.",
+    "openAccount": "Konto öffnen",
+    "emptyDescription": "Noch keine gespeicherten Stories. Tippe bei einer Story auf ❤️, um sie zu speichern."
+  },
+  "account": {
+    "signedInTitle": "👤 Konto",
+    "signedOutTitle": "🔐 Konto",
+    "resourcesTitle": "Support und Datenschutz",
+    "resourcesDescription": "BrightNews stellt bereits die Support-, Datenschutz- und Kontolöschungslinks bereit, die App-Stores verlangen. Halte diese Seiten vor einer breiteren Beta aktuell.",
+    "supportEmail": "Support-E-Mail:",
+    "sendBetaFeedback": "Beta-Feedback senden",
+    "support": "Support",
+    "privacyPolicy": "Datenschutz",
+    "accountDeletion": "Kontolöschung anfordern",
+    "resourcesHint": "Die Feedback-E-Mail wird mit einer Vorlage geöffnet, damit Tester Bugs, verwirrende Abläufe oder Probleme mit der Story-Qualität schnell beschreiben können."
+  },
+  "auth": {
+    "defaultReader": "BrightNews-Leser",
+    "activeTitle": "Google-Sync ist aktiv",
+    "signInTitle": "Mit Google anmelden",
+    "activeDescription": "Deine gespeicherten Stories begleiten dich jetzt auf allen Geräten.",
+    "signInDescription": "Nutze dein Google-Konto, um Saves, Leseverlauf und künftige Einstellungen zu synchronisieren.",
+    "signOut": "Abmelden",
+    "loadingAccount": "Konto wird geladen...",
+    "plan": "Plan: {plan}",
+    "ready": "BEREIT",
+    "setup": "SETUP",
+    "connected": "Google-Konto verbunden",
+    "googleSync": "Google-Sync",
+    "helpText": "Melde dich einmal an und halte deine Sammlung guter Nachrichten überall synchron.",
+    "benefitCrossDevice": "Geräteübergreifende Saves",
+    "benefitCleanerLogin": "Saubererer Beta-Login",
+    "benefitFutureBriefings": "Zukünftige personalisierte Briefings",
+    "redirecting": "Weiterleitung...",
+    "continueWithGoogle": "Mit Google fortfahren",
+    "syncingSaved": "Gespeicherte Stories werden synchronisiert..."
+  },
+  "onboarding": {
+    "eyebrow": "Willkommen bei BrightNews",
+    "title": "Ein ruhigerer Weg, informiert zu bleiben",
+    "intro": "BrightNews zeigt glaubwürdige positive Geschichten aus aller Welt. Starte mit dem Welt-Feed, wechsle Regionen und Kategorien und speichere die Stories, die du behalten möchtest.",
+    "point1Title": "Positive Nachrichten, global",
+    "point1Description": "Lies echte positive Geschichten aus mehreren Regionen, statt immer wieder durch dieselbe Negativität zu scrollen.",
+    "point2Title": "Echte Quellenlinks",
+    "point2Description": "Öffne die Originalquelle hinter jeder Story, damit sich der Feed glaubwürdig und geerdet anfühlt.",
+    "point3Title": "Speichern und teilen",
+    "point3Description": "Behalte die Stories, die dir wichtig sind, und teile die besten mit anderen Menschen.",
+    "signInWithGoogle": "Mit Google anmelden",
+    "startReading": "Jetzt lesen",
+    "hint": "Region, Kategorie und Sprache kannst du später ändern."
+  },
+  "review": {
+    "title": "🛠️ Prüfwarteschlange",
+    "signInFirst": "Melde dich zuerst an, um importierte Stories zu prüfen.",
+    "adminOnly": "Dieser Bereich ist nur für Admin-Konten verfügbar.",
+    "intro": "Genehmige hier positive Kandidaten und führe dann `npm run publish:approved` aus.",
+    "refresh": "Aktualisieren",
+    "loading": "Prüfwarteschlange wird geladen...",
+    "empty": "Für diesen Filter wurden keine Rohartikel gefunden.",
+    "noPreview": "Keine Vorschau verfügbar.",
+    "readSource": "Quelle lesen",
+    "invalidSourceLink": "Ungültiger Quellenlink",
+    "reject": "Ablehnen",
+    "approve": "Genehmigen"
+  },
+  "story": {
+    "save": "Story speichern",
+    "removeSaved": "Gespeicherte Story entfernen",
+    "readSource": "Quelle lesen"
+  },
+  "feedback": {
+    "signInSuccess": "Erfolgreich angemeldet.",
+    "savedSynced": "Gespeicherte Stories wurden mit deinem Konto synchronisiert.",
+    "shareError": "Diese Story kann derzeit nicht geteilt werden.",
+    "loadAccountError": "Dein Konto konnte nicht geladen werden.",
+    "syncSavedError": "Gespeicherte Stories konnten nicht synchronisiert werden.",
+    "loadReviewError": "Die Prüfwarteschlange konnte nicht geladen werden.",
+    "approveError": "Der Artikel konnte nicht genehmigt werden.",
+    "rejectError": "Der Artikel konnte nicht abgelehnt werden.",
+    "saveSyncError": "Die Synchronisierung der gespeicherten Story ist fehlgeschlagen.",
+    "startGoogleSignInError": "Google-Anmeldung konnte nicht gestartet werden."
+  }
+}

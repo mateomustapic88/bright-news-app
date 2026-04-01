@@ -1,0 +1,171 @@
+{
+  "tabs": {
+    "home": "Početna",
+    "discover": "Istraži",
+    "saved": "Spremljeno",
+    "account": "Račun",
+    "review": "Pregled"
+  },
+  "categories": {
+    "all": "Sve",
+    "Environment": "Planet",
+    "Science": "Znanost",
+    "Community": "Ljudi",
+    "Health": "Zdravlje",
+    "Animals": "Životinje",
+    "Innovation": "Tehnologija"
+  },
+  "regions": {
+    "world": "Svijet",
+    "us": "SAD",
+    "uk": "UK",
+    "hr": "Hrvatska",
+    "de": "Njemačka",
+    "fr": "Francuska",
+    "jp": "Japan",
+    "au": "Australija",
+    "br": "Brazil",
+    "in": "Indija"
+  },
+  "languages": {
+    "all": "Svi jezici",
+    "en": "Engleski",
+    "hr": "Hrvatski",
+    "de": "Njemački",
+    "fr": "Francuski",
+    "ja": "Japanski",
+    "pt": "Portugalski"
+  },
+  "languageShort": {
+    "all": "Svi",
+    "en": "Engleski",
+    "hr": "Hrvatski",
+    "de": "Njemački",
+    "fr": "Francuski",
+    "ja": "Japanski",
+    "pt": "Portugalski"
+  },
+  "reviewFilters": {
+    "pending": "Na čekanju",
+    "approved": "Odobreno",
+    "rejected": "Odbijeno",
+    "all": "Sve"
+  },
+  "topbar": {
+    "account": "Račun",
+    "signIn": "Prijava",
+    "language": "Jezik"
+  },
+  "header": {
+    "eyebrow": "Današnji pregled",
+    "title": "Dobre vijesti, bez negativnosti.",
+    "meta": "Pozitivne priče iz cijelog svijeta · {date}",
+    "lede": "Smireniji pregled onoga što se poboljšava, gradi, liječi i ide naprijed.",
+    "betaFeedback": "Beta feedback",
+    "refreshStories": "Osvježi vijesti",
+    "edition": "Izdanje"
+  },
+  "home": {
+    "exploreFeed": "Istraži feed",
+    "exploreDescription": "Odaberi temu pa skrolaj kroz jedan tok priča.",
+    "highlights": "Današnji naglasci",
+    "title": "Jedan smiren tok dobrih vijesti.",
+    "description": "Kreni od najjače priče, pa nastavi kroz ostatak feeda ispod.",
+    "loading": "Učitavam današnje dobre vijesti...",
+    "noStoriesTitle": "Nema pronađenih vijesti",
+    "noStoriesDescription": "Još nema pozitivnih vijesti za ovu regiju i kategoriju. Isprobaj drugi filter ili dodaj više priča u Supabase.",
+    "readMore": "PROČITAJ VIŠE ↓",
+    "showLess": "PRIKAŽI MANJE ↑"
+  },
+  "discover": {
+    "title": "🌍 Istraži regije",
+    "description": "Dodirni regiju da istražiš njezine dobre vijesti",
+    "moreCountriesTitle": "Dolazi još zemalja i bogatija lokalna pokrivenost.",
+    "moreCountriesText": "Kvalitetu izvora širimo regiju po regiju."
+  },
+  "saved": {
+    "title": "❤️ Spremljene vijesti",
+    "signInTitle": "Prijavi se za pregled spremljenih vijesti",
+    "signInDescription": "Tvoj popis spremljenih vijesti sada živi u računu. Otvori Račun, prijavi se Googleom i sinkroniziraj ga među uređajima.",
+    "openAccount": "Otvori račun",
+    "emptyDescription": "Još nema spremljenih vijesti. Dodirni ❤️ na bilo kojoj priči da je spremiš."
+  },
+  "account": {
+    "signedInTitle": "👤 Račun",
+    "signedOutTitle": "🔐 Račun",
+    "resourcesTitle": "Podrška i privatnost",
+    "resourcesDescription": "BrightNews već izlaže linkove za podršku, privatnost i brisanje računa koje trgovine aplikacija traže. Održavaj te stranice ažurnima prije šire bete.",
+    "supportEmail": "Email podrške:",
+    "sendBetaFeedback": "Pošalji beta feedback",
+    "support": "Podrška",
+    "privacyPolicy": "Pravila privatnosti",
+    "accountDeletion": "Zatraži brisanje računa",
+    "resourcesHint": "Email za feedback otvara se s unaprijed pripremljenim predloškom kako bi testeri brzo opisali bugove, zbunjujuće tokove ili probleme s kvalitetom vijesti."
+  },
+  "auth": {
+    "defaultReader": "BrightNews čitatelj",
+    "activeTitle": "Google sinkronizacija je aktivna",
+    "signInTitle": "Prijavi se Googleom",
+    "activeDescription": "Tvoje spremljene vijesti sada te prate na svim uređajima.",
+    "signInDescription": "Koristi svoj Google račun za sinkronizaciju spremanja, povijesti čitanja i budućih postavki.",
+    "signOut": "Odjava",
+    "loadingAccount": "Učitavam račun...",
+    "plan": "Plan: {plan}",
+    "ready": "SPREMNO",
+    "setup": "POSTAVKE",
+    "connected": "Google račun povezan",
+    "googleSync": "Google sinkronizacija",
+    "helpText": "Prijavi se jednom i zadrži svoju kolekciju dobrih vijesti sinkroniziranom gdje god čitaš.",
+    "benefitCrossDevice": "Spremljeno na svim uređajima",
+    "benefitCleanerLogin": "Jednostavniji beta login",
+    "benefitFutureBriefings": "Budući personalizirani sažeci",
+    "redirecting": "Preusmjeravam...",
+    "continueWithGoogle": "Nastavi s Googleom",
+    "syncingSaved": "Sinkroniziram spremljene vijesti..."
+  },
+  "onboarding": {
+    "eyebrow": "Dobrodošli u BrightNews",
+    "title": "Smireniji način da ostaneš informiran",
+    "intro": "BrightNews donosi vjerodostojne pozitivne priče iz cijelog svijeta. Kreni od svjetskog feeda, mijenjaj regije i kategorije te spremi priče koje vrijedi sačuvati.",
+    "point1Title": "Pozitivne vijesti, globalno",
+    "point1Description": "Čitaj stvarne pozitivne priče iz više regija umjesto beskrajnog skrolanja kroz istu negativu.",
+    "point2Title": "Stvarni izvorni linkovi",
+    "point2Description": "Otvori originalni izvor iza svake priče kako bi feed ostao vjerodostojan i prizemljen.",
+    "point3Title": "Spremi i podijeli",
+    "point3Description": "Sačuvaj priče koje su ti važne i podijeli najbolje s drugim ljudima.",
+    "signInWithGoogle": "Prijavi se Googleom",
+    "startReading": "Počni čitati",
+    "hint": "Regiju, kategoriju i jezik možeš promijeniti kasnije."
+  },
+  "review": {
+    "title": "🛠️ Red za pregled",
+    "signInFirst": "Prvo se prijavi za pregled uvezenih priča.",
+    "adminOnly": "Ovo područje dostupno je samo administratorskim računima.",
+    "intro": "Ovdje odobri pozitivne kandidate, pa zatim pokreni `npm run publish:approved`.",
+    "refresh": "Osvježi",
+    "loading": "Učitavam red za pregled...",
+    "empty": "Nema pronađenih sirovih članaka za ovaj filter.",
+    "noPreview": "Pregled nije dostupan.",
+    "readSource": "Pročitaj izvor",
+    "invalidSourceLink": "Neispravan izvorni link",
+    "reject": "Odbij",
+    "approve": "Odobri"
+  },
+  "story": {
+    "save": "Spremi vijest",
+    "removeSaved": "Ukloni spremljenu vijest",
+    "readSource": "Pročitaj izvor"
+  },
+  "feedback": {
+    "signInSuccess": "Uspješno prijavljen.",
+    "savedSynced": "Spremljene vijesti sinkronizirane su s tvojim računom.",
+    "shareError": "Trenutno nije moguće podijeliti ovu vijest.",
+    "loadAccountError": "Nije moguće učitati tvoj račun.",
+    "syncSavedError": "Nije moguće sinkronizirati spremljene vijesti.",
+    "loadReviewError": "Nije moguće učitati red za pregled.",
+    "approveError": "Nije moguće odobriti članak.",
+    "rejectError": "Nije moguće odbiti članak.",
+    "saveSyncError": "Sinkronizacija spremljene vijesti nije uspjela.",
+    "startGoogleSignInError": "Nije moguće pokrenuti Google prijavu."
+  }
+}

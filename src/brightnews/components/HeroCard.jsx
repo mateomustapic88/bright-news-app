@@ -1,10 +1,11 @@
 import { getCategoryMeta, getCategoryThemeClass } from "../constants";
+import { getCategoryLabel } from "../i18n";
 import StoryImpact from "./StoryImpact";
 import StorySaveButton from "./StorySaveButton";
 import StoryShareButton from "./StoryShareButton";
 import StorySourceLink from "./StorySourceLink";
 
-const HeroCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave, handleShareStory }) => {
+const HeroCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave, handleShareStory, t, uiLanguage }) => {
   const category = getCategoryMeta(story.category);
   const themeClass = getCategoryThemeClass(story.category);
   const isExpanded = expanded === story.id;
@@ -34,11 +35,12 @@ const HeroCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave, 
             saved={saved}
             toggleSave={toggleSave}
             variant="hero"
+            t={t}
           />
         </div>
         <span className="bn-hero-card__emoji">{story.emoji}</span>
         <div className="bn-hero-card__category-tag">
-          {category.emoji} {story.category}
+          {category.emoji} {getCategoryLabel(story.category, uiLanguage)}
         </div>
       </div>
 
@@ -54,11 +56,11 @@ const HeroCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave, 
           <div className="bn-card-details">
             <p className="bn-card-summary">{story.summary}</p>
             <StoryImpact impact={story.impact} themeClass={themeClass} />
-            <StorySourceLink sourceUrl={story.sourceUrl} />
+            <StorySourceLink sourceUrl={story.sourceUrl} label={t("story.readSource")} />
           </div>
         )}
 
-        <div className="bn-card-toggle">{isExpanded ? "SHOW LESS ↑" : "READ MORE ↓"}</div>
+        <div className="bn-card-toggle">{isExpanded ? t("home.showLess") : t("home.readMore")}</div>
       </div>
     </article>
   );

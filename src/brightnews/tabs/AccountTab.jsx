@@ -17,12 +17,13 @@ const AccountTab = ({
   handleGoogleSignIn,
   handleSignOut,
   handleFeedbackClick,
+  t,
 }) => {
   const feedbackMailto = buildBetaFeedbackMailto();
 
   return (
     <section className="bn-tab bn-account-tab">
-      <h2>{session?.user ? "👤 Account" : "🔐 Account"}</h2>
+      <h2>{session?.user ? t("account.signedInTitle") : t("account.signedOutTitle")}</h2>
 
       <AuthPanel
         session={session}
@@ -34,34 +35,33 @@ const AccountTab = ({
         syncingSaved={syncingSaved}
         handleSignOut={handleSignOut}
         handleGoogleSignIn={handleGoogleSignIn}
+        t={t}
       />
 
       <section className="bn-account-resources">
-        <h3>Support and privacy</h3>
+        <h3>{t("account.resourcesTitle")}</h3>
         <p>
-          BrightNews already exposes the support, privacy, and account-deletion links that app stores
-          ask for. Keep these pages updated before wider beta rollout.
+          {t("account.resourcesDescription")}
         </p>
         <p>
-          Support email: <a href={SUPPORT_MAILTO}>{SUPPORT_EMAIL}</a>
+          {t("account.supportEmail")} <a href={SUPPORT_MAILTO}>{SUPPORT_EMAIL}</a>
         </p>
         <div className="bn-account-resources__actions">
           <a className="bn-button bn-button--primary" href={feedbackMailto} onClick={handleFeedbackClick}>
-            Send beta feedback
+            {t("account.sendBetaFeedback")}
           </a>
           <a className="bn-button bn-button--secondary" href={LEGAL_LINKS.support} target="_blank" rel="noreferrer">
-            Support
+            {t("account.support")}
           </a>
           <a className="bn-button bn-button--secondary" href={LEGAL_LINKS.privacy} target="_blank" rel="noreferrer">
-            Privacy policy
+            {t("account.privacyPolicy")}
           </a>
           <a className="bn-button bn-button--danger" href={LEGAL_LINKS.deletion} target="_blank" rel="noreferrer">
-            Request account deletion
+            {t("account.accountDeletion")}
           </a>
         </div>
         <p className="bn-account-resources__hint">
-          The feedback email opens with a prefilled template so testers can quickly describe bugs,
-          confusing flows, or story quality issues.
+          {t("account.resourcesHint")}
         </p>
       </section>
     </section>

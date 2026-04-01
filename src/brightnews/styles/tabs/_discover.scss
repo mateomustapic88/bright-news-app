@@ -1,10 +1,11 @@
 .bn-discover-tab {
   h2 {
-    margin-bottom: 4px;
+    margin-bottom: 6px;
   }
 
   p {
-    margin-bottom: 18px;
+    margin-bottom: 22px;
+    max-width: 58ch;
     font-weight: 500;
   }
 }
@@ -31,38 +32,48 @@
   span {
     font-size: 12px;
     line-height: 1.5;
-    color: var(--bn-text-soft);
+    color: var(--bn-text-muted);
   }
 }
 
 .bn-region-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 14px;
 }
 
 .bn-discover-region {
-  border: 1.5px solid var(--bn-border);
+  border: 1px solid rgba(19, 32, 51, 0.08);
   border-radius: var(--bn-radius-xl);
-  background: var(--bn-surface);
-  padding: 22px 16px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 252, 247, 0.94)),
+    radial-gradient(circle at top left, rgba(243, 201, 111, 0.14), transparent 40%);
+  padding: 28px 20px;
   cursor: pointer;
   text-align: center;
   transition: all var(--bn-transition);
+  box-shadow: var(--bn-shadow-card);
 
   &.is-active {
-    border-color: var(--bn-text-strong);
-    background: var(--bn-text-strong);
-    color: var(--bn-surface);
+    border-color: rgba(19, 32, 51, 0.22);
+    background: linear-gradient(180deg, #132033, #20314a);
+    color: #fffdf7;
+    transform: translateY(-1px);
   }
 }
 
 .bn-discover-region__flag {
-  margin-bottom: 8px;
-  font-size: 34px;
+  margin-bottom: 10px;
+  font-size: 38px;
 }
 
 .bn-discover-region__label {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
+}
+
+@media (min-width: 769px) {
+  .bn-region-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }

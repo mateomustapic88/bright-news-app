@@ -1,4 +1,5 @@
 import { REVIEW_FILTERS } from "../constants";
+import { getReviewFilterLabel } from "../i18n";
 import Chip from "../components/Chip";
 import EmptyState from "../components/EmptyState";
 import RawArticleCard from "../components/RawArticleCard";
@@ -15,12 +16,14 @@ const ReviewTab = ({
   handleRefreshRawArticles,
   handleApproveRawArticle,
   handleRejectRawArticle,
+  t,
+  uiLanguage,
 }) => {
   if (!session?.user) {
     return (
       <section className="bn-tab bn-review-tab">
-        <h2>🛠️ Review Queue</h2>
-        <p className="bn-tab-note">Sign in first to review imported stories.</p>
+        <h2>{t("review.title")}</h2>
+        <p className="bn-tab-note">{t("review.signInFirst")}</p>
       </section>
     );
   }
@@ -28,8 +31,8 @@ const ReviewTab = ({
   if (!profile?.is_admin) {
     return (
       <section className="bn-tab bn-review-tab">
-        <h2>🛠️ Review Queue</h2>
-        <p className="bn-tab-note">This area is only available to admin accounts.</p>
+        <h2>{t("review.title")}</h2>
+        <p className="bn-tab-note">{t("review.adminOnly")}</p>
       </section>
     );
   }
@@ -38,8 +41,8 @@ const ReviewTab = ({
     <section className="bn-tab bn-review-tab">
       <div className="bn-review-tab__header">
         <div>
-          <h2>🛠️ Review Queue</h2>
-          <p>Approve positive candidates here, then run `npm run publish:approved`.</p>
+          <h2>{t("review.title")}</h2>
+          <p>{t("review.intro")}</p>
         </div>
 
         <button
@@ -47,7 +50,7 @@ const ReviewTab = ({
           onClick={handleRefreshRawArticles}
           className="bn-button bn-button--secondary"
         >
-          Refresh
+          {t("review.refresh")}
         </button>
       </div>
 
@@ -59,16 +62,16 @@ const ReviewTab = ({
             onClick={() => setReviewFilter(item.id)}
             className="bn-chip--review"
           >
-            <span>{item.label}</span>
+            <span>{getReviewFilterLabel(item.id, uiLanguage)}</span>
           </Chip>
         ))}
       </div>
 
-      {rawLoading && <StatusMessage variant="info">Loading review queue...</StatusMessage>}
+      {rawLoading && <StatusMessage variant="info">{t("review.loading")}</StatusMessage>}
       {rawError && <StatusMessage variant="error">{rawError}</StatusMessage>}
 
       {!rawLoading && !rawError && rawArticles.length === 0 && (
-        <EmptyState icon="🗂️" description="No raw articles found for this filter." />
+        <EmptyState icon="🗂️" description={t("review.empty")} />
       )}
 
       <div className="bn-stack">
@@ -78,6 +81,7 @@ const ReviewTab = ({
             article={article}
             handleApproveRawArticle={handleApproveRawArticle}
             handleRejectRawArticle={handleRejectRawArticle}
+            t={t}
           />
         ))}
       </div>

@@ -1,0 +1,171 @@
+{
+  "tabs": {
+    "home": "Home",
+    "discover": "Discover",
+    "saved": "Saved",
+    "account": "Account",
+    "review": "Review"
+  },
+  "categories": {
+    "all": "All",
+    "Environment": "Planet",
+    "Science": "Science",
+    "Community": "People",
+    "Health": "Health",
+    "Animals": "Animals",
+    "Innovation": "Tech"
+  },
+  "regions": {
+    "world": "World",
+    "us": "USA",
+    "uk": "UK",
+    "hr": "Croatia",
+    "de": "Germany",
+    "fr": "France",
+    "jp": "Japan",
+    "au": "Australia",
+    "br": "Brazil",
+    "in": "India"
+  },
+  "languages": {
+    "all": "All languages",
+    "en": "English",
+    "hr": "Croatian",
+    "de": "German",
+    "fr": "French",
+    "ja": "Japanese",
+    "pt": "Portuguese"
+  },
+  "languageShort": {
+    "all": "All",
+    "en": "English",
+    "hr": "Croatian",
+    "de": "German",
+    "fr": "French",
+    "ja": "Japanese",
+    "pt": "Portuguese"
+  },
+  "reviewFilters": {
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "all": "All"
+  },
+  "topbar": {
+    "account": "Account",
+    "signIn": "Sign In",
+    "language": "Language"
+  },
+  "header": {
+    "eyebrow": "Today's brief",
+    "title": "Good news, without the negativity.",
+    "meta": "Positive stories from around the world · {date}",
+    "lede": "A calmer read on what is improving, building, healing, and moving forward.",
+    "betaFeedback": "Beta feedback",
+    "refreshStories": "Refresh stories",
+    "edition": "Edition"
+  },
+  "home": {
+    "exploreFeed": "Explore the feed",
+    "exploreDescription": "Choose a topic, then scroll a single story flow.",
+    "highlights": "Today's highlights",
+    "title": "One calm stream of good news.",
+    "description": "Start with the strongest story, then keep exploring the rest of the feed below.",
+    "loading": "Loading today's good news...",
+    "noStoriesTitle": "No stories found",
+    "noStoriesDescription": "There are no positive stories for this region and category yet. Try another filter or add more stories in Supabase.",
+    "readMore": "READ MORE ↓",
+    "showLess": "SHOW LESS ↑"
+  },
+  "discover": {
+    "title": "🌍 Explore Regions",
+    "description": "Tap any region to explore its good news",
+    "moreCountriesTitle": "More countries and richer local coverage are on the way.",
+    "moreCountriesText": "We're expanding source quality region by region."
+  },
+  "saved": {
+    "title": "❤️ Saved Stories",
+    "signInTitle": "Sign in to view saved stories",
+    "signInDescription": "Your saved list lives in your account now. Open Account to sign in with Google and sync it across devices.",
+    "openAccount": "Open Account",
+    "emptyDescription": "No saved stories yet. Tap ❤️ on any story to save it."
+  },
+  "account": {
+    "signedInTitle": "👤 Account",
+    "signedOutTitle": "🔐 Account",
+    "resourcesTitle": "Support and privacy",
+    "resourcesDescription": "BrightNews already exposes the support, privacy, and account-deletion links that app stores ask for. Keep these pages updated before wider beta rollout.",
+    "supportEmail": "Support email:",
+    "sendBetaFeedback": "Send beta feedback",
+    "support": "Support",
+    "privacyPolicy": "Privacy policy",
+    "accountDeletion": "Request account deletion",
+    "resourcesHint": "The feedback email opens with a prefilled template so testers can quickly describe bugs, confusing flows, or story quality issues."
+  },
+  "auth": {
+    "defaultReader": "BrightNews reader",
+    "activeTitle": "Google sync is active",
+    "signInTitle": "Sign in with Google",
+    "activeDescription": "Your saved stories now follow you across devices.",
+    "signInDescription": "Use your Google account to sync saves, reading history, and future preferences.",
+    "signOut": "Sign out",
+    "loadingAccount": "Loading account...",
+    "plan": "Plan: {plan}",
+    "ready": "READY",
+    "setup": "SETUP",
+    "connected": "Google account connected",
+    "googleSync": "Google Sync",
+    "helpText": "Sign in once and keep your good-news collection synced everywhere you read.",
+    "benefitCrossDevice": "Cross-device saves",
+    "benefitCleanerLogin": "Cleaner beta login",
+    "benefitFutureBriefings": "Future personalized briefings",
+    "redirecting": "Redirecting...",
+    "continueWithGoogle": "Continue with Google",
+    "syncingSaved": "Syncing saved stories..."
+  },
+  "onboarding": {
+    "eyebrow": "Welcome to BrightNews",
+    "title": "A calmer way to stay informed",
+    "intro": "BrightNews surfaces credible positive stories from around the world. Start with the world feed, switch regions and categories, and save the stories worth keeping.",
+    "point1Title": "Positive news, globally",
+    "point1Description": "Read real uplifting stories from multiple regions instead of doomscrolling the same negativity.",
+    "point2Title": "Real source links",
+    "point2Description": "Open the original source behind each story so the feed still feels credible and grounded.",
+    "point3Title": "Save and share",
+    "point3Description": "Keep the stories that matter to you and share the best ones with other people.",
+    "signInWithGoogle": "Sign in with Google",
+    "startReading": "Start reading",
+    "hint": "You can change region, category, and language later."
+  },
+  "review": {
+    "title": "🛠️ Review Queue",
+    "signInFirst": "Sign in first to review imported stories.",
+    "adminOnly": "This area is only available to admin accounts.",
+    "intro": "Approve positive candidates here, then run `npm run publish:approved`.",
+    "refresh": "Refresh",
+    "loading": "Loading review queue...",
+    "empty": "No raw articles found for this filter.",
+    "noPreview": "No preview available.",
+    "readSource": "Read source",
+    "invalidSourceLink": "Invalid source link",
+    "reject": "Reject",
+    "approve": "Approve"
+  },
+  "story": {
+    "save": "Save story",
+    "removeSaved": "Remove saved story",
+    "readSource": "Read source"
+  },
+  "feedback": {
+    "signInSuccess": "Signed in successfully.",
+    "savedSynced": "Saved stories are synced to your account.",
+    "shareError": "Unable to share this story right now.",
+    "loadAccountError": "Unable to load your account.",
+    "syncSavedError": "Unable to sync saved stories.",
+    "loadReviewError": "Unable to load review queue.",
+    "approveError": "Unable to approve article.",
+    "rejectError": "Unable to reject article.",
+    "saveSyncError": "Saved story sync failed.",
+    "startGoogleSignInError": "Unable to start Google sign-in."
+  }
+}

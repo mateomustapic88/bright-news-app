@@ -1,0 +1,171 @@
+{
+  "tabs": {
+    "home": "Accueil",
+    "discover": "Explorer",
+    "saved": "Enregistré",
+    "account": "Compte",
+    "review": "Révision"
+  },
+  "categories": {
+    "all": "Tout",
+    "Environment": "Planète",
+    "Science": "Science",
+    "Community": "Personnes",
+    "Health": "Santé",
+    "Animals": "Animaux",
+    "Innovation": "Tech"
+  },
+  "regions": {
+    "world": "Monde",
+    "us": "USA",
+    "uk": "R.-U.",
+    "hr": "Croatie",
+    "de": "Allemagne",
+    "fr": "France",
+    "jp": "Japon",
+    "au": "Australie",
+    "br": "Brésil",
+    "in": "Inde"
+  },
+  "languages": {
+    "all": "Toutes les langues",
+    "en": "Anglais",
+    "hr": "Croate",
+    "de": "Allemand",
+    "fr": "Français",
+    "ja": "Japonais",
+    "pt": "Portugais"
+  },
+  "languageShort": {
+    "all": "Toutes",
+    "en": "Anglais",
+    "hr": "Croate",
+    "de": "Allemand",
+    "fr": "Français",
+    "ja": "Japonais",
+    "pt": "Portugais"
+  },
+  "reviewFilters": {
+    "pending": "En attente",
+    "approved": "Approuvé",
+    "rejected": "Rejeté",
+    "all": "Tout"
+  },
+  "topbar": {
+    "account": "Compte",
+    "signIn": "Connexion",
+    "language": "Langue"
+  },
+  "header": {
+    "eyebrow": "Le brief du jour",
+    "title": "De bonnes nouvelles, sans négativité.",
+    "meta": "Des histoires positives du monde entier · {date}",
+    "lede": "Une lecture plus calme de ce qui s'améliore, se construit, guérit et avance.",
+    "betaFeedback": "Retour bêta",
+    "refreshStories": "Actualiser les actualités",
+    "edition": "Édition"
+  },
+  "home": {
+    "exploreFeed": "Explorer le flux",
+    "exploreDescription": "Choisissez un sujet, puis faites défiler un seul flux d'articles.",
+    "highlights": "Les temps forts du jour",
+    "title": "Un flux calme de bonnes nouvelles.",
+    "description": "Commencez par l'histoire la plus forte, puis explorez le reste du flux ci-dessous.",
+    "loading": "Chargement des bonnes nouvelles du jour...",
+    "noStoriesTitle": "Aucune histoire trouvée",
+    "noStoriesDescription": "Il n'y a pas encore d'histoires positives pour cette région et cette catégorie. Essayez un autre filtre ou ajoutez plus d'histoires dans Supabase.",
+    "readMore": "LIRE PLUS ↓",
+    "showLess": "VOIR MOINS ↑"
+  },
+  "discover": {
+    "title": "🌍 Explorer les régions",
+    "description": "Touchez une région pour découvrir ses bonnes nouvelles",
+    "moreCountriesTitle": "Plus de pays et une couverture locale plus riche arrivent bientôt.",
+    "moreCountriesText": "Nous améliorons la qualité des sources région par région."
+  },
+  "saved": {
+    "title": "❤️ Histoires enregistrées",
+    "signInTitle": "Connectez-vous pour voir les histoires enregistrées",
+    "signInDescription": "Votre liste enregistrée vit maintenant dans votre compte. Ouvrez Compte, connectez-vous avec Google et synchronisez-la entre vos appareils.",
+    "openAccount": "Ouvrir le compte",
+    "emptyDescription": "Aucune histoire enregistrée pour l'instant. Touchez ❤️ sur une histoire pour l'enregistrer."
+  },
+  "account": {
+    "signedInTitle": "👤 Compte",
+    "signedOutTitle": "🔐 Compte",
+    "resourcesTitle": "Assistance et confidentialité",
+    "resourcesDescription": "BrightNews expose déjà les liens d'assistance, de confidentialité et de suppression de compte demandés par les stores. Gardez ces pages à jour avant une bêta plus large.",
+    "supportEmail": "E-mail d'assistance :",
+    "sendBetaFeedback": "Envoyer un retour bêta",
+    "support": "Assistance",
+    "privacyPolicy": "Politique de confidentialité",
+    "accountDeletion": "Demander la suppression du compte",
+    "resourcesHint": "L'e-mail de retour s'ouvre avec un modèle prérempli afin que les testeurs puissent décrire rapidement les bugs, les parcours confus ou les problèmes de qualité des histoires."
+  },
+  "auth": {
+    "defaultReader": "Lecteur BrightNews",
+    "activeTitle": "La synchronisation Google est active",
+    "signInTitle": "Se connecter avec Google",
+    "activeDescription": "Vos histoires enregistrées vous suivent désormais sur tous vos appareils.",
+    "signInDescription": "Utilisez votre compte Google pour synchroniser vos enregistrements, votre historique de lecture et vos préférences futures.",
+    "signOut": "Se déconnecter",
+    "loadingAccount": "Chargement du compte...",
+    "plan": "Forfait : {plan}",
+    "ready": "PRÊT",
+    "setup": "CONFIG",
+    "connected": "Compte Google connecté",
+    "googleSync": "Synchronisation Google",
+    "helpText": "Connectez-vous une fois et gardez votre collection de bonnes nouvelles synchronisée partout.",
+    "benefitCrossDevice": "Enregistrements multi-appareils",
+    "benefitCleanerLogin": "Connexion bêta plus simple",
+    "benefitFutureBriefings": "Futurs briefings personnalisés",
+    "redirecting": "Redirection...",
+    "continueWithGoogle": "Continuer avec Google",
+    "syncingSaved": "Synchronisation des histoires enregistrées..."
+  },
+  "onboarding": {
+    "eyebrow": "Bienvenue sur BrightNews",
+    "title": "Une façon plus calme de rester informé",
+    "intro": "BrightNews met en avant des histoires positives crédibles du monde entier. Commencez par le flux monde, changez de région et de catégorie, et enregistrez les histoires qui valent la peine d'être gardées.",
+    "point1Title": "Des nouvelles positives, à l'échelle mondiale",
+    "point1Description": "Lisez de vraies histoires encourageantes de plusieurs régions au lieu de défiler la même négativité.",
+    "point2Title": "De vrais liens sources",
+    "point2Description": "Ouvrez la source originale derrière chaque histoire afin que le flux reste crédible et ancré dans le réel.",
+    "point3Title": "Enregistrer et partager",
+    "point3Description": "Gardez les histoires qui comptent pour vous et partagez les meilleures avec d'autres personnes.",
+    "signInWithGoogle": "Se connecter avec Google",
+    "startReading": "Commencer à lire",
+    "hint": "Vous pourrez changer la région, la catégorie et la langue plus tard."
+  },
+  "review": {
+    "title": "🛠️ File de révision",
+    "signInFirst": "Connectez-vous d'abord pour examiner les histoires importées.",
+    "adminOnly": "Cette zone est réservée aux comptes administrateurs.",
+    "intro": "Approuvez ici les candidats positifs, puis lancez `npm run publish:approved`.",
+    "refresh": "Actualiser",
+    "loading": "Chargement de la file de révision...",
+    "empty": "Aucun article brut trouvé pour ce filtre.",
+    "noPreview": "Aucun aperçu disponible.",
+    "readSource": "Lire la source",
+    "invalidSourceLink": "Lien source invalide",
+    "reject": "Rejeter",
+    "approve": "Approuver"
+  },
+  "story": {
+    "save": "Enregistrer l'histoire",
+    "removeSaved": "Retirer l'histoire enregistrée",
+    "readSource": "Lire la source"
+  },
+  "feedback": {
+    "signInSuccess": "Connexion réussie.",
+    "savedSynced": "Les histoires enregistrées sont synchronisées avec votre compte.",
+    "shareError": "Impossible de partager cette histoire pour le moment.",
+    "loadAccountError": "Impossible de charger votre compte.",
+    "syncSavedError": "Impossible de synchroniser les histoires enregistrées.",
+    "loadReviewError": "Impossible de charger la file de révision.",
+    "approveError": "Impossible d'approuver l'article.",
+    "rejectError": "Impossible de rejeter l'article.",
+    "saveSyncError": "La synchronisation de l'histoire enregistrée a échoué.",
+    "startGoogleSignInError": "Impossible de démarrer la connexion Google."
+  }
+}

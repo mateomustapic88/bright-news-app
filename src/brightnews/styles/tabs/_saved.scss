@@ -1,6 +1,6 @@
 .bn-saved-tab {
   h2 {
-    margin-bottom: 16px;
+    margin-bottom: 18px;
   }
 
   .bn-saved-tab__locked {
@@ -15,5 +15,17 @@
   .bn-empty-state__icon {
     font-size: 52px;
     margin-bottom: 14px;
+  }
+}
+
+@media (min-width: 940px) {
+  .bn-saved-tab .bn-stack {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .bn-saved-tab .bn-saved-tab__locked {
+    max-width: 640px;
   }
 }

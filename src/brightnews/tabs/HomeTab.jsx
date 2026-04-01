@@ -1,8 +1,8 @@
 import { CATEGORIES, getCategoryThemeClass } from "../constants";
+import { getCategoryLabel } from "../i18n";
 import Chip from "../components/Chip";
 import EmptyState from "../components/EmptyState";
 import HeroCard from "../components/HeroCard";
-import SectionLabel from "../components/SectionLabel";
 import StatusMessage from "../components/StatusMessage";
 import StoryCard from "../components/StoryCard";
 
@@ -19,6 +19,8 @@ const HomeTab = ({
   setExpanded,
   toggleSave,
   handleShareStory,
+  t,
+  uiLanguage,
 }) => {
   const featuredStory = stories.reduce((best, story) => {
     if (!best) return story;
@@ -30,23 +32,32 @@ const HomeTab = ({
 
   return (
     <section className="bn-tab bn-home-tab">
-      <div className="bn-chip-row">
-        {CATEGORIES.map(item => (
-          <Chip
-            key={item.id}
-            active={category === item.id}
-            onClick={() => setCategory(item.id)}
-            className={`bn-chip--category ${getCategoryThemeClass(item.id)}`}
-          >
-            <span>{item.emoji}</span>
-            <span>{item.label}</span>
-          </Chip>
-        ))}
+      <div className="bn-home-tab__filters-surface">
+        <div className="bn-home-tab__filters-copy">
+          <span className="bn-home-tab__filters-kicker">{t("home.exploreFeed")}</span>
+          <p>{t("home.exploreDescription")}</p>
+        </div>
+
+        <div className="bn-home-tab__filters">
+          <div className="bn-chip-row bn-chip-row--surface">
+            {CATEGORIES.map(item => (
+              <Chip
+                key={item.id}
+                active={category === item.id}
+                onClick={() => setCategory(item.id)}
+                className={`bn-chip--category ${getCategoryThemeClass(item.id)}`}
+              >
+                <span>{item.emoji}</span>
+                <span>{getCategoryLabel(item.id, uiLanguage)}</span>
+              </Chip>
+            ))}
+          </div>
+        </div>
       </div>
 
       {loading && firstLoad && (
         <StatusMessage variant="accent" showDot>
-          Loading today&apos;s good news...
+          {t("home.loading")}
         </StatusMessage>
       )}
 
@@ -56,39 +67,50 @@ const HomeTab = ({
       {!loading && !error && stories.length === 0 && (
         <EmptyState
           icon="🗞️"
-          title="No stories found"
-          description="There are no positive stories for this region and category yet. Try another filter or add more stories in Supabase."
+          title={t("home.noStoriesTitle")}
+          description={t("home.noStoriesDescription")}
         />
       )}
 
       {featuredStory && (
         <>
-          <SectionLabel icon="📌" label="Top Story" />
-          <div className="bn-home-tab__hero">
-            <HeroCard
-              story={featuredStory}
-              expanded={expanded}
-              firstLoad={firstLoad}
-              saved={saved}
-              setExpanded={setExpanded}
-              toggleSave={toggleSave}
-              handleShareStory={handleShareStory}
-            />
+          <div className="bn-home-tab__intro">
+            <div>
+              <span className="bn-home-tab__kicker">{t("home.highlights")}</span>
+              <h2>{t("home.title")}</h2>
+              <p>{t("home.description")}</p>
+            </div>
           </div>
 
-          <SectionLabel icon="🌟" label="More Good News" />
-          <div className="bn-stack">
-            {remainingStories.map(story => (
-              <StoryCard
-                key={story.id}
-                story={story}
+          <div className="bn-home-tab__story-grid">
+            <div className="bn-home-tab__lead">
+              <HeroCard
+                story={featuredStory}
                 expanded={expanded}
                 firstLoad={firstLoad}
                 saved={saved}
                 setExpanded={setExpanded}
                 toggleSave={toggleSave}
                 handleShareStory={handleShareStory}
+                t={t}
+                uiLanguage={uiLanguage}
               />
+            </div>
+
+            {remainingStories.map(story => (
+              <div key={story.id} className="bn-home-tab__story-cell">
+                <StoryCard
+                  story={story}
+                  expanded={expanded}
+                  firstLoad={firstLoad}
+                  saved={saved}
+                  setExpanded={setExpanded}
+                  toggleSave={toggleSave}
+                  handleShareStory={handleShareStory}
+                  t={t}
+                  uiLanguage={uiLanguage}
+                />
+              </div>
             ))}
           </div>
         </>

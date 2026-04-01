@@ -1,0 +1,171 @@
+{
+  "tabs": {
+    "home": "Início",
+    "discover": "Explorar",
+    "saved": "Salvos",
+    "account": "Conta",
+    "review": "Revisão"
+  },
+  "categories": {
+    "all": "Tudo",
+    "Environment": "Planeta",
+    "Science": "Ciência",
+    "Community": "Pessoas",
+    "Health": "Saúde",
+    "Animals": "Animais",
+    "Innovation": "Tecnologia"
+  },
+  "regions": {
+    "world": "Mundo",
+    "us": "EUA",
+    "uk": "Reino Unido",
+    "hr": "Croácia",
+    "de": "Alemanha",
+    "fr": "França",
+    "jp": "Japão",
+    "au": "Austrália",
+    "br": "Brasil",
+    "in": "Índia"
+  },
+  "languages": {
+    "all": "Todos os idiomas",
+    "en": "Inglês",
+    "hr": "Croata",
+    "de": "Alemão",
+    "fr": "Francês",
+    "ja": "Japonês",
+    "pt": "Português"
+  },
+  "languageShort": {
+    "all": "Todos",
+    "en": "Inglês",
+    "hr": "Croata",
+    "de": "Alemão",
+    "fr": "Francês",
+    "ja": "Japonês",
+    "pt": "Português"
+  },
+  "reviewFilters": {
+    "pending": "Pendente",
+    "approved": "Aprovado",
+    "rejected": "Rejeitado",
+    "all": "Tudo"
+  },
+  "topbar": {
+    "account": "Conta",
+    "signIn": "Entrar",
+    "language": "Idioma"
+  },
+  "header": {
+    "eyebrow": "Resumo do dia",
+    "title": "Boas notícias, sem negatividade.",
+    "meta": "Histórias positivas do mundo todo · {date}",
+    "lede": "Uma leitura mais calma sobre o que está melhorando, sendo construído, curado e levado adiante.",
+    "betaFeedback": "Feedback beta",
+    "refreshStories": "Atualizar notícias",
+    "edition": "Edição"
+  },
+  "home": {
+    "exploreFeed": "Explorar o feed",
+    "exploreDescription": "Escolha um tema e percorra um único fluxo de histórias.",
+    "highlights": "Destaques de hoje",
+    "title": "Um fluxo calmo de boas notícias.",
+    "description": "Comece pela história mais forte e continue explorando o restante do feed abaixo.",
+    "loading": "Carregando as boas notícias de hoje...",
+    "noStoriesTitle": "Nenhuma história encontrada",
+    "noStoriesDescription": "Ainda não há histórias positivas para esta região e categoria. Tente outro filtro ou adicione mais histórias no Supabase.",
+    "readMore": "LER MAIS ↓",
+    "showLess": "MOSTRAR MENOS ↑"
+  },
+  "discover": {
+    "title": "🌍 Explorar regiões",
+    "description": "Toque em qualquer região para explorar suas boas notícias",
+    "moreCountriesTitle": "Mais países e cobertura local mais rica estão a caminho.",
+    "moreCountriesText": "Estamos ampliando a qualidade das fontes região por região."
+  },
+  "saved": {
+    "title": "❤️ Histórias salvas",
+    "signInTitle": "Entre para ver as histórias salvas",
+    "signInDescription": "Sua lista salva agora vive na sua conta. Abra Conta, entre com Google e sincronize entre dispositivos.",
+    "openAccount": "Abrir conta",
+    "emptyDescription": "Ainda não há histórias salvas. Toque em ❤️ em qualquer história para salvá-la."
+  },
+  "account": {
+    "signedInTitle": "👤 Conta",
+    "signedOutTitle": "🔐 Conta",
+    "resourcesTitle": "Suporte e privacidade",
+    "resourcesDescription": "O BrightNews já expõe os links de suporte, privacidade e exclusão de conta exigidos pelas lojas de aplicativos. Mantenha essas páginas atualizadas antes de uma beta mais ampla.",
+    "supportEmail": "Email de suporte:",
+    "sendBetaFeedback": "Enviar feedback beta",
+    "support": "Suporte",
+    "privacyPolicy": "Política de privacidade",
+    "accountDeletion": "Solicitar exclusão da conta",
+    "resourcesHint": "O email de feedback abre com um modelo preenchido para que testadores descrevam rapidamente bugs, fluxos confusos ou problemas de qualidade das histórias."
+  },
+  "auth": {
+    "defaultReader": "Leitor BrightNews",
+    "activeTitle": "A sincronização do Google está ativa",
+    "signInTitle": "Entrar com Google",
+    "activeDescription": "Suas histórias salvas agora acompanham você em todos os dispositivos.",
+    "signInDescription": "Use sua conta Google para sincronizar salvos, histórico de leitura e preferências futuras.",
+    "signOut": "Sair",
+    "loadingAccount": "Carregando conta...",
+    "plan": "Plano: {plan}",
+    "ready": "PRONTO",
+    "setup": "CONFIG",
+    "connected": "Conta Google conectada",
+    "googleSync": "Sincronização Google",
+    "helpText": "Entre uma vez e mantenha sua coleção de boas notícias sincronizada em qualquer lugar.",
+    "benefitCrossDevice": "Salvos entre dispositivos",
+    "benefitCleanerLogin": "Login beta mais limpo",
+    "benefitFutureBriefings": "Resumos personalizados futuros",
+    "redirecting": "Redirecionando...",
+    "continueWithGoogle": "Continuar com Google",
+    "syncingSaved": "Sincronizando histórias salvas..."
+  },
+  "onboarding": {
+    "eyebrow": "Bem-vindo ao BrightNews",
+    "title": "Uma forma mais calma de se manter informado",
+    "intro": "O BrightNews mostra histórias positivas e confiáveis do mundo todo. Comece pelo feed global, troque de regiões e categorias e salve as histórias que valem a pena guardar.",
+    "point1Title": "Notícias positivas, globalmente",
+    "point1Description": "Leia histórias realmente inspiradoras de várias regiões em vez de rolar sempre a mesma negatividade.",
+    "point2Title": "Links reais para as fontes",
+    "point2Description": "Abra a fonte original de cada história para que o feed continue confiável e bem fundamentado.",
+    "point3Title": "Salvar e compartilhar",
+    "point3Description": "Guarde as histórias que importam para você e compartilhe as melhores com outras pessoas.",
+    "signInWithGoogle": "Entrar com Google",
+    "startReading": "Começar a ler",
+    "hint": "Você pode mudar região, categoria e idioma depois."
+  },
+  "review": {
+    "title": "🛠️ Fila de revisão",
+    "signInFirst": "Entre primeiro para revisar histórias importadas.",
+    "adminOnly": "Esta área está disponível apenas para contas de administrador.",
+    "intro": "Aprove candidatos positivos aqui e depois execute `npm run publish:approved`.",
+    "refresh": "Atualizar",
+    "loading": "Carregando fila de revisão...",
+    "empty": "Nenhum artigo bruto encontrado para este filtro.",
+    "noPreview": "Nenhuma prévia disponível.",
+    "readSource": "Ler fonte",
+    "invalidSourceLink": "Link da fonte inválido",
+    "reject": "Rejeitar",
+    "approve": "Aprovar"
+  },
+  "story": {
+    "save": "Salvar história",
+    "removeSaved": "Remover história salva",
+    "readSource": "Ler fonte"
+  },
+  "feedback": {
+    "signInSuccess": "Login realizado com sucesso.",
+    "savedSynced": "As histórias salvas estão sincronizadas com sua conta.",
+    "shareError": "Não foi possível compartilhar esta história agora.",
+    "loadAccountError": "Não foi possível carregar sua conta.",
+    "syncSavedError": "Não foi possível sincronizar as histórias salvas.",
+    "loadReviewError": "Não foi possível carregar a fila de revisão.",
+    "approveError": "Não foi possível aprovar o artigo.",
+    "rejectError": "Não foi possível rejeitar o artigo.",
+    "saveSyncError": "A sincronização da história salva falhou.",
+    "startGoogleSignInError": "Não foi possível iniciar o login com Google."
+  }
+}

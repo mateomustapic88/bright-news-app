@@ -1,0 +1,171 @@
+{
+  "tabs": {
+    "home": "ホーム",
+    "discover": "地域",
+    "saved": "保存済み",
+    "account": "アカウント",
+    "review": "レビュー"
+  },
+  "categories": {
+    "all": "すべて",
+    "Environment": "地球",
+    "Science": "科学",
+    "Community": "人々",
+    "Health": "健康",
+    "Animals": "動物",
+    "Innovation": "テック"
+  },
+  "regions": {
+    "world": "世界",
+    "us": "アメリカ",
+    "uk": "イギリス",
+    "hr": "クロアチア",
+    "de": "ドイツ",
+    "fr": "フランス",
+    "jp": "日本",
+    "au": "オーストラリア",
+    "br": "ブラジル",
+    "in": "インド"
+  },
+  "languages": {
+    "all": "すべての言語",
+    "en": "英語",
+    "hr": "クロアチア語",
+    "de": "ドイツ語",
+    "fr": "フランス語",
+    "ja": "日本語",
+    "pt": "ポルトガル語"
+  },
+  "languageShort": {
+    "all": "すべて",
+    "en": "英語",
+    "hr": "クロアチア語",
+    "de": "ドイツ語",
+    "fr": "フランス語",
+    "ja": "日本語",
+    "pt": "ポルトガル語"
+  },
+  "reviewFilters": {
+    "pending": "保留",
+    "approved": "承認済み",
+    "rejected": "却下",
+    "all": "すべて"
+  },
+  "topbar": {
+    "account": "アカウント",
+    "signIn": "サインイン",
+    "language": "言語"
+  },
+  "header": {
+    "eyebrow": "今日のブリーフ",
+    "title": "ネガティブさのない、良いニュース。",
+    "meta": "世界中の前向きなストーリー · {date}",
+    "lede": "良くなっていること、築かれていること、癒やされていること、前進していることを穏やかに読めます。",
+    "betaFeedback": "ベータフィードバック",
+    "refreshStories": "ニュースを更新",
+    "edition": "版"
+  },
+  "home": {
+    "exploreFeed": "フィードを探す",
+    "exploreDescription": "トピックを選び、1つの流れでストーリーを追いましょう。",
+    "highlights": "今日のハイライト",
+    "title": "穏やかな良いニュースの流れ。",
+    "description": "まずは最も強いストーリーから始めて、その下に続くフィードを読んでください。",
+    "loading": "今日の良いニュースを読み込み中...",
+    "noStoriesTitle": "ストーリーが見つかりません",
+    "noStoriesDescription": "この地域とカテゴリには、まだ前向きなストーリーがありません。別のフィルターを試すか、Supabase にストーリーを追加してください。",
+    "readMore": "もっと読む ↓",
+    "showLess": "閉じる ↑"
+  },
+  "discover": {
+    "title": "🌍 地域を探す",
+    "description": "地域をタップして、その良いニュースを見てみましょう",
+    "moreCountriesTitle": "今後さらに多くの国と、より豊かなローカルカバレッジが追加されます。",
+    "moreCountriesText": "地域ごとにソースの質を広げています。"
+  },
+  "saved": {
+    "title": "❤️ 保存したストーリー",
+    "signInTitle": "保存したストーリーを見るにはサインインしてください",
+    "signInDescription": "保存リストは現在アカウントに保存されています。アカウントを開いて Google でサインインし、端末間で同期してください。",
+    "openAccount": "アカウントを開く",
+    "emptyDescription": "まだ保存したストーリーはありません。任意のストーリーで ❤️ をタップして保存してください。"
+  },
+  "account": {
+    "signedInTitle": "👤 アカウント",
+    "signedOutTitle": "🔐 アカウント",
+    "resourcesTitle": "サポートとプライバシー",
+    "resourcesDescription": "BrightNews は、アプリストアが求めるサポート、プライバシー、アカウント削除のリンクをすでに公開しています。より広いベータ公開の前にこれらのページを更新してください。",
+    "supportEmail": "サポートメール:",
+    "sendBetaFeedback": "ベータフィードバックを送信",
+    "support": "サポート",
+    "privacyPolicy": "プライバシーポリシー",
+    "accountDeletion": "アカウント削除を依頼",
+    "resourcesHint": "フィードバックメールはあらかじめ入力されたテンプレートで開くため、テスターはバグ、分かりにくい操作、記事品質の問題をすぐに共有できます。"
+  },
+  "auth": {
+    "defaultReader": "BrightNews 読者",
+    "activeTitle": "Google 同期が有効です",
+    "signInTitle": "Google でサインイン",
+    "activeDescription": "保存したストーリーはすべての端末で利用できます。",
+    "signInDescription": "Google アカウントを使って保存、読書履歴、今後の設定を同期しましょう。",
+    "signOut": "サインアウト",
+    "loadingAccount": "アカウントを読み込み中...",
+    "plan": "プラン: {plan}",
+    "ready": "準備完了",
+    "setup": "設定中",
+    "connected": "Google アカウント接続済み",
+    "googleSync": "Google 同期",
+    "helpText": "一度サインインすれば、どこでも良いニュースのコレクションを同期できます。",
+    "benefitCrossDevice": "端末間で保存を同期",
+    "benefitCleanerLogin": "より簡単なベータログイン",
+    "benefitFutureBriefings": "今後のパーソナル要約",
+    "redirecting": "移動中...",
+    "continueWithGoogle": "Google で続行",
+    "syncingSaved": "保存したストーリーを同期中..."
+  },
+  "onboarding": {
+    "eyebrow": "BrightNews へようこそ",
+    "title": "落ち着いて情報を得る方法",
+    "intro": "BrightNews は、世界中の信頼できる前向きなストーリーを届けます。まずは世界フィードから始め、地域やカテゴリを切り替え、残しておきたいストーリーを保存しましょう。",
+    "point1Title": "前向きなニュースを世界から",
+    "point1Description": "同じネガティブな話題を延々と追う代わりに、複数の地域から本当に前向きなストーリーを読みましょう。",
+    "point2Title": "本物のソースリンク",
+    "point2Description": "各ストーリーの元ソースを開けるので、フィードは信頼でき、地に足のついたものになります。",
+    "point3Title": "保存して共有",
+    "point3Description": "大切なストーリーを保存し、良いものを他の人にも共有しましょう。",
+    "signInWithGoogle": "Google でサインイン",
+    "startReading": "読み始める",
+    "hint": "地域、カテゴリ、言語は後で変更できます。"
+  },
+  "review": {
+    "title": "🛠️ レビューキュー",
+    "signInFirst": "インポートされたストーリーを確認するには、まずサインインしてください。",
+    "adminOnly": "このエリアは管理者アカウントのみ利用できます。",
+    "intro": "ここで前向きな候補を承認し、その後 `npm run publish:approved` を実行してください。",
+    "refresh": "更新",
+    "loading": "レビューキューを読み込み中...",
+    "empty": "このフィルターに該当する原稿はありません。",
+    "noPreview": "プレビューはありません。",
+    "readSource": "ソースを読む",
+    "invalidSourceLink": "無効なソースリンク",
+    "reject": "却下",
+    "approve": "承認"
+  },
+  "story": {
+    "save": "ストーリーを保存",
+    "removeSaved": "保存したストーリーを削除",
+    "readSource": "ソースを読む"
+  },
+  "feedback": {
+    "signInSuccess": "サインインしました。",
+    "savedSynced": "保存したストーリーはアカウントに同期されました。",
+    "shareError": "このストーリーは現在共有できません。",
+    "loadAccountError": "アカウントを読み込めません。",
+    "syncSavedError": "保存したストーリーを同期できません。",
+    "loadReviewError": "レビューキューを読み込めません。",
+    "approveError": "記事を承認できません。",
+    "rejectError": "記事を却下できません。",
+    "saveSyncError": "保存ストーリーの同期に失敗しました。",
+    "startGoogleSignInError": "Google サインインを開始できません。"
+  }
+}

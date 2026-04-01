@@ -1,57 +1,56 @@
-const ONBOARDING_POINTS = [
-  {
-    emoji: "🌍",
-    title: "Positive news, globally",
-    description: "Read real uplifting stories from multiple regions instead of doomscrolling the same negativity.",
-  },
-  {
-    emoji: "🔗",
-    title: "Real source links",
-    description: "Open the original source behind each story so the feed still feels credible and grounded.",
-  },
-  {
-    emoji: "❤️",
-    title: "Save and share",
-    description: "Keep the stories that matter to you and share the best ones with other people.",
-  },
-];
+const OnboardingModal = ({ session, handleDismiss, handleGoogleSignIn, t }) => {
+  const onboardingPoints = [
+    {
+      emoji: "🌍",
+      title: t("onboarding.point1Title"),
+      description: t("onboarding.point1Description"),
+    },
+    {
+      emoji: "🔗",
+      title: t("onboarding.point2Title"),
+      description: t("onboarding.point2Description"),
+    },
+    {
+      emoji: "❤️",
+      title: t("onboarding.point3Title"),
+      description: t("onboarding.point3Description"),
+    },
+  ];
 
-const OnboardingModal = ({ session, handleDismiss, handleGoogleSignIn }) => (
-  <div className="bn-onboarding" role="dialog" aria-modal="true" aria-labelledby="bn-onboarding-title">
-    <div className="bn-onboarding__surface">
-      <div className="bn-onboarding__hero">
-        <p className="bn-onboarding__eyebrow">Welcome to BrightNews</p>
-        <h2 id="bn-onboarding-title">A calmer way to stay informed</h2>
-        <p className="bn-onboarding__intro">
-          BrightNews surfaces credible positive stories from around the world. Start with the world
-          feed, switch regions and categories, and save the stories worth keeping.
-        </p>
-      </div>
+  return (
+    <div className="bn-onboarding" role="dialog" aria-modal="true" aria-labelledby="bn-onboarding-title">
+      <div className="bn-onboarding__surface">
+        <div className="bn-onboarding__hero">
+          <p className="bn-onboarding__eyebrow">{t("onboarding.eyebrow")}</p>
+          <h2 id="bn-onboarding-title">{t("onboarding.title")}</h2>
+          <p className="bn-onboarding__intro">{t("onboarding.intro")}</p>
+        </div>
 
-      <div className="bn-onboarding__grid">
-        {ONBOARDING_POINTS.map(item => (
-          <article key={item.title} className="bn-onboarding__card">
-            <span className="bn-onboarding__icon" aria-hidden="true">{item.emoji}</span>
-            <h3>{item.title}</h3>
-            <p>{item.description}</p>
-          </article>
-        ))}
-      </div>
+        <div className="bn-onboarding__grid">
+          {onboardingPoints.map(item => (
+            <article key={item.title} className="bn-onboarding__card">
+              <span className="bn-onboarding__icon" aria-hidden="true">{item.emoji}</span>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+            </article>
+          ))}
+        </div>
 
-      <div className="bn-onboarding__actions">
-        {!session?.user && (
-          <button type="button" className="bn-button bn-button--secondary" onClick={handleGoogleSignIn}>
-            Sign in with Google
+        <div className="bn-onboarding__actions">
+          {!session?.user && (
+            <button type="button" className="bn-button bn-button--secondary" onClick={handleGoogleSignIn}>
+              {t("onboarding.signInWithGoogle")}
+            </button>
+          )}
+          <button type="button" className="bn-button bn-button--primary" onClick={handleDismiss}>
+            {t("onboarding.startReading")}
           </button>
-        )}
-        <button type="button" className="bn-button bn-button--primary" onClick={handleDismiss}>
-          Start reading
-        </button>
-      </div>
+        </div>
 
-      <p className="bn-onboarding__hint">You can change region, category, and language later.</p>
+        <p className="bn-onboarding__hint">{t("onboarding.hint")}</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default OnboardingModal;

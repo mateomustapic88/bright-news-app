@@ -1,7 +1,9 @@
-const DiscoverTab = ({ region, regions, setRegion, setTab }) => (
+import { getRegionLabel } from "../i18n";
+
+const DiscoverTab = ({ region, regions, setRegion, setTab, t, uiLanguage }) => (
   <section className="bn-tab bn-discover-tab">
-    <h2>🌍 Explore Regions</h2>
-    <p>Tap any region to explore its good news</p>
+    <h2>{t("discover.title")}</h2>
+    <p>{t("discover.description")}</p>
 
     <div className="bn-region-grid">
       {regions.map(item => (
@@ -15,14 +17,14 @@ const DiscoverTab = ({ region, regions, setRegion, setTab }) => (
           className={`bn-discover-region${region === item.code ? " is-active" : ""}`}
         >
           <div className="bn-discover-region__flag">{item.flag}</div>
-          <div className="bn-discover-region__label">{item.label}</div>
+          <div className="bn-discover-region__label">{getRegionLabel(item.code, uiLanguage)}</div>
         </button>
       ))}
     </div>
 
     <div className="bn-discover-note">
-      <strong>More countries and richer local coverage are on the way.</strong>
-      <span>We&apos;re expanding source quality region by region.</span>
+      <strong>{t("discover.moreCountriesTitle")}</strong>
+      <span>{t("discover.moreCountriesText")}</span>
     </div>
   </section>
 );

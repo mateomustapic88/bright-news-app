@@ -1,6 +1,6 @@
 import { normalizeExternalUrl } from "../../lib/urls";
 
-const StorySourceLink = ({ sourceUrl, compact = false }) => {
+const StorySourceLink = ({ sourceUrl, compact = false, label = "Read source" }) => {
   const normalizedUrl = normalizeExternalUrl(sourceUrl);
   if (!normalizedUrl) return null;
 
@@ -13,7 +13,7 @@ const StorySourceLink = ({ sourceUrl, compact = false }) => {
       className={`bn-source-link${compact ? " is-compact" : ""}`}
     >
       <span>🔗</span>
-      <span>Read source</span>
+      <span>{label}</span>
     </a>
   );
 };

@@ -1,6 +1,6 @@
 import { normalizeExternalUrl } from "../../lib/urls";
 
-const RawArticleCard = ({ article, handleApproveRawArticle, handleRejectRawArticle }) => {
+const RawArticleCard = ({ article, handleApproveRawArticle, handleRejectRawArticle, t }) => {
   const sourceUrl = normalizeExternalUrl(article.source_url);
 
   return (
@@ -13,16 +13,16 @@ const RawArticleCard = ({ article, handleApproveRawArticle, handleRejectRawArtic
       </div>
 
       <h3>{article.title}</h3>
-      <p>{article.description || article.content || "No preview available."}</p>
+      <p>{article.description || article.content || t("review.noPreview")}</p>
 
       <div className="bn-raw-article-card__footer">
         {sourceUrl ? (
           <a href={sourceUrl} target="_blank" rel="noreferrer noopener" className="bn-source-link is-compact">
             <span>🔗</span>
-            <span>Read source</span>
+            <span>{t("review.readSource")}</span>
           </a>
         ) : (
-          <span className="bn-raw-article-card__missing-link">Invalid source link</span>
+          <span className="bn-raw-article-card__missing-link">{t("review.invalidSourceLink")}</span>
         )}
 
         <div className="bn-raw-article-card__actions">
@@ -31,14 +31,14 @@ const RawArticleCard = ({ article, handleApproveRawArticle, handleRejectRawArtic
             onClick={() => handleRejectRawArticle(article.id)}
             className="bn-button bn-button--danger"
           >
-            Reject
+            {t("review.reject")}
           </button>
           <button
             type="button"
             onClick={() => handleApproveRawArticle(article.id)}
             className="bn-button bn-button--success"
           >
-            Approve
+            {t("review.approve")}
           </button>
         </div>
       </div>
