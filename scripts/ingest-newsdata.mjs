@@ -36,7 +36,7 @@ const retryDelayMs = Number(getEnv("INGEST_NEWSDATA_RETRY_DELAY_MS") || 5000);
 const maxPages = Math.max(1, Number(getEnv("INGEST_NEWSDATA_PAGES") || 1));
 const timeframe = getEnv("INGEST_NEWSDATA_TIMEFRAME") || "";
 const queryMode = (getEnv("INGEST_NEWSDATA_QUERY_MODE") || "category").trim().toLowerCase();
-const enabledRegionCodes = (getEnv("INGEST_REGION_CODES") || DEFAULT_INGEST_REGION_CODES)
+const enabledRegionCodes = (getEnv("INGEST_NEWSDATA_REGION_CODES") || getEnv("INGEST_REGION_CODES") || DEFAULT_INGEST_REGION_CODES)
   .split(",")
   .map(value => value.trim())
   .filter(Boolean);

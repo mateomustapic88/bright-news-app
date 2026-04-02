@@ -35,7 +35,7 @@ const maxRetriesPerRequest = Number(getEnv("INGEST_MAX_RETRIES") || 3);
 const retryDelayMs = Number(getEnv("INGEST_RETRY_DELAY_MS") || 5000);
 const maxResultsPerPage = Math.min(100, Number(getEnv("INGEST_GNEWS_MAX_RESULTS") || 25));
 const maxPages = Math.max(1, Number(getEnv("INGEST_GNEWS_PAGES") || 1));
-const enabledRegionCodes = (getEnv("INGEST_REGION_CODES") || DEFAULT_INGEST_REGION_CODES)
+const enabledRegionCodes = (getEnv("INGEST_GNEWS_REGION_CODES") || getEnv("INGEST_REGION_CODES") || DEFAULT_INGEST_REGION_CODES)
   .split(",")
   .map(value => value.trim())
   .filter(Boolean);
