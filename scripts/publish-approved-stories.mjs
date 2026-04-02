@@ -17,10 +17,9 @@ if (!supabaseUrl) {
 }
 
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
-const maxPublishedStories = Number(getEnv("MAX_PUBLISHED_STORIES") || 150);
+const maxPublishedStoriesPerBucket = Number(getEnv("MAX_PUBLISHED_STORIES_PER_BUCKET") || 50);
 const maxRetries = Number(getEnv("PUBLISH_APPROVED_MAX_RETRIES") || 3);
 const retryDelayMs = Number(getEnv("PUBLISH_APPROVED_RETRY_DELAY_MS") || 1500);
-const existingStoriesChunkSize = Number(getEnv("PUBLISH_APPROVED_EXISTING_STORIES_CHUNK_SIZE") || 40);
 
 const toSentence = value => (value || "").replace(/\s+/g, " ").trim();
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -62,38 +61,48 @@ const withRetries = async (label, runQuery) => {
   }
 };
 
-const chunk = (items, size) => {
-  const chunks = [];
+const getStoryBucketKey = story => story.country_code || story.region_code || "world";
 
-  for (let index = 0; index < items.length; index += size) {
-    chunks.push(items.slice(index, index + size));
+const countStoriesByBucket = stories => {
+  const counts = new Map();
+
+  for (const story of stories) {
+    const bucketKey = getStoryBucketKey(story);
+    counts.set(bucketKey, (counts.get(bucketKey) || 0) + 1);
   }
 
-  return chunks;
+  return counts;
 };
 
-const loadExistingStoriesBySourceUrl = async sourceUrls => {
-  if (sourceUrls.length === 0) {
-    return [];
-  }
+const loadLiveStories = async () => {
+  const { data, error } = await withRetries(
+    "Failed to load live stories",
+    () => supabase
+      .from("stories")
+      .select("id, source_url, region_code, country_code, is_pinned, published_at")
+      .order("is_pinned", { ascending: false })
+      .order("published_at", { ascending: false }),
+  );
 
-  const stories = [];
-  const urlChunks = chunk(sourceUrls, existingStoriesChunkSize);
+  if (error) throw new Error(error.message);
+  return data || [];
+};
 
-  for (const [index, urlChunk] of urlChunks.entries()) {
-    const { data, error } = await withRetries(
-      `Failed to load existing published stories chunk ${index + 1}/${urlChunks.length}`,
-      () => supabase
-        .from("stories")
-        .select("id, source_url")
-        .in("source_url", urlChunk),
-    );
+const loadRepublishCandidates = async () => {
+  const { data, error } = await withRetries(
+    "Failed to load republish candidates",
+    () => supabase
+      .from("raw_articles")
+      .select("*")
+      .eq("review_status", "published")
+      .is("published_story_id", null)
+      .ilike("review_notes", "%Moved out of live feed due to published story cap.%")
+      .order("published_at", { ascending: false })
+      .limit(500),
+  );
 
-    if (error) throw new Error(error.message);
-    stories.push(...(data || []));
-  }
-
-  return stories;
+  if (error) throw new Error(error.message);
+  return data || [];
 };
 
 const buildStoryRow = rawArticle => {
@@ -118,18 +127,19 @@ const buildStoryRow = rawArticle => {
 };
 
 const prunePublishedStories = async () => {
-  const { data: publishedStories, error: storiesError } = await withRetries(
-    "Failed to load published stories",
-    () => supabase
-      .from("stories")
-      .select("id")
-      .order("is_pinned", { ascending: false })
-      .order("published_at", { ascending: false }),
-  );
+  const publishedStories = await loadLiveStories();
+  const bucketCounts = new Map();
+  const overflowStories = [];
 
-  if (storiesError) throw new Error(storiesError.message);
+  for (const story of publishedStories) {
+    const bucketKey = getStoryBucketKey(story);
+    const nextCount = (bucketCounts.get(bucketKey) || 0) + 1;
+    bucketCounts.set(bucketKey, nextCount);
 
-  const overflowStories = (publishedStories || []).slice(maxPublishedStories);
+    if (!story.is_pinned && nextCount > maxPublishedStoriesPerBucket) {
+      overflowStories.push(story);
+    }
+  }
 
   if (overflowStories.length === 0) {
     return { prunedStories: 0, resetRawArticles: 0 };
@@ -204,41 +214,63 @@ export const run = async () => {
     );
 
     if (approvedError) throw new Error(approvedError.message);
-    if (!approvedRows || approvedRows.length === 0) {
-      const emptyResult = { approved: 0, inserted: 0, published: 0 };
-      logPublishStage("no_approved_rows", emptyResult);
-      console.log(JSON.stringify(emptyResult, null, 2));
-      return emptyResult;
-    }
 
-    const normalizedApprovedRows = approvedRows
+    const normalizedApprovedRows = (approvedRows || [])
       .map(row => ({ ...row, source_url: normalizeExternalUrl(row.source_url) }))
       .filter(row => row.source_url);
     logPublishStage("approved_rows_loaded", {
-      approvedRows: approvedRows.length,
+      approvedRows: approvedRows?.length || 0,
       normalizedApprovedRows: normalizedApprovedRows.length,
     });
 
     stage = "load_existing_stories";
-    const sourceUrls = normalizedApprovedRows.map(row => row.source_url);
-    const existingStories = await loadExistingStoriesBySourceUrl(sourceUrls);
+    const liveStories = await loadLiveStories();
+    const existingStories = liveStories;
     const existingBySourceUrl = new Map(existingStories.map(story => [story.source_url, story.id]));
     const rowsToInsert = normalizedApprovedRows.filter(row => !existingBySourceUrl.has(row.source_url));
+    const bucketCounts = countStoriesByBucket(liveStories);
+    const republishCandidates = await loadRepublishCandidates();
+    const approvedInsertCounts = countStoriesByBucket(rowsToInsert);
+    const selectedRepublishRows = [];
+    const selectedSourceUrls = new Set(rowsToInsert.map(row => row.source_url));
+
+    for (const row of republishCandidates) {
+      const sourceUrl = normalizeExternalUrl(row.source_url);
+      if (!sourceUrl || existingBySourceUrl.has(sourceUrl) || selectedSourceUrls.has(sourceUrl)) {
+        continue;
+      }
+
+      const normalizedRow = { ...row, source_url: sourceUrl };
+      const bucketKey = getStoryBucketKey(normalizedRow);
+      const plannedCount = (bucketCounts.get(bucketKey) || 0) + (approvedInsertCounts.get(bucketKey) || 0);
+
+      if (plannedCount >= maxPublishedStoriesPerBucket) {
+        continue;
+      }
+
+      approvedInsertCounts.set(bucketKey, plannedCount + 1);
+      selectedSourceUrls.add(sourceUrl);
+      selectedRepublishRows.push(normalizedRow);
+    }
+
+    const candidateRowsToInsert = [...rowsToInsert, ...selectedRepublishRows];
     logPublishStage("existing_stories_loaded", {
-      sourceUrls: sourceUrls.length,
+      liveStories: liveStories.length,
       existingStories: existingBySourceUrl.size,
       rowsToInsert: rowsToInsert.length,
+      republishRowsToInsert: selectedRepublishRows.length,
+      candidateRowsToInsert: candidateRowsToInsert.length,
     });
 
     let insertedStories = [];
 
-    if (rowsToInsert.length > 0) {
+    if (candidateRowsToInsert.length > 0) {
       stage = "insert_stories";
       const { data: insertedData, error: insertError } = await withRetries(
         "Failed to insert published stories",
         () => supabase
           .from("stories")
-          .insert(rowsToInsert.map(buildStoryRow).filter(Boolean))
+          .insert(candidateRowsToInsert.map(buildStoryRow).filter(Boolean))
           .select("id, source_url"),
       );
 
@@ -255,7 +287,7 @@ export const run = async () => {
     stage = "mark_raw_articles_published";
     let markedPublished = 0;
 
-    for (const row of normalizedApprovedRows) {
+    for (const row of candidateRowsToInsert) {
       const publishedStoryId = publishedBySourceUrl.get(row.source_url);
       if (!publishedStoryId) continue;
 
@@ -263,7 +295,10 @@ export const run = async () => {
         `Failed to mark raw article ${row.id} as published`,
         () => supabase
           .from("raw_articles")
-          .update({ review_status: "published", published_story_id: publishedStoryId })
+          .update({
+            review_status: "published",
+            published_story_id: publishedStoryId,
+          })
           .eq("id", row.id),
       );
 
@@ -278,12 +313,13 @@ export const run = async () => {
     logPublishStage(stage, pruneResult);
 
     const result = {
-      approved: approvedRows.length,
+      approved: approvedRows?.length || 0,
+      republished: selectedRepublishRows.length,
       inserted: insertedStories.length,
-      published: approvedRows.length,
+      published: markedPublished,
       prunedStories: pruneResult.prunedStories,
       resetRawArticles: pruneResult.resetRawArticles,
-      maxPublishedStories,
+      maxPublishedStoriesPerBucket,
     };
 
     logPublishStage("completed", result);
