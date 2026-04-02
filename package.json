@@ -17,6 +17,7 @@
     "preview": "vite preview",
     "ingest:gnews": "node --env-file=.env scripts/ingest-gnews.mjs",
     "ingest:gdelt": "node --env-file=.env scripts/ingest-gdelt.mjs",
+    "ingest:guardian": "node --env-file=.env scripts/ingest-guardian.mjs",
     "ingest:google-news-rss": "node --env-file=.env scripts/ingest-google-news-rss.mjs",
     "ingest:newsdata": "node --env-file=.env scripts/ingest-newsdata.mjs",
     "backfill:hr-news": "node --env-file=.env scripts/backfill-hr-news.mjs",
