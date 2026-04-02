@@ -18,8 +18,41 @@ if (!supabaseUrl) {
 
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 const maxPublishedStories = Number(getEnv("MAX_PUBLISHED_STORIES") || 150);
+const maxRetries = Number(getEnv("PUBLISH_APPROVED_MAX_RETRIES") || 3);
+const retryDelayMs = Number(getEnv("PUBLISH_APPROVED_RETRY_DELAY_MS") || 1500);
 
 const toSentence = value => (value || "").replace(/\s+/g, " ").trim();
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+const isRetryableFetchError = error => {
+  const message = String(error?.message || "").toLowerCase();
+  return (
+    error?.name === "AbortError" ||
+    message.includes("fetch failed") ||
+    message.includes("network") ||
+    message.includes("timeout") ||
+    message.includes("timed out") ||
+    message.includes("socket") ||
+    message.includes("econnreset") ||
+    message.includes("etimedout")
+  );
+};
+
+const withRetries = async (label, runQuery) => {
+  for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
+    try {
+      return await runQuery();
+    } catch (error) {
+      const shouldRetry = isRetryableFetchError(error) && attempt < maxRetries;
+
+      if (!shouldRetry) {
+        throw new Error(`${label}: ${error?.message || "Unknown fetch error"}`);
+      }
+
+      await sleep(retryDelayMs * (attempt + 1));
+    }
+  }
+};
 
 const buildStoryRow = rawArticle => {
   const sourceUrl = normalizeExternalUrl(rawArticle.source_url);
@@ -43,11 +76,14 @@ const buildStoryRow = rawArticle => {
 };
 
 const prunePublishedStories = async () => {
-  const { data: publishedStories, error: storiesError } = await supabase
-    .from("stories")
-    .select("id")
-    .order("is_pinned", { ascending: false })
-    .order("published_at", { ascending: false });
+  const { data: publishedStories, error: storiesError } = await withRetries(
+    "Failed to load published stories",
+    () => supabase
+      .from("stories")
+      .select("id")
+      .order("is_pinned", { ascending: false })
+      .order("published_at", { ascending: false }),
+  );
 
   if (storiesError) throw new Error(storiesError.message);
 
@@ -59,35 +95,47 @@ const prunePublishedStories = async () => {
 
   const overflowIds = overflowStories.map(story => story.id);
 
-  const { data: affectedRawArticles, error: rawSelectError } = await supabase
-    .from("raw_articles")
-    .select("id")
-    .in("published_story_id", overflowIds);
+  const { data: affectedRawArticles, error: rawSelectError } = await withRetries(
+    "Failed to load raw articles for prune",
+    () => supabase
+      .from("raw_articles")
+      .select("id")
+      .in("published_story_id", overflowIds),
+  );
 
   if (rawSelectError) throw new Error(rawSelectError.message);
 
-  const { error: rawUpdateError } = await supabase
-    .from("raw_articles")
-    .update({
-      review_status: "approved",
-      published_story_id: null,
-      review_notes: "Moved out of live feed due to published story cap.",
-    })
-    .in("published_story_id", overflowIds);
+  const { error: rawUpdateError } = await withRetries(
+    "Failed to reset raw articles during prune",
+    () => supabase
+      .from("raw_articles")
+      .update({
+        review_status: "approved",
+        published_story_id: null,
+        review_notes: "Moved out of live feed due to published story cap.",
+      })
+      .in("published_story_id", overflowIds),
+  );
 
   if (rawUpdateError) throw new Error(rawUpdateError.message);
 
-  const { error: deleteSavedError } = await supabase
-    .from("saved_stories")
-    .delete()
-    .in("story_id", overflowIds);
+  const { error: deleteSavedError } = await withRetries(
+    "Failed to delete saved stories during prune",
+    () => supabase
+      .from("saved_stories")
+      .delete()
+      .in("story_id", overflowIds),
+  );
 
   if (deleteSavedError) throw new Error(deleteSavedError.message);
 
-  const { error: deleteStoriesError } = await supabase
-    .from("stories")
-    .delete()
-    .in("id", overflowIds);
+  const { error: deleteStoriesError } = await withRetries(
+    "Failed to delete overflow stories",
+    () => supabase
+      .from("stories")
+      .delete()
+      .in("id", overflowIds),
+  );
 
   if (deleteStoriesError) throw new Error(deleteStoriesError.message);
 
@@ -98,13 +146,16 @@ const prunePublishedStories = async () => {
 };
 
 export const run = async () => {
-  const { data: approvedRows, error: approvedError } = await supabase
-    .from("raw_articles")
-    .select("*")
-    .eq("review_status", "approved")
-    .is("published_story_id", null)
-    .order("published_at", { ascending: false })
-    .limit(100);
+  const { data: approvedRows, error: approvedError } = await withRetries(
+    "Failed to load approved raw articles",
+    () => supabase
+      .from("raw_articles")
+      .select("*")
+      .eq("review_status", "approved")
+      .is("published_story_id", null)
+      .order("published_at", { ascending: false })
+      .limit(100),
+  );
 
   if (approvedError) throw new Error(approvedError.message);
   if (!approvedRows || approvedRows.length === 0) {
@@ -118,10 +169,15 @@ export const run = async () => {
     .filter(row => row.source_url);
 
   const sourceUrls = normalizedApprovedRows.map(row => row.source_url);
-  const { data: existingStories, error: existingError } = await supabase
-    .from("stories")
-    .select("id, source_url")
-    .in("source_url", sourceUrls);
+  const { data: existingStories, error: existingError } = sourceUrls.length === 0
+    ? { data: [], error: null }
+    : await withRetries(
+      "Failed to load existing published stories",
+      () => supabase
+        .from("stories")
+        .select("id, source_url")
+        .in("source_url", sourceUrls),
+    );
 
   if (existingError) throw new Error(existingError.message);
 
@@ -131,10 +187,13 @@ export const run = async () => {
   let insertedStories = [];
 
   if (rowsToInsert.length > 0) {
-    const { data: insertedData, error: insertError } = await supabase
-      .from("stories")
-      .insert(rowsToInsert.map(buildStoryRow).filter(Boolean))
-      .select("id, source_url");
+    const { data: insertedData, error: insertError } = await withRetries(
+      "Failed to insert published stories",
+      () => supabase
+        .from("stories")
+        .insert(rowsToInsert.map(buildStoryRow).filter(Boolean))
+        .select("id, source_url"),
+    );
 
     if (insertError) throw new Error(insertError.message);
     insertedStories = insertedData || [];
@@ -149,10 +208,13 @@ export const run = async () => {
     const publishedStoryId = publishedBySourceUrl.get(row.source_url);
     if (!publishedStoryId) continue;
 
-    const { error: updateError } = await supabase
-      .from("raw_articles")
-      .update({ review_status: "published", published_story_id: publishedStoryId })
-      .eq("id", row.id);
+    const { error: updateError } = await withRetries(
+      `Failed to mark raw article ${row.id} as published`,
+      () => supabase
+        .from("raw_articles")
+        .update({ review_status: "published", published_story_id: publishedStoryId })
+        .eq("id", row.id),
+    );
 
     if (updateError) throw new Error(updateError.message);
   }

@@ -16,6 +16,7 @@ export const run = async () => {
   const newscatcher = { skipped: false };
   const rss = { skipped: false };
   const openai = { skipped: false };
+  const published = { skipped: false };
 
   try {
     Object.assign(gnews, await runGnewsIngest());
@@ -66,7 +67,12 @@ export const run = async () => {
     openai.error = error.message;
   }
 
-  const published = await runPublishApproved();
+  try {
+    Object.assign(published, await runPublishApproved());
+  } catch (error) {
+    published.skipped = true;
+    published.error = error.message;
+  }
 
   const result = { gnews, gdelt, googleNewsRss, newsdata, newscatcher, rss, openai, published };
   console.log(JSON.stringify(result, null, 2));
