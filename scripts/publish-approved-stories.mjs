@@ -17,7 +17,6 @@ if (!supabaseUrl) {
 }
 
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
-const maxPublishedStoriesPerBucket = Number(getEnv("MAX_PUBLISHED_STORIES_PER_BUCKET") || 50);
 const maxRetries = Number(getEnv("PUBLISH_APPROVED_MAX_RETRIES") || 3);
 const retryDelayMs = Number(getEnv("PUBLISH_APPROVED_RETRY_DELAY_MS") || 1500);
 
@@ -59,19 +58,6 @@ const withRetries = async (label, runQuery) => {
       await sleep(retryDelayMs * (attempt + 1));
     }
   }
-};
-
-const getStoryBucketKey = story => story.country_code || story.region_code || "world";
-
-const countStoriesByBucket = stories => {
-  const counts = new Map();
-
-  for (const story of stories) {
-    const bucketKey = getStoryBucketKey(story);
-    counts.set(bucketKey, (counts.get(bucketKey) || 0) + 1);
-  }
-
-  return counts;
 };
 
 const loadLiveStories = async () => {
@@ -126,77 +112,6 @@ const buildStoryRow = rawArticle => {
   };
 };
 
-const prunePublishedStories = async () => {
-  const publishedStories = await loadLiveStories();
-  const bucketCounts = new Map();
-  const overflowStories = [];
-
-  for (const story of publishedStories) {
-    const bucketKey = getStoryBucketKey(story);
-    const nextCount = (bucketCounts.get(bucketKey) || 0) + 1;
-    bucketCounts.set(bucketKey, nextCount);
-
-    if (!story.is_pinned && nextCount > maxPublishedStoriesPerBucket) {
-      overflowStories.push(story);
-    }
-  }
-
-  if (overflowStories.length === 0) {
-    return { prunedStories: 0, resetRawArticles: 0 };
-  }
-
-  const overflowIds = overflowStories.map(story => story.id);
-
-  const { data: affectedRawArticles, error: rawSelectError } = await withRetries(
-    "Failed to load raw articles for prune",
-    () => supabase
-      .from("raw_articles")
-      .select("id")
-      .in("published_story_id", overflowIds),
-  );
-
-  if (rawSelectError) throw new Error(rawSelectError.message);
-
-  const { error: rawUpdateError } = await withRetries(
-    "Failed to reset raw articles during prune",
-    () => supabase
-      .from("raw_articles")
-      .update({
-        review_status: "published",
-        published_story_id: null,
-        review_notes: "Moved out of live feed due to published story cap.",
-      })
-      .in("published_story_id", overflowIds),
-  );
-
-  if (rawUpdateError) throw new Error(rawUpdateError.message);
-
-  const { error: deleteSavedError } = await withRetries(
-    "Failed to delete saved stories during prune",
-    () => supabase
-      .from("saved_stories")
-      .delete()
-      .in("story_id", overflowIds),
-  );
-
-  if (deleteSavedError) throw new Error(deleteSavedError.message);
-
-  const { error: deleteStoriesError } = await withRetries(
-    "Failed to delete overflow stories",
-    () => supabase
-      .from("stories")
-      .delete()
-      .in("id", overflowIds),
-  );
-
-  if (deleteStoriesError) throw new Error(deleteStoriesError.message);
-
-  return {
-    prunedStories: overflowIds.length,
-    resetRawArticles: (affectedRawArticles || []).length,
-  };
-};
-
 export const run = async () => {
   let stage = "load_approved_raw_articles";
 
@@ -228,9 +143,7 @@ export const run = async () => {
     const existingStories = liveStories;
     const existingBySourceUrl = new Map(existingStories.map(story => [story.source_url, story.id]));
     const rowsToInsert = normalizedApprovedRows.filter(row => !existingBySourceUrl.has(row.source_url));
-    const bucketCounts = countStoriesByBucket(liveStories);
     const republishCandidates = await loadRepublishCandidates();
-    const approvedInsertCounts = countStoriesByBucket(rowsToInsert);
     const selectedRepublishRows = [];
     const selectedSourceUrls = new Set(rowsToInsert.map(row => row.source_url));
 
@@ -240,17 +153,8 @@ export const run = async () => {
         continue;
       }
 
-      const normalizedRow = { ...row, source_url: sourceUrl };
-      const bucketKey = getStoryBucketKey(normalizedRow);
-      const plannedCount = (bucketCounts.get(bucketKey) || 0) + (approvedInsertCounts.get(bucketKey) || 0);
-
-      if (plannedCount >= maxPublishedStoriesPerBucket) {
-        continue;
-      }
-
-      approvedInsertCounts.set(bucketKey, plannedCount + 1);
       selectedSourceUrls.add(sourceUrl);
-      selectedRepublishRows.push(normalizedRow);
+      selectedRepublishRows.push({ ...row, source_url: sourceUrl });
     }
 
     const candidateRowsToInsert = [...rowsToInsert, ...selectedRepublishRows];
@@ -308,18 +212,12 @@ export const run = async () => {
 
     logPublishStage(stage, { markedPublished });
 
-    stage = "prune_published_stories";
-    const pruneResult = await prunePublishedStories();
-    logPublishStage(stage, pruneResult);
-
     const result = {
       approved: approvedRows?.length || 0,
       republished: selectedRepublishRows.length,
       inserted: insertedStories.length,
       published: markedPublished,
-      prunedStories: pruneResult.prunedStories,
-      resetRawArticles: pruneResult.resetRawArticles,
-      maxPublishedStoriesPerBucket,
+      liveStories: liveStories.length + insertedStories.length,
     };
 
     logPublishStage("completed", result);

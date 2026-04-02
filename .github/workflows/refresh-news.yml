@@ -62,5 +62,4 @@ jobs:
           INGEST_GDELT_MAX_RECORDS: ${{ vars.INGEST_GDELT_MAX_RECORDS }}
           INGEST_RSS_MAX_ITEMS_PER_FEED: ${{ vars.INGEST_RSS_MAX_ITEMS_PER_FEED }}
           INGEST_RSS_MAX_RETRIES: ${{ vars.INGEST_RSS_MAX_RETRIES }}
-          MAX_PUBLISHED_STORIES_PER_BUCKET: ${{ vars.MAX_PUBLISHED_STORIES_PER_BUCKET || '50' }}
         run: node scripts/refresh-news.mjs
