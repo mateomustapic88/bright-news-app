@@ -44,7 +44,13 @@ const Header = ({
             {t("header.betaFeedback")}
           </a>
           <button type="button" onClick={onRefresh} className="bn-refresh-button" aria-label={t("header.refreshStories")}>
-            🔄
+            <span className="bn-refresh-button__icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M16 10a6 6 0 1 1-1.76-4.24" />
+                <path d="M16 4v4h-4" />
+              </svg>
+            </span>
+            <span className="bn-refresh-button__label">{t("header.refreshStories")}</span>
           </button>
         </div>
       </div>
@@ -60,13 +66,16 @@ const Header = ({
               aria-expanded={isRegionPickerOpen}
               aria-haspopup="dialog"
             >
-              <span className="bn-globe-selector__icon" aria-hidden="true">{currentRegion?.flag || "🌍"}</span>
+              <span className="bn-globe-selector__icon" aria-hidden="true">
+                <span className="bn-globe-selector__glyph">{currentRegion?.flag || "🌍"}</span>
+              </span>
               <span className="bn-globe-selector__copy">
                 <strong>{currentRegionLabel}</strong>
                 <span>Switch country coverage</span>
               </span>
               <span className="bn-globe-selector__chevron" aria-hidden="true">
-                {isRegionPickerOpen ? "−" : "+"}
+                <span className="bn-globe-selector__chevron-line bn-globe-selector__chevron-line--horizontal" />
+                <span className="bn-globe-selector__chevron-line bn-globe-selector__chevron-line--vertical" />
               </span>
             </button>
 
