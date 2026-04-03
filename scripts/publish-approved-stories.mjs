@@ -108,6 +108,7 @@ const buildStoryRow = rawArticle => {
     country_code: rawArticle.country_code,
     is_pinned: false,
     published_at: rawArticle.published_at || new Date().toISOString(),
+    image_url: normalizeExternalUrl(rawArticle.image_url || "") || "",
     source_url: sourceUrl,
   };
 };

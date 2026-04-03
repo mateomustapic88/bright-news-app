@@ -13,6 +13,7 @@ const mapStoryRow = story => ({
   impact: sanitizeText(story.impact),
   readTime: story.read_time || "1 min read",
   sourceUrl: normalizeExternalUrl(story.source_url),
+  imageUrl: normalizeExternalUrl(story.image_url || ""),
   regionCode: story.region_code || "world",
   languageCode: getLanguageForRegionCode(story.region_code || "world"),
   savedCount: Number(story.saved_count || 0),

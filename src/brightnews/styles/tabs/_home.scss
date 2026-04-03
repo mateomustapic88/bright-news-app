@@ -88,11 +88,19 @@
   .bn-home-tab__story-cell {
     grid-column: span 6;
   }
+
+  .bn-home-tab__story-cell.is-expanded {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (min-width: 1220px) {
   .bn-home-tab__story-cell {
     grid-column: span 4;
+  }
+
+  .bn-home-tab__story-cell.is-expanded {
+    grid-column: 1 / -1;
   }
 }
 

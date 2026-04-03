@@ -1,5 +1,6 @@
 import { getCategoryMeta, getCategoryThemeClass } from "../constants";
 import { getCategoryLabel } from "../i18n";
+import StoryMedia from "./StoryMedia";
 import StoryImpact from "./StoryImpact";
 import StorySaveButton from "./StorySaveButton";
 import StoryShareButton from "./StoryShareButton";
@@ -24,6 +25,12 @@ const HeroCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave, 
       onClick={() => !isDimmed && setExpanded(isExpanded ? null : story.id)}
     >
       <div className="bn-hero-card__media">
+        <StoryMedia
+          story={story}
+          className="bn-story-media bn-story-media--hero"
+          imageClassName="bn-story-media__image bn-story-media__image--hero"
+          fallbackClassName="bn-hero-card__emoji"
+        />
         <div className="bn-hero-card__actions">
           <StoryShareButton
             story={story}
@@ -38,7 +45,6 @@ const HeroCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave, 
             t={t}
           />
         </div>
-        <span className="bn-hero-card__emoji">{story.emoji}</span>
         <div className="bn-hero-card__category-tag">
           {category.emoji} {getCategoryLabel(story.category, uiLanguage)}
         </div>

@@ -1,5 +1,6 @@
 import { getCategoryMeta, getCategoryThemeClass } from "../constants";
 import { getCategoryLabel } from "../i18n";
+import StoryMedia from "./StoryMedia";
 import StorySaveButton from "./StorySaveButton";
 import StoryShareButton from "./StoryShareButton";
 import StorySourceLink from "./StorySourceLink";
@@ -10,7 +11,12 @@ const SavedStoryCard = ({ story, saved, toggleSave, handleShareStory, t, uiLangu
 
   return (
     <article className={`bn-saved-card ${themeClass}`.trim()}>
-      <div className="bn-saved-card__media">{story.emoji}</div>
+      <StoryMedia
+        story={story}
+        className="bn-saved-card__media"
+        imageClassName="bn-saved-card__image"
+        fallbackClassName="bn-saved-card__emoji"
+      />
 
       <div className="bn-saved-card__content">
         <div className="bn-saved-card__topline">

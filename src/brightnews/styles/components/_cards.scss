@@ -34,6 +34,40 @@
     color-mix(in srgb, var(--bn-category-bg) 92%, white),
     color-mix(in srgb, var(--bn-category-color) 14%, white)
   );
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(19, 32, 51, 0.04), rgba(19, 32, 51, 0.08));
+    pointer-events: none;
+  }
+}
+
+.bn-story-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--bn-category-bg) 92%, white),
+    color-mix(in srgb, var(--bn-category-color) 14%, white)
+  );
+}
+
+.bn-story-media__image,
+.bn-story-card__image,
+.bn-saved-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bn-story-media--hero {
+  width: 100%;
+  height: 100%;
 }
 
 .bn-hero-card__actions {
@@ -42,17 +76,21 @@
   left: 18px;
   display: inline-flex;
   gap: 8px;
+  z-index: 2;
 }
 
 .bn-hero-card__emoji {
   font-size: 84px;
   filter: drop-shadow(0 8px 16px rgba(19, 32, 51, 0.08));
+  position: relative;
+  z-index: 1;
 }
 
 .bn-hero-card__category-tag {
   position: absolute;
   top: 18px;
   right: 18px;
+  z-index: 2;
   padding: 7px 14px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.94);
@@ -101,12 +139,21 @@
   align-items: center;
   justify-content: center;
   background: var(--bn-category-bg);
+  overflow: hidden;
 }
 
 .bn-story-card__icon {
   width: 72px;
   height: 72px;
   border-radius: 22px;
+}
+
+.bn-story-card__image,
+.bn-saved-card__image {
+  border-radius: inherit;
+}
+
+.bn-story-card__emoji {
   font-size: 36px;
 }
 
@@ -177,6 +224,9 @@
   width: 48px;
   height: 48px;
   border-radius: 13px;
+}
+
+.bn-saved-card__emoji {
   font-size: 24px;
 }
 
@@ -252,6 +302,42 @@
 
   .bn-story-card {
     height: 100%;
+  }
+
+  .bn-story-card.is-expanded {
+    padding: 24px;
+  }
+
+  .bn-story-card.is-expanded .bn-story-card__header {
+    display: grid;
+    grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+    gap: 22px;
+    align-items: start;
+  }
+
+  .bn-story-card.is-expanded .bn-story-card__icon {
+    width: 100%;
+    height: 240px;
+    border-radius: 28px;
+  }
+
+  .bn-story-card.is-expanded .bn-story-card__emoji {
+    font-size: 96px;
+  }
+
+  .bn-story-card.is-expanded .bn-card-title {
+    font-size: 1.7rem;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+  }
+
+  .bn-story-card.is-expanded .bn-card-summary--preview {
+    -webkit-line-clamp: unset;
+  }
+
+  .bn-story-card.is-expanded .bn-story-card__details {
+    margin-top: 20px;
+    padding-top: 18px;
   }
 }
 

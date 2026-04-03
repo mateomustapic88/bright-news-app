@@ -115,7 +115,10 @@ const HomeTab = ({
             </div>
 
             {remainingStories.map(story => (
-              <div key={story.id} className="bn-home-tab__story-cell">
+              <div
+                key={story.id}
+                className={`bn-home-tab__story-cell${expanded === story.id ? " is-expanded" : ""}`}
+              >
                 <StoryCard
                   story={story}
                   expanded={expanded}

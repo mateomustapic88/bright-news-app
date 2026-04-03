@@ -633,6 +633,12 @@ const extractTagAttributes = (block, tagName) => {
   );
 };
 
+const extractTagAttributesAll = (block, tagName) =>
+  Array.from(block.matchAll(new RegExp(`<${tagName}\\b([^>]*)>`, "gi"))).map(([, attributes]) =>
+    Object.fromEntries(
+      Array.from(String(attributes || "").matchAll(/([\w:-]+)="([^"]*)"/g)).map(([, key, value]) => [key, value]),
+    ));
+
 export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 const chunkArray = (items, size) => {
@@ -711,6 +717,132 @@ export const toSentence = value => {
   }
 
   return result.replace(/\s+/g, " ").trim();
+};
+
+const IMAGE_FILE_PATTERN = /^https?:\/\/\S+\.(?:jpe?g|png|webp|gif|avif|svg)(?:\?\S*)?$/i;
+
+const isLikelyImageUrl = value => {
+  const normalized = normalizeExternalUrl(value || "");
+  if (!normalized) return false;
+
+  if (IMAGE_FILE_PATTERN.test(normalized)) return true;
+  return /[?&](?:format|fm|width|height|resize|crop|quality)=/i.test(normalized);
+};
+
+export const extractImageUrlFromHtml = value => {
+  const input = decodeHtmlEntitiesDeep(String(value || ""));
+  if (!input) return "";
+
+  const imageTagMatch = input.match(/<img[^>]+src=["']([^"'<>]+)["']/i);
+  if (imageTagMatch) {
+    const candidate = normalizeExternalUrl(imageTagMatch[1]);
+    if (isLikelyImageUrl(candidate)) return candidate;
+  }
+
+  const metaImageMatch = input.match(/(?:og:image|twitter:image)["'\s:>]+content=["']([^"'<>]+)["']/i);
+  if (metaImageMatch) {
+    const candidate = normalizeExternalUrl(metaImageMatch[1]);
+    if (isLikelyImageUrl(candidate)) return candidate;
+  }
+
+  const urlMatches = input.match(/https?:\/\/[^\s"'<>]+/gi) || [];
+  for (const match of urlMatches) {
+    const candidate = normalizeExternalUrl(match);
+    if (isLikelyImageUrl(candidate)) return candidate;
+  }
+
+  return "";
+};
+
+export const extractImageUrlFromPayload = payload => {
+  const seen = new Set();
+  const queue = [payload];
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    if (!current || seen.has(current)) continue;
+    seen.add(current);
+
+    if (typeof current === "string") {
+      const fromHtml = extractImageUrlFromHtml(current);
+      if (fromHtml) return fromHtml;
+
+      const normalized = normalizeExternalUrl(current);
+      if (isLikelyImageUrl(normalized)) return normalized;
+      continue;
+    }
+
+    if (Array.isArray(current)) {
+      queue.push(...current);
+      continue;
+    }
+
+    if (typeof current === "object") {
+      const prioritizedKeys = [
+        "image",
+        "image_url",
+        "imageUrl",
+        "media",
+        "media_url",
+        "mediaUrl",
+        "media_thumbnail",
+        "mediaThumbnail",
+        "thumbnail",
+        "thumbnail_url",
+        "thumbnailUrl",
+        "enclosure",
+        "enclosures",
+        "hero_image",
+        "heroImage",
+      ];
+
+      for (const key of prioritizedKeys) {
+        if (!(key in current)) continue;
+        const candidate = extractImageUrlFromPayload(current[key]);
+        if (candidate) return candidate;
+      }
+
+      queue.push(...Object.values(current));
+    }
+  }
+
+  return "";
+};
+
+export const extractImageUrlFromArticle = article => {
+  const directCandidates = [
+    article?.image,
+    article?.image_url,
+    article?.imageUrl,
+    article?.media,
+    article?.media_url,
+    article?.mediaUrl,
+    article?.media_thumbnail,
+    article?.mediaThumbnail,
+    article?.thumbnail,
+    article?.thumbnail_url,
+    article?.thumbnailUrl,
+    article?.enclosure,
+  ];
+
+  for (const candidate of directCandidates) {
+    const normalized = normalizeExternalUrl(candidate || "");
+    if (isLikelyImageUrl(normalized)) return normalized;
+  }
+
+  const htmlCandidates = [
+    article?.description,
+    article?.summary,
+    article?.content,
+    article?.content_encoded,
+  ];
+
+  for (const candidate of htmlCandidates) {
+    const imageUrl = extractImageUrlFromHtml(candidate);
+    if (imageUrl) return imageUrl;
+  }
+
+  return extractImageUrlFromPayload(article?.raw_payload || article?.rawPayload || article || {});
 };
 
 const normalizeHaystack = values =>
@@ -893,7 +1025,7 @@ export const buildRawArticleRow = ({
     title,
     description,
     content,
-    image_url: normalizeExternalUrl(article.image || article.image_url || "") || "",
+    image_url: extractImageUrlFromArticle({ ...article, raw_payload: rawPayload }) || "",
     published_at: article.publishedAt || article.published_at || article.pubDate || null,
     region_code: regionCode,
     country_code: countryCode,
@@ -1024,15 +1156,39 @@ export const parseRssItems = xml =>
   Array.from(xml.matchAll(/<item\b[\s\S]*?<\/item>/gi)).map(match => {
     const block = match[0];
     const sourceAttributes = extractTagAttributes(block, "source");
+    const mediaContentAttributes = extractTagAttributesAll(block, "media:content");
+    const mediaThumbnailAttributes = extractTagAttributesAll(block, "media:thumbnail");
+    const enclosureAttributes = extractTagAttributesAll(block, "enclosure");
+    const itunesImageAttributes = extractTagAttributes(block, "itunes:image");
+    const htmlDescription = extractTagValue(block, "description");
+    const htmlContent = extractTagValue(block, "content:encoded");
+    const imageUrl =
+      mediaContentAttributes
+        .map(attributes => attributes.url || attributes.href || "")
+        .map(value => normalizeExternalUrl(value))
+        .find(isLikelyImageUrl) ||
+      mediaThumbnailAttributes
+        .map(attributes => attributes.url || attributes.href || "")
+        .map(value => normalizeExternalUrl(value))
+        .find(isLikelyImageUrl) ||
+      enclosureAttributes
+        .filter(attributes => String(attributes.type || "").toLowerCase().startsWith("image/") || isLikelyImageUrl(attributes.url || ""))
+        .map(attributes => attributes.url || "")
+        .map(value => normalizeExternalUrl(value))
+        .find(isLikelyImageUrl) ||
+      normalizeExternalUrl(itunesImageAttributes.href || itunesImageAttributes.url || "") ||
+      extractImageUrlFromHtml(htmlContent) ||
+      extractImageUrlFromHtml(htmlDescription);
 
     return {
       title: extractTagValue(block, "title"),
       link: extractTagValue(block, "link"),
-      description: extractTagValue(block, "description"),
-      content_encoded: extractTagValue(block, "content:encoded"),
+      description: htmlDescription,
+      content_encoded: htmlContent,
       pubDate: extractTagValue(block, "pubDate"),
       categories: extractTagValues(block, "category"),
       source: extractTagValue(block, "source"),
       source_url: sourceAttributes.url || "",
+      image_url: imageUrl || "",
     };
   });
