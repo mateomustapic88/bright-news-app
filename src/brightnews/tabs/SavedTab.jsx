@@ -12,48 +12,56 @@ const SavedTab = ({
   handleShareStory,
   t,
   uiLanguage,
-}) => (
-  <section className="bn-tab bn-saved-tab">
-    <h2>{t("saved.title")}</h2>
+}) => {
+  const stateClass = !session?.user
+    ? "bn-saved-tab--locked"
+    : savedStories.length === 0
+      ? "bn-saved-tab--empty"
+      : "bn-saved-tab--list";
 
-    {shareFeedback && <StatusMessage variant={shareFeedback.variant}>{shareFeedback.message}</StatusMessage>}
+  return (
+    <section className={`bn-tab bn-saved-tab ${stateClass}`}>
+      {session?.user ? <h2>{t("saved.title")}</h2> : null}
 
-    {!session?.user ? (
-      <div className="bn-saved-tab__locked">
-        <EmptyState
-          icon="🔐"
-          title={t("saved.signInTitle")}
-          description={t("saved.signInDescription")}
-        />
-        <button
-          type="button"
-          onClick={() => setTab("account")}
-          className="bn-button bn-button--primary"
-        >
-          {t("saved.openAccount")}
-        </button>
-      </div>
-    ) : savedStories.length === 0 ? (
-      <EmptyState
-        icon="🤍"
-        description={t("saved.emptyDescription")}
-      />
-    ) : (
-      <div className="bn-stack">
-        {savedStories.map(story => (
-          <SavedStoryCard
-            key={story.id}
-            story={story}
-            saved={saved}
-            toggleSave={toggleSave}
-            handleShareStory={handleShareStory}
-            t={t}
-            uiLanguage={uiLanguage}
+      {shareFeedback && <StatusMessage variant={shareFeedback.variant}>{shareFeedback.message}</StatusMessage>}
+
+      {!session?.user ? (
+        <div className="bn-saved-tab__locked">
+          <EmptyState
+            icon="🔐"
+            title={t("saved.signInTitle")}
+            description={t("saved.signInDescription")}
           />
-        ))}
-      </div>
-    )}
-  </section>
-);
+          <button
+            type="button"
+            onClick={() => setTab("account")}
+            className="bn-button bn-button--primary"
+          >
+            {t("saved.openAccount")}
+          </button>
+        </div>
+      ) : savedStories.length === 0 ? (
+        <EmptyState
+          icon="🤍"
+          description={t("saved.emptyDescription")}
+        />
+      ) : (
+        <div className="bn-stack">
+          {savedStories.map(story => (
+            <SavedStoryCard
+              key={story.id}
+              story={story}
+              saved={saved}
+              toggleSave={toggleSave}
+              handleShareStory={handleShareStory}
+              t={t}
+              uiLanguage={uiLanguage}
+            />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+};
 
 export default SavedTab;

@@ -19,6 +19,29 @@
 }
 
 @media (min-width: 940px) {
+  .bn-saved-tab--locked,
+  .bn-saved-tab--empty {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    h2,
+    .bn-status-message {
+      width: 100%;
+      max-width: 640px;
+    }
+
+    .bn-empty-state,
+    .bn-saved-tab__locked {
+      width: 100%;
+      max-width: 640px;
+      margin: auto 0;
+      text-align: center;
+      justify-items: center;
+    }
+  }
+
   .bn-saved-tab .bn-stack {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

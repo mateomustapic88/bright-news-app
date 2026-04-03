@@ -5,7 +5,6 @@
 }
 
 .bn-account-resources {
-  margin-top: 20px;
   padding: 18px;
   border: 1px solid var(--bn-border);
   border-radius: var(--bn-radius-xl);
@@ -53,5 +52,11 @@
   .bn-account-tab > h2,
   .bn-account-tab > .bn-status-message {
     grid-column: 1 / -1;
+  }
+
+  .bn-account-tab > .bn-auth-panel,
+  .bn-account-tab > .bn-account-resources {
+    margin-top: 0;
+    align-self: start;
   }
 }
