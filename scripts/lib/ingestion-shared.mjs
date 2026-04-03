@@ -1,4 +1,5 @@
 import { normalizeExternalUrl } from "../../src/lib/urls.js";
+import { isBlockedStoryImageUrl, isLikelyBrandingImageUrl } from "../../src/lib/storyImages.js";
 
 export const REGION_CONFIG = [
   { code: "world", country: "", lang: "en" },
@@ -720,35 +721,109 @@ export const toSentence = value => {
 };
 
 const IMAGE_FILE_PATTERN = /^https?:\/\/\S+\.(?:jpe?g|png|webp|gif|avif|svg)(?:\?\S*)?$/i;
+const HTML_IMAGE_META_KEYS = new Set([
+  "og:image",
+  "og:image:url",
+  "twitter:image",
+  "twitter:image:src",
+  "image",
+  "thumbnailurl",
+]);
+const CLOUDINARY_IMAGE_PATTERN = /\/image\/upload\//i;
+const TRANSFORMED_IMAGE_PATTERN = /\/f_(?:jpe?g|png|webp|gif|avif)\b/i;
+const IMAGE_QUERY_HINT_PATTERN = /[?&](?:format|fm|width|height|resize|crop|quality)=/i;
+const ATTRIBUTE_CACHE = new Map();
 
 const isLikelyImageUrl = value => {
   const normalized = normalizeExternalUrl(value || "");
   if (!normalized) return false;
 
   if (IMAGE_FILE_PATTERN.test(normalized)) return true;
-  return /[?&](?:format|fm|width|height|resize|crop|quality)=/i.test(normalized);
+  if (CLOUDINARY_IMAGE_PATTERN.test(normalized)) return true;
+  if (TRANSFORMED_IMAGE_PATTERN.test(normalized)) return true;
+  return IMAGE_QUERY_HINT_PATTERN.test(normalized);
+};
+
+const extractAttributeValue = (tag, attributeName) => {
+  const cacheKey = `${attributeName}`;
+  let matcher = ATTRIBUTE_CACHE.get(cacheKey);
+
+  if (!matcher) {
+    const escapedAttributeName = attributeName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    matcher = new RegExp(`${escapedAttributeName}\\s*=\\s*["']([^"']+)["']`, "i");
+    ATTRIBUTE_CACHE.set(cacheKey, matcher);
+  }
+
+  const match = tag.match(matcher);
+  return match?.[1] || "";
+};
+
+const extractSrcsetUrl = value => {
+  const firstSource = String(value || "")
+    .split(",")
+    .map(part => part.trim())
+    .find(Boolean);
+
+  if (!firstSource) return "";
+  return firstSource.split(/\s+/)[0] || "";
+};
+
+export const resolveHtmlImageCandidate = value => {
+  const candidate = normalizeExternalUrl(value || "");
+  if (!isLikelyImageUrl(candidate)) return "";
+  if (isBlockedStoryImageUrl(candidate)) return "";
+  return candidate;
 };
 
 export const extractImageUrlFromHtml = value => {
   const input = decodeHtmlEntitiesDeep(String(value || ""));
   if (!input) return "";
 
-  const imageTagMatch = input.match(/<img[^>]+src=["']([^"'<>]+)["']/i);
-  if (imageTagMatch) {
-    const candidate = normalizeExternalUrl(imageTagMatch[1]);
-    if (isLikelyImageUrl(candidate)) return candidate;
+  for (const match of input.matchAll(/<meta\b[^>]*>/gi)) {
+    const tag = match[0];
+    const key =
+      extractAttributeValue(tag, "property") ||
+      extractAttributeValue(tag, "name") ||
+      extractAttributeValue(tag, "itemprop");
+
+    if (!HTML_IMAGE_META_KEYS.has(String(key || "").toLowerCase())) continue;
+
+    const candidate = resolveHtmlImageCandidate(extractAttributeValue(tag, "content"));
+    if (candidate) return candidate;
   }
 
-  const metaImageMatch = input.match(/(?:og:image|twitter:image)["'\s:>]+content=["']([^"'<>]+)["']/i);
-  if (metaImageMatch) {
-    const candidate = normalizeExternalUrl(metaImageMatch[1]);
-    if (isLikelyImageUrl(candidate)) return candidate;
+  for (const match of input.matchAll(/<link\b[^>]*>/gi)) {
+    const tag = match[0];
+    const rel = extractAttributeValue(tag, "rel").toLowerCase();
+    if (!["image_src", "preload"].includes(rel)) continue;
+
+    const candidate = resolveHtmlImageCandidate(
+      extractAttributeValue(tag, "href") || extractAttributeValue(tag, "imagesrc")
+    );
+    if (candidate) return candidate;
+  }
+
+  for (const match of input.matchAll(/<img\b[^>]*>/gi)) {
+    const tag = match[0];
+    const candidates = [
+      extractAttributeValue(tag, "src"),
+      extractAttributeValue(tag, "data-src"),
+      extractAttributeValue(tag, "data-lazy-src"),
+      extractAttributeValue(tag, "data-original"),
+      extractSrcsetUrl(extractAttributeValue(tag, "srcset")),
+      extractSrcsetUrl(extractAttributeValue(tag, "data-srcset")),
+    ];
+
+    for (const candidateValue of candidates) {
+      const candidate = resolveHtmlImageCandidate(candidateValue);
+      if (candidate) return candidate;
+    }
   }
 
   const urlMatches = input.match(/https?:\/\/[^\s"'<>]+/gi) || [];
   for (const match of urlMatches) {
-    const candidate = normalizeExternalUrl(match);
-    if (isLikelyImageUrl(candidate)) return candidate;
+    const candidate = resolveHtmlImageCandidate(match);
+    if (candidate) return candidate;
   }
 
   return "";
@@ -757,9 +832,11 @@ export const extractImageUrlFromHtml = value => {
 export const extractImageUrlFromPayload = payload => {
   const seen = new Set();
   const queue = [payload];
+  let queueIndex = 0;
 
-  while (queue.length > 0) {
-    const current = queue.shift();
+  while (queueIndex < queue.length) {
+    const current = queue[queueIndex];
+    queueIndex += 1;
     if (!current || seen.has(current)) continue;
     seen.add(current);
 
@@ -767,8 +844,8 @@ export const extractImageUrlFromPayload = payload => {
       const fromHtml = extractImageUrlFromHtml(current);
       if (fromHtml) return fromHtml;
 
-      const normalized = normalizeExternalUrl(current);
-      if (isLikelyImageUrl(normalized)) return normalized;
+      const normalized = resolveHtmlImageCandidate(current);
+      if (normalized) return normalized;
       continue;
     }
 
@@ -826,8 +903,8 @@ export const extractImageUrlFromArticle = article => {
   ];
 
   for (const candidate of directCandidates) {
-    const normalized = normalizeExternalUrl(candidate || "");
-    if (isLikelyImageUrl(normalized)) return normalized;
+    const normalized = resolveHtmlImageCandidate(candidate || "");
+    if (normalized) return normalized;
   }
 
   const htmlCandidates = [

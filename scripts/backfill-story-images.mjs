@@ -5,6 +5,7 @@ import {
   extractImageUrlFromHtml,
   sleep,
 } from "./lib/ingestion-shared.mjs";
+import { isBlockedStoryImageUrl } from "../src/lib/storyImages.js";
 
 const getEnv = name => process.env[name];
 const getRequiredEnv = name => {
@@ -26,14 +27,26 @@ const requestDelayMs = Number(getEnv("BACKFILL_STORY_IMAGES_DELAY_MS") || 50);
 const onlyPublished = String(getEnv("BACKFILL_STORY_IMAGES_ONLY_PUBLISHED") || "true") !== "false";
 const fetchSourcePages = String(getEnv("BACKFILL_STORY_IMAGES_FETCH_SOURCE") || "true") !== "false";
 const fetchTimeoutMs = Number(getEnv("BACKFILL_STORY_IMAGES_FETCH_TIMEOUT_MS") || 6000);
+const upsertChunkSize = Number(getEnv("BACKFILL_STORY_IMAGES_UPSERT_CHUNK_SIZE") || 100);
+
+const isBadImageUrl = value => isBlockedStoryImageUrl(value);
+
+const chunkArray = (rows, size) => {
+  const chunks = [];
+
+  for (let index = 0; index < rows.length; index += size) {
+    chunks.push(rows.slice(index, index + size));
+  }
+
+  return chunks;
+};
 
 const loadRawArticles = async () => {
   let query = supabase
     .from("raw_articles")
     .select("id, source_url, description, content, image_url, review_status, raw_payload, published_story_id")
-    .eq("image_url", "")
     .order("published_at", { ascending: false })
-    .limit(batchSize);
+    .limit(batchSize * 4);
 
   if (onlyPublished) {
     query = query.in("review_status", ["published", "approved"]);
@@ -41,11 +54,16 @@ const loadRawArticles = async () => {
 
   const { data, error } = await query;
   if (error) throw error;
-  return data || [];
+  return (data || []).filter(row => isBadImageUrl(row.image_url)).slice(0, batchSize);
 };
+
+const fetchedImageBySourceUrl = new Map();
 
 const fetchImageFromSourceUrl = async sourceUrl => {
   if (!fetchSourcePages || !sourceUrl || sourceUrl.includes("news.google.com")) return "";
+  if (fetchedImageBySourceUrl.has(sourceUrl)) {
+    return fetchedImageBySourceUrl.get(sourceUrl);
+  }
 
   try {
     const response = await fetch(sourceUrl, {
@@ -57,29 +75,29 @@ const fetchImageFromSourceUrl = async sourceUrl => {
       redirect: "follow",
     });
 
-    if (!response.ok) return "";
+    if (!response.ok) {
+      fetchedImageBySourceUrl.set(sourceUrl, "");
+      return "";
+    }
+
     const html = await response.text();
-    return extractImageUrlFromHtml(html);
+    const imageUrl = extractImageUrlFromHtml(html);
+    fetchedImageBySourceUrl.set(sourceUrl, imageUrl);
+    return imageUrl;
   } catch {
+    fetchedImageBySourceUrl.set(sourceUrl, "");
     return "";
   }
 };
 
 const updateRawArticleImages = async rows => {
   if (rows.length === 0) return 0;
-  let updated = 0;
-
-  for (const row of rows) {
-    const { error } = await supabase
-      .from("raw_articles")
-      .update({ image_url: row.image_url })
-      .eq("id", row.id);
-
+  for (const chunk of chunkArray(rows, upsertChunkSize)) {
+    const { error } = await supabase.from("raw_articles").upsert(chunk, { onConflict: "id" });
     if (error) throw error;
-    updated += 1;
   }
 
-  return updated;
+  return rows.length;
 };
 
 const syncStoriesFromRawArticles = async () => {
@@ -111,29 +129,30 @@ const syncStoriesFromRawArticles = async () => {
 
     if (sourceError) throw sourceError;
 
+    const rawImageBySourceUrl = new Map();
+
+    for (const row of raws || []) {
+      if (row.source_url && row.image_url) {
+        rawImageBySourceUrl.set(row.source_url, row.image_url);
+      }
+    }
+
     for (const story of storiesBySource || []) {
-      const matchingRaw = (raws || []).find(row => row.source_url === story.source_url && row.image_url);
-      if (matchingRaw?.image_url) {
-        updatesByStoryId.set(story.id, matchingRaw.image_url);
+      const imageUrl = rawImageBySourceUrl.get(story.source_url);
+      if (imageUrl) {
+        updatesByStoryId.set(story.id, imageUrl);
       }
     }
   }
 
   const storyUpdates = Array.from(updatesByStoryId.entries()).map(([id, image_url]) => ({ id, image_url }));
   if (storyUpdates.length === 0) return 0;
-
-  let updated = 0;
-  for (const row of storyUpdates) {
-    const { error } = await supabase
-      .from("stories")
-      .update({ image_url: row.image_url })
-      .eq("id", row.id);
-
+  for (const chunk of chunkArray(storyUpdates, upsertChunkSize)) {
+    const { error } = await supabase.from("stories").upsert(chunk, { onConflict: "id" });
     if (error) throw error;
-    updated += 1;
   }
 
-  return updated;
+  return storyUpdates.length;
 };
 
 export const run = async () => {
@@ -142,6 +161,9 @@ export const run = async () => {
 
   for (const row of rawArticles) {
     let imageUrl = extractImageUrlFromArticle(row);
+    if (isBadImageUrl(imageUrl)) {
+      imageUrl = "";
+    }
     if (!imageUrl) {
       imageUrl = await fetchImageFromSourceUrl(row.source_url);
     }

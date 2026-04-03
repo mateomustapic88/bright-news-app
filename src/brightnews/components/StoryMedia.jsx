@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { isBlockedStoryImageUrl } from "../../lib/storyImages.js";
+
+const shouldSuppressStoryImage = story => isBlockedStoryImageUrl(story?.imageUrl);
 
 const StoryMedia = ({ story, className = "", imageClassName = "", fallbackClassName = "" }) => {
   const [imageFailed, setImageFailed] = useState(false);
-  const hasImage = Boolean(story.imageUrl) && !imageFailed;
+  const hasImage = Boolean(story.imageUrl) && !imageFailed && !shouldSuppressStoryImage(story);
 
   return (
     <div className={className}>
