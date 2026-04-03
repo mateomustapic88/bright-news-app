@@ -19,6 +19,47 @@
   animation: bn-slide 1.2s linear infinite;
 }
 
+.bn-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 14px 88px;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+}
+
+.bn-status-dialog {
+  width: min(100%, 320px);
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 22px 20px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), #ffffff);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
+  text-align: center;
+
+  p {
+    margin: 0;
+    color: var(--bn-text-strong);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+}
+
+.bn-status-dialog__spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(15, 91, 151, 0.16);
+  border-top-color: var(--bn-link);
+  border-radius: 50%;
+  animation: bn-spin 0.8s linear infinite;
+}
+
 .bn-top-bar {
   position: relative;
   display: flex;
@@ -352,12 +393,30 @@
   font-weight: 700;
   box-shadow: var(--bn-shadow-chip);
   backdrop-filter: blur(14px);
+  transition:
+    background var(--bn-transition),
+    border-color var(--bn-transition),
+    box-shadow var(--bn-transition),
+    color var(--bn-transition),
+    opacity var(--bn-transition);
 
   &:hover {
     border-color: rgba(15, 91, 151, 0.16);
     background: rgba(219, 234, 254, 0.84);
     box-shadow: 0 14px 28px rgba(15, 91, 151, 0.12);
     color: #0b4c80;
+  }
+
+  &:disabled {
+    cursor: wait;
+    opacity: 0.86;
+  }
+
+  &.is-loading {
+    border-color: rgba(15, 91, 151, 0.18);
+    background: rgba(219, 234, 254, 0.9);
+    color: #0b4c80;
+    box-shadow: 0 14px 28px rgba(15, 91, 151, 0.12);
   }
 }
 
@@ -376,6 +435,25 @@
 
 .bn-refresh-button__label {
   white-space: nowrap;
+}
+
+.bn-refresh-button__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(15, 91, 151, 0.2);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: bn-spin 0.8s linear infinite;
+}
+
+@keyframes bn-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .bn-header__actions {
@@ -714,18 +792,6 @@
   height: 3px;
   border-radius: 2px;
   background: var(--bn-accent-strong);
-}
-
-.bn-onboarding {
-  position: fixed;
-  inset: 0;
-  z-index: 300;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px 14px 88px;
-  background: rgba(15, 23, 42, 0.55);
-  backdrop-filter: blur(12px);
 }
 
 .bn-onboarding__surface {

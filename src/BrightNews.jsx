@@ -52,6 +52,7 @@ import BottomNav from "./brightnews/components/BottomNav";
 import Header from "./brightnews/components/Header";
 import LoadingBar from "./brightnews/components/LoadingBar";
 import OnboardingModal from "./brightnews/components/OnboardingModal";
+import StatusDialog from "./brightnews/components/StatusDialog";
 import TopBar from "./brightnews/components/TopBar";
 import DiscoverTab from "./brightnews/tabs/DiscoverTab";
 import AccountTab from "./brightnews/tabs/AccountTab";
@@ -79,6 +80,7 @@ const BrightNews = () => {
   const [stories, setStories]     = useState([]);
   const [savedStories, setSavedStories] = useState([]);
   const [loading, setLoading]     = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
   const [region, setRegion]       = useState(() => readPreferredRegion() || inferPreferredRegionCode());
   const [availableRegionCodes, setAvailableRegionCodes] = useState(["world"]);
@@ -710,14 +712,30 @@ const BrightNews = () => {
         feedbackHref={betaFeedbackHref}
         onFeedbackClick={handleFeedbackClick}
         showRegions={tab === "home"}
+        refreshing={refreshing}
         onRefresh={async () => {
+          if (refreshing) return;
+
+          setRefreshing(true);
           trackEvent("feed_refresh", { region, category, language: languageFilter });
-          await refreshAvailableRegions();
-          await fetchNews(region, category, true);
+          try {
+            await refreshAvailableRegions();
+            await fetchNews(region, category, true);
+          } finally {
+            setRefreshing(false);
+          }
         }}
         t={t}
         uiLanguage={uiLanguage}
       />
+
+      {refreshing ? (
+        <StatusDialog
+          className="bn-refresh-dialog"
+          label={t("header.refreshingStories")}
+          message={t("header.refreshingStories")}
+        />
+      ) : null}
 
       <div className="bn-screen">
         {tab === "home" && (

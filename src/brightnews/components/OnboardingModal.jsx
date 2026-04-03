@@ -1,3 +1,5 @@
+import DialogOverlay from "./DialogOverlay";
+
 const OnboardingModal = ({ session, handleDismiss, handleGoogleSignIn, t }) => {
   const onboardingPoints = [
     {
@@ -18,8 +20,7 @@ const OnboardingModal = ({ session, handleDismiss, handleGoogleSignIn, t }) => {
   ];
 
   return (
-    <div className="bn-onboarding" role="dialog" aria-modal="true" aria-labelledby="bn-onboarding-title">
-      <div className="bn-onboarding__surface">
+    <DialogOverlay overlayClassName="bn-onboarding" surfaceClassName="bn-onboarding__surface" ariaLabelledBy="bn-onboarding-title">
         <div className="bn-onboarding__hero">
           <p className="bn-onboarding__eyebrow">{t("onboarding.eyebrow")}</p>
           <h2 id="bn-onboarding-title">{t("onboarding.title")}</h2>
@@ -48,8 +49,7 @@ const OnboardingModal = ({ session, handleDismiss, handleGoogleSignIn, t }) => {
         </div>
 
         <p className="bn-onboarding__hint">{t("onboarding.hint")}</p>
-      </div>
-    </div>
+    </DialogOverlay>
   );
 };
 

@@ -6,6 +6,7 @@ const Header = ({
   regions,
   setRegion,
   onRefresh,
+  refreshing = false,
   feedbackHref,
   onFeedbackClick,
   showRegions = true,
@@ -43,12 +44,23 @@ const Header = ({
           <a className="bn-header__feedback" href={feedbackHref} onClick={onFeedbackClick}>
             {t("header.betaFeedback")}
           </a>
-          <button type="button" onClick={onRefresh} className="bn-refresh-button" aria-label={t("header.refreshStories")}>
+          <button
+            type="button"
+            onClick={onRefresh}
+            className={`bn-refresh-button${refreshing ? " is-loading" : ""}`}
+            aria-label={t("header.refreshStories")}
+            aria-busy={refreshing}
+            disabled={refreshing}
+          >
             <span className="bn-refresh-button__icon" aria-hidden="true">
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M16 10a6 6 0 1 1-1.76-4.24" />
-                <path d="M16 4v4h-4" />
-              </svg>
+              {refreshing ? (
+                <span className="bn-refresh-button__spinner" />
+              ) : (
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M16 10a6 6 0 1 1-1.76-4.24" />
+                  <path d="M16 4v4h-4" />
+                </svg>
+              )}
             </span>
             <span className="bn-refresh-button__label">{t("header.refreshStories")}</span>
           </button>
