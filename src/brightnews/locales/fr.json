@@ -85,7 +85,7 @@
     "description": "Commencez par l'histoire la plus forte, puis explorez le reste du flux ci-dessous.",
     "loading": "Chargement des bonnes nouvelles du jour...",
     "noStoriesTitle": "Aucune histoire trouvée",
-    "noStoriesDescription": "Il n'y a pas encore d'histoires positives pour cette région et cette catégorie. Essayez un autre filtre ou ajoutez plus d'histoires dans Supabase.",
+    "noStoriesDescription": "Il n'y a pas encore d'histoires positives pour cette région et cette catégorie. Essayez un autre filtre ou revenez bientôt.",
     "readMore": "LIRE PLUS ↓",
     "showLess": "VOIR MOINS ↑"
   },

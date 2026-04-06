@@ -30,7 +30,9 @@ import {
   upsertProfile,
 } from "./brightnews/api";
 import {
+  getAvailableAppLanguages,
   inferPreferredRegionCode,
+  inferPreferredAppLanguage,
   getLanguageFiltersForStories,
   getRegionsForCodes,
   getVisibleTabs,
@@ -42,11 +44,15 @@ import {
   getUiLanguage,
 } from "./brightnews/i18n";
 import {
+  readAppLanguage,
   readOnboardingDismissed,
   readPreferredRegion,
   readSavedStories,
+  readStoryLanguageFilter,
+  writeAppLanguage,
   writeOnboardingDismissed,
   writePreferredRegion,
+  writeStoryLanguageFilter,
 } from "./brightnews/storage";
 import BottomNav from "./brightnews/components/BottomNav";
 import Header from "./brightnews/components/Header";
@@ -85,7 +91,8 @@ const BrightNews = () => {
   const [region, setRegion]       = useState(() => readPreferredRegion() || inferPreferredRegionCode());
   const [availableRegionCodes, setAvailableRegionCodes] = useState(["world"]);
   const [category, setCategory]   = useState("all");
-  const [languageFilter, setLanguageFilter] = useState("en");
+  const [appLanguage, setAppLanguage] = useState(() => readAppLanguage() || inferPreferredAppLanguage());
+  const [storyLanguageFilter, setStoryLanguageFilter] = useState(() => readStoryLanguageFilter() || "all");
   const [expanded, setExpanded]   = useState(null);
   const [error, setError]         = useState(null);
   const [saved, setSaved]         = useState(readSavedStories);
@@ -109,8 +116,9 @@ const BrightNews = () => {
   const savedRef = useRef(saved);
   const regionInitializedRef = useRef(false);
   const categoryInitializedRef = useRef(false);
-  const languageInitializedRef = useRef(false);
-  const uiLanguage = getUiLanguage(languageFilter);
+  const appLanguageInitializedRef = useRef(false);
+  const storyLanguageInitializedRef = useRef(false);
+  const uiLanguage = getUiLanguage(appLanguage);
   const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
 
   const adjustSavedCount = useCallback((items, storyId, delta) => (
@@ -132,6 +140,14 @@ const BrightNews = () => {
   useEffect(() => {
     writePreferredRegion(region);
   }, [region]);
+
+  useEffect(() => {
+    writeAppLanguage(appLanguage);
+  }, [appLanguage]);
+
+  useEffect(() => {
+    writeStoryLanguageFilter(storyLanguageFilter);
+  }, [storyLanguageFilter]);
 
   useEffect(() => {
     enableAnalytics();
@@ -301,15 +317,26 @@ const BrightNews = () => {
   }, [category]);
 
   useEffect(() => {
-    if (!languageInitializedRef.current) {
-      languageInitializedRef.current = true;
-      setAnalyticsUserProperty("language_filter", languageFilter);
+    if (!appLanguageInitializedRef.current) {
+      appLanguageInitializedRef.current = true;
+      setAnalyticsUserProperty("app_language", appLanguage);
       return;
     }
 
-    trackEvent("language_change", { language: languageFilter });
-    setAnalyticsUserProperty("language_filter", languageFilter);
-  }, [languageFilter]);
+    trackEvent("app_language_change", { language: appLanguage });
+    setAnalyticsUserProperty("app_language", appLanguage);
+  }, [appLanguage]);
+
+  useEffect(() => {
+    if (!storyLanguageInitializedRef.current) {
+      storyLanguageInitializedRef.current = true;
+      setAnalyticsUserProperty("story_language_filter", storyLanguageFilter);
+      return;
+    }
+
+    trackEvent("story_language_filter_change", { language: storyLanguageFilter });
+    setAnalyticsUserProperty("story_language_filter", storyLanguageFilter);
+  }, [storyLanguageFilter]);
 
   useEffect(() => {
     if (!expanded) return;
@@ -364,14 +391,15 @@ const BrightNews = () => {
 
   const languageFilters = getLanguageFiltersForStories(stories);
   const visibleStories = stories.filter(story => (
-    languageFilter === "all" || story.languageCode === languageFilter
+    storyLanguageFilter === "all" || story.languageCode === storyLanguageFilter
   ));
+  const appLanguages = getAvailableAppLanguages();
 
   useEffect(() => {
     if (loading || stories.length === 0) return;
-    if (languageFilters.some(item => item.id === languageFilter)) return;
-    setLanguageFilter("all");
-  }, [languageFilter, languageFilters, loading, stories.length]);
+    if (languageFilters.some(item => item.id === storyLanguageFilter)) return;
+    setStoryLanguageFilter("all");
+  }, [storyLanguageFilter, languageFilters, loading, stories.length]);
 
   useEffect(() => {
     if (!session?.user) return;
@@ -699,9 +727,9 @@ const BrightNews = () => {
         tab={tab}
         tabs={localizedTabs}
         setTab={setTab}
-        languageFilter={languageFilter}
-        languageFilters={languageFilters}
-        setLanguageFilter={setLanguageFilter}
+        appLanguage={appLanguage}
+        appLanguages={appLanguages}
+        setAppLanguage={setAppLanguage}
         t={t}
         uiLanguage={uiLanguage}
       />
@@ -717,7 +745,7 @@ const BrightNews = () => {
           if (refreshing) return;
 
           setRefreshing(true);
-          trackEvent("feed_refresh", { region, category, language: languageFilter });
+          trackEvent("feed_refresh", { region, category, language: storyLanguageFilter });
           try {
             await refreshAvailableRegions();
             await fetchNews(region, category, true);

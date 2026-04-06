@@ -85,7 +85,7 @@
     "description": "Comece pela história mais forte e continue explorando o restante do feed abaixo.",
     "loading": "Carregando as boas notícias de hoje...",
     "noStoriesTitle": "Nenhuma história encontrada",
-    "noStoriesDescription": "Ainda não há histórias positivas para esta região e categoria. Tente outro filtro ou adicione mais histórias no Supabase.",
+    "noStoriesDescription": "Ainda não há histórias positivas para esta região e categoria. Tente outro filtro ou volte em breve.",
     "readMore": "LER MAIS ↓",
     "showLess": "MOSTRAR MENOS ↑"
   },

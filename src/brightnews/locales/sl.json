@@ -1,0 +1,183 @@
+{
+  "tabs": {
+    "home": "Domov",
+    "discover": "Razišči",
+    "saved": "Shranjeno",
+    "account": "Račun",
+    "review": "Pregled"
+  },
+  "categories": {
+    "all": "Vse",
+    "Environment": "Planet",
+    "Science": "Znanost",
+    "Community": "Ljudje",
+    "Health": "Zdravje",
+    "Animals": "Živali",
+    "Innovation": "Tehnologija"
+  },
+  "regions": {
+    "world": "Svet",
+    "us": "ZDA",
+    "uk": "VB",
+    "hr": "Hrvaška",
+    "si": "Slovenija",
+    "rs": "Srbija",
+    "ba": "Bosna in Hercegovina",
+    "de": "Nemčija",
+    "fr": "Francija",
+    "jp": "Japonska",
+    "au": "Avstralija",
+    "br": "Brazilija",
+    "in": "Indija"
+  },
+  "languages": {
+    "all": "Vsi jeziki",
+    "en": "Angleščina",
+    "hr": "Hrvaščina",
+    "sl": "Slovenščina",
+    "sr": "Srbščina",
+    "bs": "Bosanščina",
+    "de": "Nemščina",
+    "fr": "Francoščina",
+    "ja": "Japonščina",
+    "pt": "Portugalščina"
+  },
+  "languageShort": {
+    "all": "Vsi",
+    "en": "Angleščina",
+    "hr": "Hrvaščina",
+    "sl": "Slovenščina",
+    "sr": "Srbščina",
+    "bs": "Bosanščina",
+    "de": "Nemščina",
+    "fr": "Francoščina",
+    "ja": "Japonščina",
+    "pt": "Portugalščina"
+  },
+  "reviewFilters": {
+    "pending": "Na čakanju",
+    "approved": "Odobreno",
+    "rejected": "Zavrnjeno",
+    "all": "Vse"
+  },
+  "topbar": {
+    "account": "Račun",
+    "signIn": "Prijava",
+    "language": "Jezik"
+  },
+  "header": {
+    "eyebrow": "Današnji pregled",
+    "title": "Dobre novice, brez negativnosti.",
+    "meta": "Pozitivne zgodbe z vsega sveta · {date}",
+    "lede": "Brez vojn, brez politike, brez gospodarske panike. Samo pozitivne in spodbudne novice.",
+    "betaFeedback": "Beta povratne informacije",
+    "refreshStories": "Osveži novice",
+    "refreshingStories": "Osvežujem novice...",
+    "edition": "Izdaja"
+  },
+  "home": {
+    "exploreFeed": "Razišči tok",
+    "exploreDescription": "Izberi temo in nato raziskuj enoten tok zgodb.",
+    "topStory": "Glavna zgodba",
+    "moreGoodNews": "Še več dobrih novic",
+    "highlights": "Današnji poudarki",
+    "title": "En miren tok dobrih novic.",
+    "description": "Začni z najmočnejšo zgodbo, nato pa nadaljuj z raziskovanjem preostalega toka spodaj.",
+    "loading": "Nalagam današnje dobre novice...",
+    "noStoriesTitle": "Ni najdenih zgodb",
+    "noStoriesDescription": "Za to regijo in kategorijo še ni pozitivnih zgodb. Poskusi drug filter ali preveri znova kmalu.",
+    "readMore": "PREBERI VEČ ↓",
+    "showLess": "POKAŽI MANJ ↑"
+  },
+  "discover": {
+    "title": "🌍 Razišči regije",
+    "description": "Tapni katerokoli regijo in razišči njene dobre novice",
+    "moreCountriesTitle": "Kmalu prihaja več držav in bogatejša lokalna pokritost.",
+    "moreCountriesText": "Kakovost virov širimo regijo za regijo."
+  },
+  "saved": {
+    "title": "❤️ Shranjene zgodbe",
+    "signInTitle": "Prijavi se za ogled shranjenih zgodb",
+    "signInDescription": "Tvoj seznam shranjenih zgodb je zdaj v računu. Odpri Račun, prijavi se z Googlom in ga sinhroniziraj med napravami.",
+    "openAccount": "Odpri račun",
+    "emptyDescription": "Še ni shranjenih zgodb. Tapni ❤️ na katerikoli zgodbi, da jo shraniš."
+  },
+  "account": {
+    "signedInTitle": "👤 Račun",
+    "signedOutTitle": "🔐 Račun",
+    "resourcesTitle": "Podpora in zasebnost",
+    "resourcesDescription": "BrightNews že prikazuje povezave za podporo, zasebnost in izbris računa, ki jih zahtevajo trgovine z aplikacijami. Pred širšim beta lansiranjem te strani redno posodabljaj.",
+    "supportEmail": "E-pošta za podporo:",
+    "sendBetaFeedback": "Pošlji beta povratne informacije",
+    "support": "Podpora",
+    "privacyPolicy": "Politika zasebnosti",
+    "accountDeletion": "Zahtevaj izbris računa",
+    "resourcesHint": "E-pošta za povratne informacije se odpre s pripravljenim predlogom, da lahko testerji hitro opišejo napake, zmedene tokove ali težave s kakovostjo zgodb."
+  },
+  "auth": {
+    "defaultReader": "Bralec BrightNews",
+    "activeTitle": "Google sinhronizacija je aktivna",
+    "signInTitle": "Prijava z Googlom",
+    "activeDescription": "Tvoje shranjene zgodbe te zdaj spremljajo med napravami.",
+    "signInDescription": "Uporabi svoj Google račun za sinhronizacijo shranjenih zgodb, zgodovine branja in prihodnjih nastavitev.",
+    "signOut": "Odjava",
+    "loadingAccount": "Nalagam račun...",
+    "plan": "Paket: {plan}",
+    "ready": "PRIPRAVLJENO",
+    "setup": "NASTAVITEV",
+    "connected": "Google račun povezan",
+    "googleSync": "Google sinhronizacija",
+    "helpText": "Prijavi se enkrat in ohrani svojo zbirko dobrih novic sinhronizirano povsod, kjer bereš.",
+    "benefitCrossDevice": "Shranjevanje med napravami",
+    "benefitCleanerLogin": "Enostavnejša beta prijava",
+    "benefitFutureBriefings": "Prihodnji personalizirani pregledi",
+    "redirecting": "Preusmerjam...",
+    "continueWithGoogle": "Nadaljuj z Googlom",
+    "syncingSaved": "Sinhroniziram shranjene zgodbe..."
+  },
+  "onboarding": {
+    "eyebrow": "Dobrodošel v BrightNews",
+    "title": "Mirnejši način za obveščenost",
+    "intro": "BrightNews izpostavlja verodostojne pozitivne zgodbe z vsega sveta. Začni s svetovnim tokom, preklapljaj med regijami in kategorijami ter shrani zgodbe, ki jih želiš obdržati.",
+    "point1Title": "Pozitivne novice, globalno",
+    "point1Description": "Beri resnične spodbudne zgodbe iz več regij, namesto da vedno znova doomscrollaš isto negativnost.",
+    "point2Title": "Prave povezave do virov",
+    "point2Description": "Odpri izvirni vir za vsako zgodbo, da tok ostane verodostojen in prizemljen.",
+    "point3Title": "Shrani in deli",
+    "point3Description": "Ohrani zgodbe, ki so ti pomembne, in najboljše deli z drugimi.",
+    "signInWithGoogle": "Prijava z Googlom",
+    "startReading": "Začni brati",
+    "hint": "Regijo, kategorijo in jezik lahko kasneje spremeniš."
+  },
+  "review": {
+    "title": "🛠️ Čakalna vrsta za pregled",
+    "signInFirst": "Najprej se prijavi za pregled uvoženih zgodb.",
+    "adminOnly": "To območje je na voljo samo administratorskim računom.",
+    "intro": "Tukaj odobri pozitivne kandidate, nato pa zaženi `npm run publish:approved`.",
+    "refresh": "Osveži",
+    "loading": "Nalagam čakalno vrsto za pregled...",
+    "empty": "Za ta filter ni najdenih surovih člankov.",
+    "noPreview": "Predogled ni na voljo.",
+    "readSource": "Preberi vir",
+    "invalidSourceLink": "Neveljavna povezava do vira",
+    "reject": "Zavrni",
+    "approve": "Odobri"
+  },
+  "story": {
+    "save": "Shrani zgodbo",
+    "removeSaved": "Odstrani shranjeno zgodbo",
+    "readSource": "Preberi vir"
+  },
+  "feedback": {
+    "signInSuccess": "Uspešno prijavljen.",
+    "savedSynced": "Shranjene zgodbe so sinhronizirane z vašim računom.",
+    "shareError": "Te zgodbe trenutno ni mogoče deliti.",
+    "loadAccountError": "Računa ni bilo mogoče naložiti.",
+    "syncSavedError": "Shranjevanja zgodb ni bilo mogoče sinhronizirati.",
+    "loadReviewError": "Čakalne vrste za pregled ni bilo mogoče naložiti.",
+    "approveError": "Članka ni bilo mogoče odobriti.",
+    "rejectError": "Članka ni bilo mogoče zavrniti.",
+    "saveSyncError": "Sinhronizacija shranjene zgodbe ni uspela.",
+    "startGoogleSignInError": "Google prijave ni bilo mogoče začeti."
+  }
+}

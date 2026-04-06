@@ -85,7 +85,7 @@
     "description": "Start with the strongest story, then keep exploring the rest of the feed below.",
     "loading": "Loading today's good news...",
     "noStoriesTitle": "No stories found",
-    "noStoriesDescription": "There are no positive stories for this region and category yet. Try another filter or add more stories in Supabase.",
+    "noStoriesDescription": "There are no positive stories for this region and category yet. Try another filter or check back soon.",
     "readMore": "READ MORE ↓",
     "showLess": "SHOW LESS ↑"
   },

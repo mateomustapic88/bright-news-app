@@ -70,6 +70,8 @@ export const REVIEW_FILTERS = [
 export const SAVED_STORIES_KEY = "brightnews.savedStories";
 export const ONBOARDING_DISMISSED_KEY = "brightnews.onboardingDismissed";
 export const PREFERRED_REGION_KEY = "brightnews.preferredRegion";
+export const APP_LANGUAGE_KEY = "brightnews.appLanguage";
+export const STORY_LANGUAGE_FILTER_KEY = "brightnews.storyLanguageFilter";
 
 export const getCategoryMeta = id =>
   CATEGORIES.find(category => category.id === id) || CATEGORIES[1];
@@ -93,6 +95,9 @@ export const getRegionsForCodes = regionCodes => {
 
 export const getLanguageForRegionCode = regionCode =>
   REGION_LANGUAGE_BY_CODE[regionCode] || "en";
+
+export const getAvailableAppLanguages = () =>
+  Object.values(LANGUAGE_META).filter(language => language.id !== "all");
 
 const COUNTRY_TO_REGION_CODE = {
   au: "au",
@@ -155,6 +160,22 @@ export const inferPreferredRegionCode = () => {
   }
 
   return "world";
+};
+
+export const inferPreferredAppLanguage = () => {
+  if (typeof navigator !== "undefined") {
+    const localeCandidates = [navigator.language, ...(navigator.languages || [])]
+      .filter(Boolean);
+
+    for (const locale of localeCandidates) {
+      const languageCode = String(locale).split(/[-_]/)[0]?.toLowerCase();
+      if (languageCode && LANGUAGE_META[languageCode] && languageCode !== "all") {
+        return languageCode;
+      }
+    }
+  }
+
+  return "en";
 };
 
 export const getLanguageFiltersForStories = stories => {

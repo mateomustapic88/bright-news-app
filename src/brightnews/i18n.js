@@ -1,20 +1,26 @@
+import bs from "./locales/bs.json";
 import de from "./locales/de.json";
 import en from "./locales/en.json";
 import fr from "./locales/fr.json";
 import hr from "./locales/hr.json";
 import ja from "./locales/ja.json";
 import pt from "./locales/pt.json";
+import sl from "./locales/sl.json";
+import sr from "./locales/sr.json";
 
 const UI_LOCALES = {
   en: "en-US",
   hr: "hr-HR",
+  sl: "sl-SI",
+  sr: "sr-RS",
+  bs: "bs-BA",
   de: "de-DE",
   fr: "fr-FR",
   ja: "ja-JP",
   pt: "pt-BR",
 };
 
-const STRINGS = { en, hr, de, fr, ja, pt };
+const STRINGS = { en, hr, sl, sr, bs, de, fr, ja, pt };
 
 const getNestedValue = (object, path) =>
   String(path || "")
