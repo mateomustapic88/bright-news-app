@@ -1,34 +1,38 @@
 # BrightNews
 
-BrightNews is a positive-news app that surfaces credible uplifting stories from around the world without the usual doomscrolling.
+BrightNews is a calmer news app focused on positive, uplifting stories from around the world.
 
-## Stack
+Instead of doomscrolling through war, political chaos, and economic panic, BrightNews highlights progress in science, health, communities, environment, animals, and innovation.
 
-- React + Vite
+## What It Includes
+
+- curated positive-news feed
+- region-based discovery
+- save and share actions
+- localized app interface
+- web app plus Capacitor-based mobile shells
+
+## Tech Stack
+
+- React
+- Vite
 - Supabase
-- Capacitor for iOS and Android shells
+- Capacitor
 
-## Local app
+## Local Development
+
+Install dependencies and start the app:
 
 ```bash
 npm install
 npm run dev
 ```
 
-The local web app runs on:
+Default local URL:
 
 - `http://localhost:5173`
 
-## Environment
-
-Copy `.env.example` values into `.env` and fill the real keys for:
-
-- Supabase
-- GNews
-- NewsCatcher
-- OpenAI review pipeline
-
-## Main scripts
+## Common Scripts
 
 ```bash
 npm run dev
@@ -40,63 +44,24 @@ npm run cap:open:android
 npm run assets:generate
 ```
 
-## News pipeline
+## Environment
 
-```bash
-npm run ingest:gnews
-npm run ingest:gdelt
-npm run ingest:newscatcher
-npm run ingest:rss
-npm run review:pending
-npm run publish:approved
-npm run refresh:news
-```
+Create a local `.env` file and add the required project keys for the services used by the app.
 
-## Mobile beta notes
+At minimum, local development expects app configuration for:
 
-The project already includes Capacitor shells in:
+- Supabase
+- external news/content providers used by the project
 
-- `ios/`
-- `android/`
+## Project Structure
 
-Brand assets are generated from:
+- `src/`: app UI and shared frontend logic
+- `public/`: static public pages and assets
+- `android/`: Android shell
+- `ios/`: iOS shell
+- `resources/`: branding and generated app assets
+- `docs/`: supporting project documentation
 
-- `resources/logo.svg`
+## Status
 
-Mobile auth currently uses:
-
-- app scheme: `com.mateomustapic.brightnews`
-- callback: `com.mateomustapic.brightnews://auth/callback`
-
-See [docs/mobile_beta_setup.md](docs/mobile_beta_setup.md) for the current mobile checklist.
-For beta usage tracking, see [docs/firebase_analytics.md](docs/firebase_analytics.md).
-
-## GitHub Pages deploy
-
-This repo includes a GitHub Pages workflow that deploys the Vite build from `main`.
-
-After the first push:
-
-1. Open `Settings -> Pages` in the GitHub repo
-2. Set `Source` to `GitHub Actions`
-3. Push to `main`
-
-Repository variables required for the Pages build:
-
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
-- optional: `VITE_WEB_AUTH_REDIRECT_URL`
-
-Add them in:
-
-- `Settings -> Secrets and variables -> Actions -> Variables`
-
-The deployed site will then be available at:
-
-- `https://mateomustapic88.github.io/bright-news-app/`
-
-The legal/store URLs will be:
-
-- `https://mateomustapic88.github.io/bright-news-app/privacy-policy.html`
-- `https://mateomustapic88.github.io/bright-news-app/support.html`
-- `https://mateomustapic88.github.io/bright-news-app/account-deletion.html`
+BrightNews is under active development and is currently being refined for wider public release.

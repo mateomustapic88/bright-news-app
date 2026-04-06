@@ -54,7 +54,9 @@ const loadRawArticles = async () => {
 
   const { data, error } = await query;
   if (error) throw error;
-  return (data || []).filter(row => isBadImageUrl(row.image_url)).slice(0, batchSize);
+  return (data || [])
+    .filter(row => !row.image_url || isBadImageUrl(row.image_url))
+    .slice(0, batchSize);
 };
 
 const fetchedImageBySourceUrl = new Map();
@@ -92,8 +94,11 @@ const fetchImageFromSourceUrl = async sourceUrl => {
 
 const updateRawArticleImages = async rows => {
   if (rows.length === 0) return 0;
-  for (const chunk of chunkArray(rows, upsertChunkSize)) {
-    const { error } = await supabase.from("raw_articles").upsert(chunk, { onConflict: "id" });
+  for (const row of rows) {
+    const { error } = await supabase
+      .from("raw_articles")
+      .update({ image_url: row.image_url })
+      .eq("id", row.id);
     if (error) throw error;
   }
 
@@ -147,8 +152,11 @@ const syncStoriesFromRawArticles = async () => {
 
   const storyUpdates = Array.from(updatesByStoryId.entries()).map(([id, image_url]) => ({ id, image_url }));
   if (storyUpdates.length === 0) return 0;
-  for (const chunk of chunkArray(storyUpdates, upsertChunkSize)) {
-    const { error } = await supabase.from("stories").upsert(chunk, { onConflict: "id" });
+  for (const row of storyUpdates) {
+    const { error } = await supabase
+      .from("stories")
+      .update({ image_url: row.image_url })
+      .eq("id", row.id);
     if (error) throw error;
   }
 

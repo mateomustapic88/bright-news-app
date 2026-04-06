@@ -98,6 +98,8 @@ export const TRUSTED_AUTO_APPROVE_VENDORS = new Set(["goodnewsnetwork", "positiv
 const MIN_POSITIVE_SCORE = 0.6;
 const hasOpenAiReviewer = Boolean(process.env.OPENAI_API_KEY);
 const HEURISTIC_AUTO_APPROVE_SCORE = Number(process.env.HEURISTIC_AUTO_APPROVE_SCORE || 0.66);
+const MIN_SOURCE_QUALITY_SCORE = Number(process.env.MIN_SOURCE_QUALITY_SCORE || 0.38);
+const AUTO_APPROVE_MIN_SOURCE_QUALITY_SCORE = Number(process.env.AUTO_APPROVE_MIN_SOURCE_QUALITY_SCORE || 0.62);
 const LOCAL_POSITIVE_MIN_SCORE = Number(process.env.LOCAL_POSITIVE_MIN_SCORE || 0.45);
 const LOCAL_POSITIVE_AUTO_APPROVE_SCORE = Number(process.env.LOCAL_POSITIVE_AUTO_APPROVE_SCORE || 0.5);
 const LOCAL_POSITIVE_SCORE_BOOST = Number(process.env.LOCAL_POSITIVE_SCORE_BOOST || 0.5);
@@ -735,6 +737,10 @@ export const toSentence = value => {
 };
 
 const IMAGE_FILE_PATTERN = /^https?:\/\/\S+\.(?:jpe?g|png|webp|gif|avif|svg)(?:\?\S*)?$/i;
+const IMAGE_RICH_FORMAT_PATTERN = /\.(?:jpe?g|png|webp|avif)(?:\?\S*)?$/i;
+const IMAGE_VECTOR_PATTERN = /\.svg(?:\?\S*)?$/i;
+const IMAGE_THUMBNAIL_PATTERN = /(?:thumb|thumbnail|small|tiny|icon|avatar|placeholder|default|1x1|spacer|pixel)/i;
+const IMAGE_UPLOAD_HINT_PATTERN = /(?:wp-content\/uploads|\/uploads\/|\/media\/|\/images\/|\/photo\/|\/photos\/|cloudinary|imgix)/i;
 const HTML_IMAGE_META_KEYS = new Set([
   "og:image",
   "og:image:url",
@@ -747,6 +753,27 @@ const CLOUDINARY_IMAGE_PATTERN = /\/image\/upload\//i;
 const TRANSFORMED_IMAGE_PATTERN = /\/f_(?:jpe?g|png|webp|gif|avif)\b/i;
 const IMAGE_QUERY_HINT_PATTERN = /[?&](?:format|fm|width|height|resize|crop|quality)=/i;
 const ATTRIBUTE_CACHE = new Map();
+const SOURCE_QUALITY_PROFILES = [
+  { match: "goodnewsnetwork", score: 0.84 },
+  { match: "positive_news", score: 0.86 },
+  { match: "reasonstobecheerful", score: 0.82 },
+  { match: "goodgoodgood", score: 0.8 },
+  { match: "npr.org", score: 0.93 },
+  { match: "sciencedaily.com", score: 0.88 },
+  { match: "smithsonianmag.com", score: 0.9 },
+  { match: "mit.edu", score: 0.94 },
+  { match: "index.hr", score: 0.68 },
+  { match: "24sata.hr", score: 0.62 },
+  { match: "bug.hr", score: 0.82 },
+  { match: "poslovni.hr", score: 0.72 },
+  { match: "n1info.rs", score: 0.72 },
+  { match: "n1info.si", score: 0.72 },
+  { match: "nova.rs", score: 0.63 },
+  { match: "klix.ba", score: 0.68 },
+  { match: "capital.ba", score: 0.74 },
+  { match: "radiosarajevo.ba", score: 0.64 },
+  { match: "delo.si", score: 0.78 },
+];
 
 const isLikelyImageUrl = value => {
   const normalized = normalizeExternalUrl(value || "");
@@ -789,9 +816,43 @@ export const resolveHtmlImageCandidate = value => {
   return candidate;
 };
 
+const getImageCandidateScore = (value, source = "unknown") => {
+  const candidate = normalizeExternalUrl(value || "");
+  if (!candidate) return -Infinity;
+
+  let score = 0;
+
+  if (source === "meta") score += 5;
+  if (source === "link") score += 4;
+  if (source === "img") score += 3;
+  if (source === "payload") score += 3;
+  if (source === "text") score += 1;
+
+  if (IMAGE_RICH_FORMAT_PATTERN.test(candidate)) score += 3;
+  if (IMAGE_UPLOAD_HINT_PATTERN.test(candidate)) score += 2;
+  if (/[\?&](?:w|width|h|height)=([2-9]\d{2,}|\d{4,})/i.test(candidate)) score += 1;
+  if (/[\?&](?:fit|crop|fm|format)=/i.test(candidate)) score += 0.5;
+
+  if (IMAGE_VECTOR_PATTERN.test(candidate)) score -= 3;
+  if (IMAGE_THUMBNAIL_PATTERN.test(candidate)) score -= 2;
+  if (isLikelyBrandingImageUrl(candidate)) score -= 5;
+
+  return score;
+};
+
+const selectBestImageCandidate = candidates =>
+  candidates
+    .map(candidate => ({
+      url: resolveHtmlImageCandidate(candidate.url),
+      source: candidate.source || "unknown",
+    }))
+    .filter(candidate => candidate.url)
+    .sort((left, right) => getImageCandidateScore(right.url, right.source) - getImageCandidateScore(left.url, left.source))[0]?.url || "";
+
 export const extractImageUrlFromHtml = value => {
   const input = decodeHtmlEntitiesDeep(String(value || ""));
   if (!input) return "";
+  const candidates = [];
 
   for (const match of input.matchAll(/<meta\b[^>]*>/gi)) {
     const tag = match[0];
@@ -802,8 +863,10 @@ export const extractImageUrlFromHtml = value => {
 
     if (!HTML_IMAGE_META_KEYS.has(String(key || "").toLowerCase())) continue;
 
-    const candidate = resolveHtmlImageCandidate(extractAttributeValue(tag, "content"));
-    if (candidate) return candidate;
+    candidates.push({
+      source: "meta",
+      url: extractAttributeValue(tag, "content"),
+    });
   }
 
   for (const match of input.matchAll(/<link\b[^>]*>/gi)) {
@@ -811,15 +874,15 @@ export const extractImageUrlFromHtml = value => {
     const rel = extractAttributeValue(tag, "rel").toLowerCase();
     if (!["image_src", "preload"].includes(rel)) continue;
 
-    const candidate = resolveHtmlImageCandidate(
-      extractAttributeValue(tag, "href") || extractAttributeValue(tag, "imagesrc")
-    );
-    if (candidate) return candidate;
+    candidates.push({
+      source: "link",
+      url: extractAttributeValue(tag, "href") || extractAttributeValue(tag, "imagesrc"),
+    });
   }
 
   for (const match of input.matchAll(/<img\b[^>]*>/gi)) {
     const tag = match[0];
-    const candidates = [
+    const tagCandidates = [
       extractAttributeValue(tag, "src"),
       extractAttributeValue(tag, "data-src"),
       extractAttributeValue(tag, "data-lazy-src"),
@@ -828,19 +891,23 @@ export const extractImageUrlFromHtml = value => {
       extractSrcsetUrl(extractAttributeValue(tag, "data-srcset")),
     ];
 
-    for (const candidateValue of candidates) {
-      const candidate = resolveHtmlImageCandidate(candidateValue);
-      if (candidate) return candidate;
+    for (const candidateValue of tagCandidates) {
+      candidates.push({
+        source: "img",
+        url: candidateValue,
+      });
     }
   }
 
   const urlMatches = input.match(/https?:\/\/[^\s"'<>]+/gi) || [];
   for (const match of urlMatches) {
-    const candidate = resolveHtmlImageCandidate(match);
-    if (candidate) return candidate;
+    candidates.push({
+      source: "text",
+      url: match,
+    });
   }
 
-  return "";
+  return selectBestImageCandidate(candidates);
 };
 
 export const extractImageUrlFromPayload = payload => {
@@ -901,6 +968,7 @@ export const extractImageUrlFromPayload = payload => {
 };
 
 export const extractImageUrlFromArticle = article => {
+  const directImageCandidates = [];
   const directCandidates = [
     article?.image,
     article?.image_url,
@@ -917,9 +985,14 @@ export const extractImageUrlFromArticle = article => {
   ];
 
   for (const candidate of directCandidates) {
-    const normalized = resolveHtmlImageCandidate(candidate || "");
-    if (normalized) return normalized;
+    directImageCandidates.push({
+      source: "payload",
+      url: candidate,
+    });
   }
+
+  const directImage = selectBestImageCandidate(directImageCandidates);
+  if (directImage) return directImage;
 
   const htmlCandidates = [
     article?.description,
@@ -944,6 +1017,43 @@ const normalizeHaystack = values =>
 
 const countKeywordHits = (haystack, keywords) =>
   keywords.reduce((count, keyword) => (matchesKeyword(haystack, keyword) ? count + 1 : count), 0);
+
+const clampScore = value => Math.max(0, Math.min(1, value));
+
+export const getSourceQualityScore = ({
+  vendor,
+  sourceName = "",
+  sourceUrl = "",
+  title = "",
+  description = "",
+  content = "",
+  imageUrl = "",
+  publishedAt = null,
+}) => {
+  const normalizedVendor = String(vendor || "").toLowerCase();
+  const normalizedSourceName = String(sourceName || "").toLowerCase();
+  const normalizedSourceUrl = normalizeExternalUrl(sourceUrl || "").toLowerCase();
+  const baseProfile = SOURCE_QUALITY_PROFILES.find(profile =>
+    normalizedVendor.includes(profile.match) ||
+    normalizedSourceName.includes(profile.match) ||
+    normalizedSourceUrl.includes(profile.match)
+  );
+
+  let score = baseProfile?.score ?? 0.5;
+
+  if (title && title.length >= 30) score += 0.08;
+  if (description && description.length >= 90) score += 0.08;
+  if (content && content.length >= 160) score += 0.06;
+  if (imageUrl && !isBlockedStoryImageUrl(imageUrl)) score += 0.1;
+  if (publishedAt) score += 0.05;
+  if (normalizedSourceUrl.startsWith("https://")) score += 0.02;
+  if (normalizedSourceUrl.includes("news.google.com")) score -= 0.12;
+  if (!description && !content) score -= 0.12;
+  if (IMAGE_VECTOR_PATTERN.test(imageUrl || "")) score -= 0.08;
+  if (isLikelyBrandingImageUrl(imageUrl || "")) score -= 0.15;
+
+  return clampScore(score);
+};
 
 export const resolveCategory = ({ title, description, content = "", tags = [] }) => {
   const haystack = normalizeHaystack([title, description, content, tags.join(" ")]);
@@ -987,11 +1097,31 @@ export const resolveRegionCode = ({ title, description, content = "", tags = [],
   return "world";
 };
 
-export const inferReviewDecision = ({ vendor, title, description, content = "", tags = [] }) => {
+export const inferReviewDecision = ({
+  vendor,
+  sourceName = "",
+  sourceUrl = "",
+  imageUrl = "",
+  publishedAt = null,
+  title,
+  description,
+  content = "",
+  tags = [],
+}) => {
   const haystack = normalizeHaystack([title, description, content, tags.join(" ")]);
   const normalizedTags = tags.map(tag => toSentence(tag).toLowerCase());
   const normalizedTitle = toSentence(title).toLowerCase();
-  const normalizedSourceUrl = normalizeExternalUrl(tags.find(tag => tag.startsWith?.("http")) || "");
+  const normalizedSourceUrl = normalizeExternalUrl(sourceUrl || tags.find(tag => tag.startsWith?.("http")) || "");
+  const sourceQualityScore = getSourceQualityScore({
+    vendor,
+    sourceName,
+    sourceUrl: normalizedSourceUrl,
+    title,
+    description,
+    content,
+    imageUrl,
+    publishedAt,
+  });
 
   if (NON_NEWS_TITLE_PATTERNS.some(pattern => pattern.test(normalizedTitle))) {
     return {
@@ -1049,35 +1179,44 @@ export const inferReviewDecision = ({ vendor, title, description, content = "", 
   const autoApproveScore = isLocalPositiveLeanVendor
     ? LOCAL_POSITIVE_AUTO_APPROVE_SCORE
     : HEURISTIC_AUTO_APPROVE_SCORE;
+  const sourceAdjustedScore = clampScore((candidateScore * 0.78) + (sourceQualityScore * 0.22));
+  const effectiveMinPositiveScore = Math.max(
+    0.32,
+    minPositiveScore - (sourceQualityScore >= 0.8 ? 0.06 : 0) + (sourceQualityScore < MIN_SOURCE_QUALITY_SCORE ? 0.08 : 0),
+  );
+  const effectiveAutoApproveScore = Math.min(
+    0.92,
+    autoApproveScore - (sourceQualityScore >= 0.82 ? 0.05 : 0),
+  );
 
   if (isTrustedVendor && !hasOpenAiReviewer) {
     return {
       reviewStatus: "approved",
       rejectedReason: "",
-      reviewNotes: `Auto-approved from trusted curated source without OpenAI review (${candidateScore.toFixed(2)}).`,
+      reviewNotes: `Auto-approved from trusted curated source without OpenAI review (positive ${candidateScore.toFixed(2)}, source ${sourceQualityScore.toFixed(2)}).`,
     };
   }
 
-  if (!hasOpenAiReviewer && candidateScore >= autoApproveScore) {
+  if (!hasOpenAiReviewer && sourceQualityScore >= AUTO_APPROVE_MIN_SOURCE_QUALITY_SCORE && sourceAdjustedScore >= effectiveAutoApproveScore) {
     return {
       reviewStatus: "approved",
       rejectedReason: "",
-      reviewNotes: `Auto-approved by heuristic score without OpenAI review (${candidateScore.toFixed(2)}).`,
+      reviewNotes: `Auto-approved by heuristic score without OpenAI review (positive ${candidateScore.toFixed(2)}, source ${sourceQualityScore.toFixed(2)}, blended ${sourceAdjustedScore.toFixed(2)}).`,
     };
   }
 
-  if (!isTrustedVendor && candidateScore < minPositiveScore) {
+  if (!isTrustedVendor && (candidateScore < effectiveMinPositiveScore || sourceQualityScore < MIN_SOURCE_QUALITY_SCORE)) {
     return {
       reviewStatus: "rejected",
-      rejectedReason: "auto_low_positive_score",
-      reviewNotes: `Rejected by heuristic score (${candidateScore.toFixed(2)}).`,
+      rejectedReason: sourceQualityScore < MIN_SOURCE_QUALITY_SCORE ? "auto_low_source_quality" : "auto_low_positive_score",
+      reviewNotes: `Rejected by heuristic score (positive ${candidateScore.toFixed(2)}, source ${sourceQualityScore.toFixed(2)}).`,
     };
   }
 
   return {
     reviewStatus: "pending",
     rejectedReason: "",
-    reviewNotes: `Awaiting OpenAI review. Heuristic score: ${candidateScore.toFixed(2)}.`,
+    reviewNotes: `Awaiting OpenAI review. Positive ${candidateScore.toFixed(2)}, source ${sourceQualityScore.toFixed(2)}, blended ${sourceAdjustedScore.toFixed(2)}.`,
   };
 };
 
@@ -1100,8 +1239,14 @@ export const buildRawArticleRow = ({
 
   const description = toSentence(article.description || article.summary || "");
   const content = toSentence(article.content || article.content_encoded || "");
+  const imageUrl = extractImageUrlFromArticle({ ...article, raw_payload: rawPayload }) || "";
+  const publishedAt = article.publishedAt || article.published_at || article.pubDate || null;
   const decision = inferReviewDecision({
     vendor,
+    sourceName: sourceName || article.source_name || "",
+    sourceUrl,
+    imageUrl,
+    publishedAt,
     title,
     description,
     content,
@@ -1116,8 +1261,8 @@ export const buildRawArticleRow = ({
     title,
     description,
     content,
-    image_url: extractImageUrlFromArticle({ ...article, raw_payload: rawPayload }) || "",
-    published_at: article.publishedAt || article.published_at || article.pubDate || null,
+    image_url: imageUrl,
+    published_at: publishedAt,
     region_code: regionCode,
     country_code: countryCode,
     category,
