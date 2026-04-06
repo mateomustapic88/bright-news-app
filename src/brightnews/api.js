@@ -1,7 +1,7 @@
 import { supabase } from "../lib/supabase";
 import { sanitizeText } from "../lib/text";
 import { normalizeExternalUrl } from "../lib/urls";
-import { getLanguageForRegionCode } from "./constants";
+import { getLanguageForRegionCode, REGIONS } from "./constants";
 
 const mapStoryRow = story => ({
   id: story.id,
@@ -46,7 +46,9 @@ export const loadStories = async (regionCode, categoryId) => {
 };
 
 export const loadAvailableRegionCodes = async () => {
-  if (!supabase) return ["world"];
+  const configuredCodes = REGIONS.map(region => region.code);
+
+  if (!supabase) return configuredCodes;
 
   const { data, error } = await supabase
     .from("stories")
@@ -55,18 +57,10 @@ export const loadAvailableRegionCodes = async () => {
   if (error) throw new Error(error.message);
 
   const codes = new Set(
-    (data || [])
+    [...configuredCodes, ...(data || [])
       .map(item => item.region_code)
-      .filter(Boolean),
+      .filter(Boolean)],
   );
-
-  if (codes.size === 0) {
-    return ["world"];
-  }
-
-  if (!codes.has("world")) {
-    codes.add("world");
-  }
 
   return Array.from(codes);
 };

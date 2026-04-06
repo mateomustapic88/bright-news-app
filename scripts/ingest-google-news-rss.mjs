@@ -21,6 +21,9 @@ const GOOGLE_NEWS_REGION_CONFIG = {
   us: { hl: "en-US", gl: "US", ceid: "US:en" },
   uk: { hl: "en-GB", gl: "GB", ceid: "GB:en" },
   hr: { hl: "hr", gl: "HR", ceid: "HR:hr" },
+  si: { hl: "sl", gl: "SI", ceid: "SI:sl" },
+  rs: { hl: "sr", gl: "RS", ceid: "RS:sr" },
+  ba: { hl: "bs", gl: "BA", ceid: "BA:bs" },
   de: { hl: "de", gl: "DE", ceid: "DE:de" },
   fr: { hl: "fr", gl: "FR", ceid: "FR:fr" },
   jp: { hl: "ja", gl: "JP", ceid: "JP:ja" },
@@ -127,6 +130,21 @@ const deriveSourceName = item => {
 };
 
 const ENGLISH_STOPWORDS = [
+  "a",
+  "an",
+  "as",
+  "at",
+  "be",
+  "by",
+  "for",
+  "in",
+  "is",
+  "it",
+  "its",
+  "of",
+  "on",
+  "or",
+  "to",
   "the",
   "and",
   "are",
@@ -153,7 +171,8 @@ const isLikelyEnglishHeadline = value => {
 
   const words = headline.match(/[a-z]+/g) || [];
   const stopwordHits = words.filter(word => ENGLISH_STOPWORDS.includes(word)).length;
-  return words.length >= 5 && stopwordHits >= 2;
+  const hasEnglishPossessive = /[a-z]'s\b/.test(headline);
+  return words.length >= 5 && (stopwordHits >= 2 || (stopwordHits >= 1 && hasEnglishPossessive));
 };
 
 export const run = async () => {
