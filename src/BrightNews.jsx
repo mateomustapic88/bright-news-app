@@ -48,7 +48,6 @@ import {
   readOnboardingDismissed,
   readPreferredRegion,
   readSavedStories,
-  readStoryLanguageFilter,
   writeAppLanguage,
   writeOnboardingDismissed,
   writePreferredRegion,
@@ -92,7 +91,7 @@ const BrightNews = () => {
   const [availableRegionCodes, setAvailableRegionCodes] = useState(["world"]);
   const [category, setCategory]   = useState("all");
   const [appLanguage, setAppLanguage] = useState(() => readAppLanguage() || inferPreferredAppLanguage());
-  const [storyLanguageFilter, setStoryLanguageFilter] = useState(() => readStoryLanguageFilter() || "all");
+  const [storyLanguageFilter, setStoryLanguageFilter] = useState(() => readAppLanguage() || inferPreferredAppLanguage());
   const [expanded, setExpanded]   = useState(null);
   const [error, setError]         = useState(null);
   const [saved, setSaved]         = useState(readSavedStories);
@@ -143,6 +142,10 @@ const BrightNews = () => {
 
   useEffect(() => {
     writeAppLanguage(appLanguage);
+  }, [appLanguage]);
+
+  useEffect(() => {
+    setStoryLanguageFilter(appLanguage);
   }, [appLanguage]);
 
   useEffect(() => {
