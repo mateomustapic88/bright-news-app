@@ -1,5 +1,5 @@
 import { getCategoryMeta, getCategoryThemeClass } from "../constants";
-import { getCategoryLabel } from "../i18n";
+import { formatStoryPublishedAt, getCategoryLabel } from "../i18n";
 import StoryMedia from "./StoryMedia";
 import StoryImpact from "./StoryImpact";
 import StorySaveButton from "./StorySaveButton";
@@ -11,6 +11,7 @@ const HeroCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave, 
   const themeClass = getCategoryThemeClass(story.category);
   const isExpanded = expanded === story.id;
   const isDimmed = firstLoad;
+  const publishedLabel = formatStoryPublishedAt(story.publishedAt, uiLanguage);
 
   const classes = [
     "bn-hero-card",
@@ -53,6 +54,7 @@ const HeroCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave, 
       <div className="bn-hero-card__body">
         <div className="bn-card-meta">
           <span>📍 {story.location}</span>
+          {publishedLabel ? <span>{publishedLabel}</span> : null}
           <span>{story.readTime}</span>
         </div>
 

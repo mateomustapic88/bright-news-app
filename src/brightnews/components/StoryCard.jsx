@@ -1,5 +1,5 @@
 import { getCategoryMeta, getCategoryThemeClass } from "../constants";
-import { getCategoryLabel } from "../i18n";
+import { formatStoryPublishedAt, getCategoryLabel } from "../i18n";
 import StoryMedia from "./StoryMedia";
 import StoryImpact from "./StoryImpact";
 import StorySaveButton from "./StorySaveButton";
@@ -20,6 +20,7 @@ const StoryCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave,
   const isExpanded = expanded === story.id;
   const isDimmed = firstLoad;
   const sourceBadge = getSourceBadge(story.location);
+  const publishedLabel = formatStoryPublishedAt(story.publishedAt, uiLanguage);
 
   const classes = [
     "bn-story-card",
@@ -60,7 +61,10 @@ const StoryCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave,
           <h3 className="bn-card-title">{story.headline}</h3>
           <div className="bn-story-card__source">
             <span className="bn-story-card__source-badge">{sourceBadge}</span>
-            <span className="bn-card-location">{story.location}</span>
+            <div className="bn-story-card__source-copy">
+              <span className="bn-card-location">{story.location}</span>
+              {publishedLabel ? <span className="bn-card-location">{publishedLabel}</span> : null}
+            </div>
           </div>
           <p className={`bn-card-summary bn-card-summary--preview${isExpanded ? " is-expanded" : ""}`}>
             {story.summary}

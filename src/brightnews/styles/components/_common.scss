@@ -509,7 +509,8 @@
 
 .bn-card-meta {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 12px;
   margin-bottom: 10px;
   font-weight: 700;
 }

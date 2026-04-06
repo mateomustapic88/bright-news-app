@@ -196,6 +196,14 @@
   margin-top: 6px;
 }
 
+.bn-story-card__source-copy,
+.bn-saved-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
 .bn-story-card__source-badge {
   display: inline-flex;
   align-items: center;

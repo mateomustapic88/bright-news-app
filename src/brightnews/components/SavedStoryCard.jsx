@@ -1,5 +1,5 @@
 import { getCategoryMeta, getCategoryThemeClass } from "../constants";
-import { getCategoryLabel } from "../i18n";
+import { formatStoryPublishedAt, getCategoryLabel } from "../i18n";
 import StoryMedia from "./StoryMedia";
 import StorySaveButton from "./StorySaveButton";
 import StoryShareButton from "./StoryShareButton";
@@ -8,6 +8,7 @@ import StorySourceLink from "./StorySourceLink";
 const SavedStoryCard = ({ story, saved, toggleSave, handleShareStory, t, uiLanguage }) => {
   const category = getCategoryMeta(story.category);
   const themeClass = getCategoryThemeClass(story.category);
+  const publishedLabel = formatStoryPublishedAt(story.publishedAt, uiLanguage);
 
   return (
     <article className={`bn-saved-card ${themeClass}`.trim()}>
@@ -34,7 +35,10 @@ const SavedStoryCard = ({ story, saved, toggleSave, handleShareStory, t, uiLangu
           </div>
         </div>
         <h3 className="bn-card-title">{story.headline}</h3>
-        <span className="bn-card-location">📍 {story.location}</span>
+        <div className="bn-saved-card__meta">
+          <span className="bn-card-location">📍 {story.location}</span>
+          {publishedLabel ? <span className="bn-card-location">{publishedLabel}</span> : null}
+        </div>
         <StorySourceLink sourceUrl={story.sourceUrl} compact label={t("story.readSource")} />
       </div>
     </article>
