@@ -1,18 +1,11 @@
 import { getCategoryMeta, getCategoryThemeClass } from "../constants";
 import { formatStoryPublishedAt, getCategoryLabel } from "../i18n";
+import { getSourceBadge } from "../storyMeta";
 import StoryMedia from "./StoryMedia";
 import StoryImpact from "./StoryImpact";
 import StorySaveButton from "./StorySaveButton";
 import StoryShareButton from "./StoryShareButton";
 import StorySourceLink from "./StorySourceLink";
-
-const getSourceBadge = value =>
-  String(value || "")
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map(part => part[0]?.toUpperCase() || "")
-    .join("") || "BN";
 
 const StoryCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave, handleShareStory, t, uiLanguage }) => {
   const category = getCategoryMeta(story.category);

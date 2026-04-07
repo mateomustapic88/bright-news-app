@@ -292,6 +292,48 @@ const FEED_CONFIG = [
     category: "Community",
   },
   {
+    vendor: "slobodna_zivot",
+    sourceName: "Slobodna Dalmacija Život",
+    feedUrl: "https://www.slobodnadalmacija.hr/feed/category/264",
+    regionCode: "hr",
+    category: "Community",
+  },
+  {
+    vendor: "slobodna_zdravlje",
+    sourceName: "Slobodna Dalmacija Zdravlje",
+    feedUrl: "https://www.slobodnadalmacija.hr/feed/category/265",
+    regionCode: "hr",
+    category: "Health",
+  },
+  {
+    vendor: "slobodna_putovanja",
+    sourceName: "Slobodna Dalmacija Putovanja",
+    feedUrl: "https://www.slobodnadalmacija.hr/feed/category/268",
+    regionCode: "hr",
+    category: "Community",
+  },
+  {
+    vendor: "slobodna_tehnologija",
+    sourceName: "Slobodna Dalmacija Tehnologija",
+    feedUrl: "https://www.slobodnadalmacija.hr/feed/category/269",
+    regionCode: "hr",
+    category: "Innovation",
+  },
+  {
+    vendor: "slobodna_split",
+    sourceName: "Slobodna Dalmacija Split",
+    feedUrl: "https://www.slobodnadalmacija.hr/feed/category/253",
+    regionCode: "hr",
+    category: "Community",
+  },
+  {
+    vendor: "slobodna_dalmacija",
+    sourceName: "Slobodna Dalmacija Dalmacija",
+    feedUrl: "https://www.slobodnadalmacija.hr/feed/category/246",
+    regionCode: "hr",
+    category: "Community",
+  },
+  {
     vendor: "sib_hr",
     sourceName: "SiB.hr",
     feedUrl: "https://sib.net.hr/feed/",
@@ -323,6 +365,34 @@ const FEED_CONFIG = [
     regionCode: "rs",
   },
   {
+    vendor: "b92_zdravlje",
+    sourceName: "B92 Zdravlje",
+    feedUrl: "https://www.b92.net/rss/b92/zdravlje",
+    regionCode: "rs",
+    category: "Health",
+  },
+  {
+    vendor: "b92_zivot",
+    sourceName: "B92 Život",
+    feedUrl: "https://www.b92.net/rss/b92/zivot",
+    regionCode: "rs",
+    category: "Community",
+  },
+  {
+    vendor: "b92_tehnopolis",
+    sourceName: "B92 Tehnopolis",
+    feedUrl: "https://www.b92.net/rss/b92/tehnopolis",
+    regionCode: "rs",
+    category: "Innovation",
+  },
+  {
+    vendor: "b92_putovanja",
+    sourceName: "B92 Putovanja",
+    feedUrl: "https://www.b92.net/rss/putovanja",
+    regionCode: "rs",
+    category: "Community",
+  },
+  {
     vendor: "klix_ba",
     sourceName: "Klix",
     feedUrl: "https://www.klix.ba/rss",
@@ -340,6 +410,27 @@ const FEED_CONFIG = [
     sourceName: "Radio Sarajevo",
     feedUrl: "https://radiosarajevo.ba/rss",
     regionCode: "ba",
+  },
+  {
+    vendor: "zdraviportal_ba",
+    sourceName: "Zdravi portal",
+    feedUrl: "https://zdraviportal.ba/feed/",
+    regionCode: "ba",
+    category: "Health",
+  },
+  {
+    vendor: "novasloboda_ba",
+    sourceName: "Nova Sloboda",
+    feedUrl: "https://novasloboda.ba/feed/",
+    regionCode: "ba",
+    category: "Community",
+  },
+  {
+    vendor: "nezavisne_kultura",
+    sourceName: "Nezavisne Kultura",
+    feedUrl: "https://www.nezavisne.com/rss/kultura",
+    regionCode: "ba",
+    category: "Community",
   },
   {
     vendor: "bbc_science_environment",
@@ -480,6 +571,13 @@ const fetchFeed = async feedUrl => {
     try {
       const response = await fetch(feedUrl, {
         signal: AbortSignal.timeout(fetchTimeoutMs),
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
+          Accept: "application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8",
+          "Accept-Language": "hr-HR,hr;q=0.9,en-US;q=0.8,en;q=0.7",
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
       });
       const xml = await response.text();
 
