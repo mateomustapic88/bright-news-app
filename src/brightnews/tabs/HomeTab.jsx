@@ -7,6 +7,36 @@ import SectionLabel from "../components/SectionLabel";
 import StatusMessage from "../components/StatusMessage";
 import StoryCard from "../components/StoryCard";
 
+const FEATURED_POOL_SIZE = 12;
+
+const getFeaturedStoryScore = story => {
+  if (!story) return -Infinity;
+
+  const publishedAt = story.publishedAt ? new Date(story.publishedAt) : null;
+  const ageHours = publishedAt && !Number.isNaN(publishedAt.getTime())
+    ? (Date.now() - publishedAt.getTime()) / (1000 * 60 * 60)
+    : Number.POSITIVE_INFINITY;
+
+  let score = 0;
+
+  if (story.isPinned) score += 24;
+  if (ageHours <= 24) score += 12;
+  else if (ageHours <= 48) score += 9;
+  else if (ageHours <= 72) score += 6;
+  else if (ageHours <= 7 * 24) score += 2;
+  else score -= 8;
+
+  if (story.imageUrl) score += 2;
+  if ((story.summary || "").length >= 120) score += 1.5;
+  if ((story.savedCount || 0) > 0) score += Math.min(story.savedCount, 5) * 0.35;
+
+  if (story.category === "Science" || story.category === "Health" || story.category === "Innovation") {
+    score += 0.6;
+  }
+
+  return score;
+};
+
 const HomeTab = ({
   category,
   setCategory,
@@ -23,9 +53,11 @@ const HomeTab = ({
   t,
   uiLanguage,
 }) => {
-  const featuredStory = stories.reduce((best, story) => {
+  const featuredPool = stories.slice(0, FEATURED_POOL_SIZE);
+
+  const featuredStory = featuredPool.reduce((best, story) => {
     if (!best) return story;
-    if ((story.savedCount || 0) > (best.savedCount || 0)) return story;
+    if (getFeaturedStoryScore(story) > getFeaturedStoryScore(best)) return story;
     return best;
   }, null);
 

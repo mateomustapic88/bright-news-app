@@ -18,6 +18,7 @@ const mapStoryRow = story => ({
   regionCode: story.region_code || "world",
   languageCode: getLanguageForRegionCode(story.region_code || "world"),
   savedCount: Number(story.saved_count || 0),
+  isPinned: Boolean(story.is_pinned),
 });
 
 export const loadStories = async (regionCode, categoryId) => {
