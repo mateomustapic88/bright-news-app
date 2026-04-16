@@ -1,6 +1,6 @@
 import AuthPanel from "../components/AuthPanel";
 import {
-  buildBetaFeedbackMailto,
+  buildFeedbackMailto,
   LEGAL_LINKS,
   SUPPORT_EMAIL,
   SUPPORT_MAILTO,
@@ -19,7 +19,7 @@ const AccountTab = ({
   handleFeedbackClick,
   t,
 }) => {
-  const feedbackMailto = buildBetaFeedbackMailto();
+  const feedbackMailto = buildFeedbackMailto();
 
   return (
     <section className="bn-tab bn-account-tab">

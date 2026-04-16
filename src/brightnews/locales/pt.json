@@ -70,7 +70,7 @@
     "title": "Boas notícias, sem negatividade.",
     "meta": "Histórias positivas do mundo todo · {date}",
     "lede": "Sem guerras, sem política, sem pânico econômico. Apenas notícias positivas e inspiradoras.",
-    "betaFeedback": "Feedback beta",
+    "betaFeedback": "Feedback",
     "refreshStories": "Atualizar notícias",
     "refreshingStories": "Atualizando notícias...",
     "edition": "Edição"
@@ -106,13 +106,13 @@
     "signedInTitle": "👤 Conta",
     "signedOutTitle": "🔐 Conta",
     "resourcesTitle": "Suporte e privacidade",
-    "resourcesDescription": "O BrightNews já expõe os links de suporte, privacidade e exclusão de conta exigidos pelas lojas de aplicativos. Mantenha essas páginas atualizadas antes de uma beta mais ampla.",
+    "resourcesDescription": "O BrightNews já expõe os links de suporte, privacidade e exclusão de conta exigidos pelas lojas de aplicativos. Mantenha essas páginas atualizadas.",
     "supportEmail": "Email de suporte:",
-    "sendBetaFeedback": "Enviar feedback beta",
+    "sendBetaFeedback": "Enviar feedback",
     "support": "Suporte",
     "privacyPolicy": "Política de privacidade",
     "accountDeletion": "Solicitar exclusão da conta",
-    "resourcesHint": "O email de feedback abre com um modelo preenchido para que testadores descrevam rapidamente bugs, fluxos confusos ou problemas de qualidade das histórias."
+    "resourcesHint": "O email de feedback abre com um modelo preenchido para que as pessoas descrevam rapidamente bugs, fluxos confusos ou problemas de qualidade das histórias."
   },
   "auth": {
     "defaultReader": "Leitor BrightNews",
@@ -129,7 +129,7 @@
     "googleSync": "Sincronização Google",
     "helpText": "Entre uma vez e mantenha sua coleção de boas notícias sincronizada em qualquer lugar.",
     "benefitCrossDevice": "Salvos entre dispositivos",
-    "benefitCleanerLogin": "Login beta mais limpo",
+    "benefitCleanerLogin": "Login mais simples",
     "benefitFutureBriefings": "Resumos personalizados futuros",
     "redirecting": "Redirecionando...",
     "continueWithGoogle": "Continuar com Google",

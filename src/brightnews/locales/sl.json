@@ -70,7 +70,7 @@
     "title": "Dobre novice, brez negativnosti.",
     "meta": "Pozitivne zgodbe z vsega sveta · {date}",
     "lede": "Brez vojn, brez politike, brez gospodarske panike. Samo pozitivne in spodbudne novice.",
-    "betaFeedback": "Beta povratne informacije",
+    "betaFeedback": "Povratne informacije",
     "refreshStories": "Osveži novice",
     "refreshingStories": "Osvežujem novice...",
     "edition": "Izdaja"
@@ -106,13 +106,13 @@
     "signedInTitle": "👤 Račun",
     "signedOutTitle": "🔐 Račun",
     "resourcesTitle": "Podpora in zasebnost",
-    "resourcesDescription": "BrightNews že prikazuje povezave za podporo, zasebnost in izbris računa, ki jih zahtevajo trgovine z aplikacijami. Pred širšim beta lansiranjem te strani redno posodabljaj.",
+    "resourcesDescription": "BrightNews že prikazuje povezave za podporo, zasebnost in izbris računa, ki jih zahtevajo trgovine z aplikacijami. Te strani redno posodabljaj.",
     "supportEmail": "E-pošta za podporo:",
-    "sendBetaFeedback": "Pošlji beta povratne informacije",
+    "sendBetaFeedback": "Pošlji povratne informacije",
     "support": "Podpora",
     "privacyPolicy": "Politika zasebnosti",
     "accountDeletion": "Zahtevaj izbris računa",
-    "resourcesHint": "E-pošta za povratne informacije se odpre s pripravljenim predlogom, da lahko testerji hitro opišejo napake, zmedene tokove ali težave s kakovostjo zgodb."
+    "resourcesHint": "E-pošta za povratne informacije se odpre s pripravljenim predlogom, da lahko uporabniki hitro opišejo napake, zmedene tokove ali težave s kakovostjo zgodb."
   },
   "auth": {
     "defaultReader": "Bralec BrightNews",
@@ -129,7 +129,7 @@
     "googleSync": "Google sinhronizacija",
     "helpText": "Prijavi se enkrat in ohrani svojo zbirko dobrih novic sinhronizirano povsod, kjer bereš.",
     "benefitCrossDevice": "Shranjevanje med napravami",
-    "benefitCleanerLogin": "Enostavnejša beta prijava",
+    "benefitCleanerLogin": "Enostavnejša prijava",
     "benefitFutureBriefings": "Prihodnji personalizirani pregledi",
     "redirecting": "Preusmerjam...",
     "continueWithGoogle": "Nadaljuj z Googlom",

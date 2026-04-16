@@ -10,7 +10,7 @@ import {
 } from "./lib/analytics";
 import { shareStory } from "./lib/shareStory";
 import { supabase } from "./lib/supabase";
-import { buildBetaFeedbackMailto } from "./lib/appConfig";
+import { buildFeedbackMailto } from "./lib/appConfig";
 import {
   getAuthRedirectUrl,
   isMobileAuthCallback,
@@ -109,7 +109,7 @@ const BrightNews = () => {
   const [syncingSaved, setSyncingSaved] = useState(false);
   const [shareFeedback, setShareFeedback] = useState(null);
   const [showOnboarding, setShowOnboarding] = useState(() => !readOnboardingDismissed());
-  const betaFeedbackHref = buildBetaFeedbackMailto();
+  const feedbackHref = buildFeedbackMailto();
   const cache = useRef({});
   const abortRef = useRef(null);
   const savedRef = useRef(saved);
@@ -740,7 +740,7 @@ const BrightNews = () => {
         region={region}
         regions={availableRegions}
         setRegion={setRegion}
-        feedbackHref={betaFeedbackHref}
+        feedbackHref={feedbackHref}
         onFeedbackClick={handleFeedbackClick}
         showRegions={tab === "home"}
         refreshing={refreshing}

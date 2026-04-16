@@ -70,7 +70,7 @@
     "title": "Dobre vesti, bez negativnosti.",
     "meta": "Pozitivne priče iz celog sveta · {date}",
     "lede": "Bez ratova, bez politike, bez ekonomske panike. Samo pozitivne i ohrabrujuće vesti.",
-    "betaFeedback": "Beta feedback",
+    "betaFeedback": "Povratne informacije",
     "refreshStories": "Osveži vesti",
     "refreshingStories": "Osvežavam vesti...",
     "edition": "Izdanje"
@@ -106,13 +106,13 @@
     "signedInTitle": "👤 Nalog",
     "signedOutTitle": "🔐 Nalog",
     "resourcesTitle": "Podrška i privatnost",
-    "resourcesDescription": "BrightNews već prikazuje linkove za podršku, privatnost i brisanje naloga koje prodavnice aplikacija zahtevaju. Ove stranice održavaj ažurnim pre šireg beta izlaska.",
+    "resourcesDescription": "BrightNews već prikazuje linkove za podršku, privatnost i brisanje naloga koje prodavnice aplikacija zahtevaju. Ove stranice održavaj ažurnim.",
     "supportEmail": "Email podrške:",
-    "sendBetaFeedback": "Pošalji beta feedback",
+    "sendBetaFeedback": "Pošalji povratne informacije",
     "support": "Podrška",
     "privacyPolicy": "Politika privatnosti",
     "accountDeletion": "Zahtevaj brisanje naloga",
-    "resourcesHint": "Email za feedback se otvara sa unapred pripremljenim šablonom kako bi testeri brzo opisali bagove, zbunjujuće tokove ili probleme sa kvalitetom priča."
+    "resourcesHint": "Email za povratne informacije se otvara sa unapred pripremljenim šablonom kako bi korisnici brzo opisali bagove, zbunjujuće tokove ili probleme sa kvalitetom priča."
   },
   "auth": {
     "defaultReader": "BrightNews čitalac",
@@ -129,7 +129,7 @@
     "googleSync": "Google sinhronizacija",
     "helpText": "Prijavi se jednom i drži svoju kolekciju dobrih vesti sinhronizovanom gde god čitaš.",
     "benefitCrossDevice": "Čuvanje između uređaja",
-    "benefitCleanerLogin": "Čistija beta prijava",
+    "benefitCleanerLogin": "Jednostavnija prijava",
     "benefitFutureBriefings": "Budući personalizovani pregledi",
     "redirecting": "Preusmeravanje...",
     "continueWithGoogle": "Nastavi uz Google",

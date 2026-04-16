@@ -70,7 +70,7 @@
     "title": "Good news, without the negativity.",
     "meta": "Positive stories from around the world · {date}",
     "lede": "No wars, no politics, no economic panic. Just positive, uplifting news.",
-    "betaFeedback": "Beta feedback",
+    "betaFeedback": "Feedback",
     "refreshStories": "Refresh stories",
     "refreshingStories": "Refreshing stories...",
     "edition": "Edition"
@@ -106,13 +106,13 @@
     "signedInTitle": "👤 Account",
     "signedOutTitle": "🔐 Account",
     "resourcesTitle": "Support and privacy",
-    "resourcesDescription": "BrightNews already exposes the support, privacy, and account-deletion links that app stores ask for. Keep these pages updated before wider beta rollout.",
+    "resourcesDescription": "BrightNews already exposes the support, privacy, and account-deletion links that app stores ask for. Keep these pages updated.",
     "supportEmail": "Support email:",
-    "sendBetaFeedback": "Send beta feedback",
+    "sendBetaFeedback": "Send feedback",
     "support": "Support",
     "privacyPolicy": "Privacy policy",
     "accountDeletion": "Request account deletion",
-    "resourcesHint": "The feedback email opens with a prefilled template so testers can quickly describe bugs, confusing flows, or story quality issues."
+    "resourcesHint": "The feedback email opens with a prefilled template so people can quickly describe bugs, confusing flows, or story quality issues."
   },
   "auth": {
     "defaultReader": "BrightNews reader",
@@ -129,7 +129,7 @@
     "googleSync": "Google Sync",
     "helpText": "Sign in once and keep your good-news collection synced everywhere you read.",
     "benefitCrossDevice": "Cross-device saves",
-    "benefitCleanerLogin": "Cleaner beta login",
+    "benefitCleanerLogin": "Simpler sign-in",
     "benefitFutureBriefings": "Future personalized briefings",
     "redirecting": "Redirecting...",
     "continueWithGoogle": "Continue with Google",

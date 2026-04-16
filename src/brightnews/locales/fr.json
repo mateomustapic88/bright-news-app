@@ -70,7 +70,7 @@
     "title": "De bonnes nouvelles, sans négativité.",
     "meta": "Des histoires positives du monde entier · {date}",
     "lede": "Pas de guerres, pas de politique, pas de panique économique. Juste des nouvelles positives et encourageantes.",
-    "betaFeedback": "Retour bêta",
+    "betaFeedback": "Retour",
     "refreshStories": "Actualiser les actualités",
     "refreshingStories": "Actualisation des actualités...",
     "edition": "Édition"
@@ -106,13 +106,13 @@
     "signedInTitle": "👤 Compte",
     "signedOutTitle": "🔐 Compte",
     "resourcesTitle": "Assistance et confidentialité",
-    "resourcesDescription": "BrightNews expose déjà les liens d'assistance, de confidentialité et de suppression de compte demandés par les stores. Gardez ces pages à jour avant une bêta plus large.",
+    "resourcesDescription": "BrightNews expose déjà les liens d'assistance, de confidentialité et de suppression de compte demandés par les stores. Gardez ces pages à jour.",
     "supportEmail": "E-mail d'assistance :",
-    "sendBetaFeedback": "Envoyer un retour bêta",
+    "sendBetaFeedback": "Envoyer un retour",
     "support": "Assistance",
     "privacyPolicy": "Politique de confidentialité",
     "accountDeletion": "Demander la suppression du compte",
-    "resourcesHint": "L'e-mail de retour s'ouvre avec un modèle prérempli afin que les testeurs puissent décrire rapidement les bugs, les parcours confus ou les problèmes de qualité des histoires."
+    "resourcesHint": "L'e-mail de retour s'ouvre avec un modèle prérempli afin que les utilisateurs puissent décrire rapidement les bugs, les parcours confus ou les problèmes de qualité des histoires."
   },
   "auth": {
     "defaultReader": "Lecteur BrightNews",
@@ -129,7 +129,7 @@
     "googleSync": "Synchronisation Google",
     "helpText": "Connectez-vous une fois et gardez votre collection de bonnes nouvelles synchronisée partout.",
     "benefitCrossDevice": "Enregistrements multi-appareils",
-    "benefitCleanerLogin": "Connexion bêta plus simple",
+    "benefitCleanerLogin": "Connexion simplifiée",
     "benefitFutureBriefings": "Futurs briefings personnalisés",
     "redirecting": "Redirection...",
     "continueWithGoogle": "Continuer avec Google",

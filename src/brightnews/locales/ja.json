@@ -70,7 +70,7 @@
     "title": "ネガティブさのない、良いニュース。",
     "meta": "世界中の前向きなストーリー · {date}",
     "lede": "戦争も政治も経済不安もなし。前向きで心が明るくなるニュースだけ。",
-    "betaFeedback": "ベータフィードバック",
+    "betaFeedback": "フィードバック",
     "refreshStories": "ニュースを更新",
     "refreshingStories": "ニュースを更新しています...",
     "edition": "版"
@@ -106,13 +106,13 @@
     "signedInTitle": "👤 アカウント",
     "signedOutTitle": "🔐 アカウント",
     "resourcesTitle": "サポートとプライバシー",
-    "resourcesDescription": "BrightNews は、アプリストアが求めるサポート、プライバシー、アカウント削除のリンクをすでに公開しています。より広いベータ公開の前にこれらのページを更新してください。",
+    "resourcesDescription": "BrightNews は、アプリストアが求めるサポート、プライバシー、アカウント削除のリンクをすでに公開しています。これらのページを最新の状態に保ってください。",
     "supportEmail": "サポートメール:",
-    "sendBetaFeedback": "ベータフィードバックを送信",
+    "sendBetaFeedback": "フィードバックを送信",
     "support": "サポート",
     "privacyPolicy": "プライバシーポリシー",
     "accountDeletion": "アカウント削除を依頼",
-    "resourcesHint": "フィードバックメールはあらかじめ入力されたテンプレートで開くため、テスターはバグ、分かりにくい操作、記事品質の問題をすぐに共有できます。"
+    "resourcesHint": "フィードバックメールはあらかじめ入力されたテンプレートで開くため、ユーザーはバグ、分かりにくい操作、記事品質の問題をすぐに共有できます。"
   },
   "auth": {
     "defaultReader": "BrightNews 読者",
@@ -129,7 +129,7 @@
     "googleSync": "Google 同期",
     "helpText": "一度サインインすれば、どこでも良いニュースのコレクションを同期できます。",
     "benefitCrossDevice": "端末間で保存を同期",
-    "benefitCleanerLogin": "より簡単なベータログイン",
+    "benefitCleanerLogin": "よりシンプルなログイン",
     "benefitFutureBriefings": "今後のパーソナル要約",
     "redirecting": "移動中...",
     "continueWithGoogle": "Google で続行",

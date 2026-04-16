@@ -70,7 +70,7 @@
     "title": "Dobre vijesti, bez negativnosti.",
     "meta": "Pozitivne priče iz cijelog svijeta · {date}",
     "lede": "Bez ratova, bez politike, bez ekonomske panike. Samo pozitivne i ohrabrujuće vijesti.",
-    "betaFeedback": "Beta feedback",
+    "betaFeedback": "Povratne informacije",
     "refreshStories": "Osvježi vijesti",
     "refreshingStories": "Osvježavam vijesti...",
     "edition": "Izdanje"
@@ -106,13 +106,13 @@
     "signedInTitle": "👤 Račun",
     "signedOutTitle": "🔐 Račun",
     "resourcesTitle": "Podrška i privatnost",
-    "resourcesDescription": "BrightNews već izlaže linkove za podršku, privatnost i brisanje računa koje trgovine aplikacija traže. Održavaj te stranice ažurnima prije šire bete.",
+    "resourcesDescription": "BrightNews već prikazuje linkove za podršku, privatnost i brisanje računa koje trgovine aplikacija traže. Održavaj te stranice ažurnima.",
     "supportEmail": "Email podrške:",
-    "sendBetaFeedback": "Pošalji beta feedback",
+    "sendBetaFeedback": "Pošalji povratne informacije",
     "support": "Podrška",
     "privacyPolicy": "Pravila privatnosti",
     "accountDeletion": "Zatraži brisanje računa",
-    "resourcesHint": "Email za feedback otvara se s unaprijed pripremljenim predloškom kako bi testeri brzo opisali bugove, zbunjujuće tokove ili probleme s kvalitetom vijesti."
+    "resourcesHint": "Email za povratne informacije otvara se s unaprijed pripremljenim predloškom kako bi korisnici brzo opisali bugove, zbunjujuće tokove ili probleme s kvalitetom vijesti."
   },
   "auth": {
     "defaultReader": "BrightNews čitatelj",
@@ -129,7 +129,7 @@
     "googleSync": "Google sinkronizacija",
     "helpText": "Prijavi se jednom i zadrži svoju kolekciju dobrih vijesti sinkroniziranom gdje god čitaš.",
     "benefitCrossDevice": "Spremljeno na svim uređajima",
-    "benefitCleanerLogin": "Jednostavniji beta login",
+    "benefitCleanerLogin": "Jednostavnija prijava",
     "benefitFutureBriefings": "Budući personalizirani sažeci",
     "redirecting": "Preusmjeravam...",
     "continueWithGoogle": "Nastavi s Googleom",

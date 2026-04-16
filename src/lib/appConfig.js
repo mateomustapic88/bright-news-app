@@ -11,12 +11,12 @@ export const LEGAL_LINKS = {
   deletion: withBasePath("account-deletion.html"),
 };
 
-export const buildBetaFeedbackMailto = () => {
-  const subject = `${APP_NAME} beta feedback`;
+export const buildFeedbackMailto = () => {
+  const subject = `${APP_NAME} feedback`;
   const body = [
     "Hi,",
     "",
-    "Here is my beta feedback for BrightNews:",
+    "Here is my feedback for BrightNews:",
     "",
     "Device:",
     "OS version:",

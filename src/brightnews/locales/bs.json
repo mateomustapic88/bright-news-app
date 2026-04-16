@@ -70,7 +70,7 @@
     "title": "Dobre vijesti, bez negativnosti.",
     "meta": "Pozitivne priče iz cijelog svijeta · {date}",
     "lede": "Bez ratova, bez politike, bez ekonomske panike. Samo pozitivne i ohrabrujuće vijesti.",
-    "betaFeedback": "Beta feedback",
+    "betaFeedback": "Povratne informacije",
     "refreshStories": "Osvježi vijesti",
     "refreshingStories": "Osvježavam vijesti...",
     "edition": "Izdanje"
@@ -106,13 +106,13 @@
     "signedInTitle": "👤 Račun",
     "signedOutTitle": "🔐 Račun",
     "resourcesTitle": "Podrška i privatnost",
-    "resourcesDescription": "BrightNews već prikazuje linkove za podršku, privatnost i brisanje računa koje trgovine aplikacija traže. Ove stranice održavaj ažurnim prije šireg beta izlaska.",
+    "resourcesDescription": "BrightNews već prikazuje linkove za podršku, privatnost i brisanje računa koje trgovine aplikacija traže. Ove stranice održavaj ažurnim.",
     "supportEmail": "Email podrške:",
-    "sendBetaFeedback": "Pošalji beta feedback",
+    "sendBetaFeedback": "Pošalji povratne informacije",
     "support": "Podrška",
     "privacyPolicy": "Pravila privatnosti",
     "accountDeletion": "Zatraži brisanje računa",
-    "resourcesHint": "Email za feedback se otvara sa unaprijed pripremljenim šablonom kako bi testeri brzo opisali bagove, zbunjujuće tokove ili probleme s kvalitetom priča."
+    "resourcesHint": "Email za povratne informacije se otvara sa unaprijed pripremljenim šablonom kako bi korisnici brzo opisali bagove, zbunjujuće tokove ili probleme s kvalitetom priča."
   },
   "auth": {
     "defaultReader": "BrightNews čitalac",
@@ -129,7 +129,7 @@
     "googleSync": "Google sinhronizacija",
     "helpText": "Prijavi se jednom i drži svoju kolekciju dobrih vijesti sinhronizovanom gdje god čitaš.",
     "benefitCrossDevice": "Spremanje između uređaja",
-    "benefitCleanerLogin": "Čistija beta prijava",
+    "benefitCleanerLogin": "Jednostavnija prijava",
     "benefitFutureBriefings": "Budući personalizovani pregledi",
     "redirecting": "Preusmjeravanje...",
     "continueWithGoogle": "Nastavi uz Google",
