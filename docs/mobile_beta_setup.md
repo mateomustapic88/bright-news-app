@@ -36,6 +36,12 @@ For hosted web later, also add the production site URL and set:
 VITE_WEB_AUTH_REDIRECT_URL=https://your-domain.com
 ```
 
+If you deploy the web app on Vercel first, this can be your Vercel URL, for example:
+
+```env
+VITE_WEB_AUTH_REDIRECT_URL=https://brightnews.vercel.app
+```
+
 ### Google OAuth
 
 Google Cloud should keep using the Supabase callback URI, not the custom mobile scheme:

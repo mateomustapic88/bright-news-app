@@ -44,6 +44,18 @@ npm run cap:open:android
 npm run assets:generate
 ```
 
+## Web Deployment
+
+BrightNews can be deployed on Vercel as a standard Vite app.
+
+Required hosted-web environment variables:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `VITE_WEB_AUTH_REDIRECT_URL`
+
+See [docs/vercel_deploy.md](./docs/vercel_deploy.md) for the exact setup and public URLs.
+
 ## Environment
 
 Create a local `.env` file and add the required project keys for the services used by the app.
