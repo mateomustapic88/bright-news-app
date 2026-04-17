@@ -93,6 +93,18 @@ export const CATEGORY_CONFIG = [
     },
   },
   {
+    category: "Sports",
+    emoji: "🏅",
+    query: "\"won gold\" OR medal win OR championship victory OR tournament winners OR athlete comeback OR charity run success OR club wins title",
+    localizedQueries: {
+      hr: "\"osvojio zlato\" OR osvojila zlato OR osvajanje medalje OR prvenstvena pobjeda OR pobjednik turnira OR povratak sportaša OR uspješna humanitarna utrka OR klub osvojio naslov",
+      de: "\"gold gewonnen\" OR medaillengewinn OR meisterschaftssieg OR turniersieger OR comeback eines athleten OR erfolgreicher wohltätigkeitslauf OR verein gewinnt titel",
+      fr: "\"médaille d'or\" OR victoire en championnat OR vainqueur du tournoi OR retour d'un athlète OR course caritative réussie OR club remporte le titre",
+      ja: "金メダル獲得 OR メダル獲得 OR 選手の復活 OR 大会優勝 OR チャンピオンシップ優勝 OR チャリティーラン成功 OR クラブがタイトル獲得",
+      pt: "\"ganhou ouro\" OR conquista de medalha OR vitória no campeonato OR vencedor do torneio OR retorno do atleta OR sucesso em corrida beneficente OR clube conquista título",
+    },
+  },
+  {
     category: "Innovation",
     emoji: "💡",
     query: "clean tech breakthrough OR battery breakthrough OR affordable technology helps OR startup solution improves lives OR AI helps detect",
@@ -303,6 +315,10 @@ const NON_NEWS_TITLE_PATTERNS = [
   /\bkako izabrati .* gde ga kupiti online\b/i,
   /\b(samsung televizori|metal summit|4walls|sajam namještaja|lifestyle iskustva)\b/i,
   /\bmegan markl\b.*\b(zlostavljana|napadana)\b/i,
+/\b(transfer|transferi|prelazi|gossip)\b.*\b(igrač|igrac|player|club|klub)\b/i,
+  /\b(navijački neredi|huligani|hooligans)\b/i,
+  /\b(crveni karton|red card|suspenzija|suspension)\b/i,
+  /\b(poražen|poražena|izgubio|izgubila|lost to|defeat to)\b.*\b(klub|team|tim|momčad|ekipa)\b/i,
   /\blonglegs\b.*\bnovi film\b/i,
   /\bsmrtonosnom plesu\b.*\bsudar\b/i,
   /\bsmanjili plaće radnicima\b/i,
@@ -601,7 +617,7 @@ const COMMUNITY_POSITIVE_HINTS = [
   "osvojili",
 ];
 
-const INFORMATIVE_POSITIVE_CATEGORY_TAGS = new Set(["science", "animals", "innovation", "health", "community"]);
+const INFORMATIVE_POSITIVE_CATEGORY_TAGS = new Set(["science", "animals", "innovation", "health", "community", "sports"]);
 
 const LOCAL_INFORMATIVE_KEYWORDS = [
   "znanstvenik",
@@ -675,6 +691,28 @@ const LOCAL_INFORMATIVE_KEYWORDS = [
   "banje",
   "lekovita",
   "ljekovita",
+  "sport",
+  "sportski",
+  "sportaš",
+  "sportaši",
+  "sportista",
+  "sportisti",
+  "medalja",
+  "medalje",
+  "zlato",
+  "srebro",
+  "bronza",
+  "prvenstvo",
+  "turnir",
+  "kup",
+  "maraton",
+  "utrka",
+  "trka",
+  "pobijedio",
+  "pobijedila",
+  "osvojio",
+  "osvojila",
+  "osvojili",
 ];
 
 const CATEGORY_KEYWORDS = {
@@ -743,6 +781,29 @@ const CATEGORY_KEYWORDS = {
     "habitat",
     "shelter",
     "rewilding",
+  ],
+  Sports: [
+    "sport",
+    "sports",
+    "athlete",
+    "athletes",
+    "medal",
+    "medals",
+    "gold medal",
+    "silver medal",
+    "bronze medal",
+    "championship",
+    "tournament",
+    "cup",
+    "league title",
+    "marathon",
+    "charity run",
+    "club wins",
+    "team wins",
+    "runner",
+    "karate",
+    "football club",
+    "basketball club",
   ],
   Innovation: [
     "technology",

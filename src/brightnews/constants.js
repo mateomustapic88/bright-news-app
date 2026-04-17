@@ -50,6 +50,7 @@ export const CATEGORIES = [
   { id: "Community", label: "People", emoji: "🤝", theme: "community" },
   { id: "Health", label: "Health", emoji: "💚", theme: "health" },
   { id: "Animals", label: "Animals", emoji: "🐾", theme: "animals" },
+  { id: "Sports", label: "Sports", emoji: "🏅", theme: "sports" },
   { id: "Innovation", label: "Tech", emoji: "💡", theme: "innovation" },
 ];
 
