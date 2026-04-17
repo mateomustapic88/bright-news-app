@@ -21,10 +21,29 @@ const mapStoryRow = story => ({
   isPinned: Boolean(story.is_pinned),
 });
 
-export const loadStories = async (regionCode, categoryId) => {
+const applyStoryFilters = (query, regionCode, categoryId) => {
+  let nextQuery = query;
+
+  if (regionCode && regionCode !== "world") {
+    nextQuery = nextQuery.eq("region_code", regionCode);
+  }
+
+  if (categoryId && categoryId !== "all") {
+    nextQuery = nextQuery.eq("category", categoryId);
+  }
+
+  return nextQuery;
+};
+
+export const loadStories = async (regionCode, categoryId, options = {}) => {
   if (!supabase) {
     throw new Error("Supabase configuration is missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
   }
+
+  const {
+    offset = 0,
+    limit,
+  } = options;
 
   let query = supabase
     .from("stories")
@@ -32,12 +51,10 @@ export const loadStories = async (regionCode, categoryId) => {
     .order("is_pinned", { ascending: false })
     .order("published_at", { ascending: false });
 
-  if (regionCode && regionCode !== "world") {
-    query = query.eq("region_code", regionCode);
-  }
+  query = applyStoryFilters(query, regionCode, categoryId);
 
-  if (categoryId && categoryId !== "all") {
-    query = query.eq("category", categoryId);
+  if (typeof limit === "number" && limit > 0) {
+    query = query.range(offset, offset + limit - 1);
   }
 
   const { data, error } = await query;
@@ -45,6 +62,21 @@ export const loadStories = async (regionCode, categoryId) => {
   if (error) throw new Error(error.message);
 
   return (data || []).map(mapStoryRow);
+};
+
+export const loadStoriesPage = async (regionCode, categoryId, options = {}) => {
+  const {
+    offset = 0,
+    limit = 10,
+  } = options;
+
+  const items = await loadStories(regionCode, categoryId, { offset, limit });
+
+  return {
+    items,
+    hasMore: items.length === limit,
+    nextOffset: offset + items.length,
+  };
 };
 
 export const loadAvailableRegionCodes = async () => {

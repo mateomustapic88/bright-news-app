@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { CATEGORIES, getCategoryThemeClass } from "../constants";
 import { getCategoryLabel } from "../i18n";
 import Chip from "../components/Chip";
@@ -8,7 +9,6 @@ import StatusMessage from "../components/StatusMessage";
 import StoryCard from "../components/StoryCard";
 
 const FEATURED_POOL_SIZE = 12;
-
 const getFeaturedStoryScore = story => {
   if (!story) return -Infinity;
 
@@ -41,10 +41,13 @@ const HomeTab = ({
   category,
   setCategory,
   loading,
+  loadingMore,
   firstLoad,
   error,
   shareFeedback,
   stories,
+  hasMore,
+  onLoadMore,
   expanded,
   saved,
   setExpanded,
@@ -53,6 +56,10 @@ const HomeTab = ({
   t,
   uiLanguage,
 }) => {
+  const loadMoreRef = useRef(null);
+  const [desktopFeedEnabled, setDesktopFeedEnabled] = useState(() => (
+    typeof window !== "undefined" ? window.matchMedia("(min-width: 769px)").matches : false
+  ));
   const featuredPool = stories.slice(0, FEATURED_POOL_SIZE);
 
   const featuredStory = featuredPool.reduce((best, story) => {
@@ -62,6 +69,43 @@ const HomeTab = ({
   }, null);
 
   const remainingStories = stories.filter(story => story.id !== featuredStory?.id);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    const mediaQuery = window.matchMedia("(min-width: 769px)");
+    const syncDesktopMode = event => {
+      setDesktopFeedEnabled(event.matches);
+    };
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", syncDesktopMode);
+      return () => mediaQuery.removeEventListener("change", syncDesktopMode);
+    }
+
+    mediaQuery.addListener(syncDesktopMode);
+    return () => mediaQuery.removeListener(syncDesktopMode);
+  }, []);
+
+  useEffect(() => {
+    if (!desktopFeedEnabled || !hasMore || loading || loadingMore || !onLoadMore) return undefined;
+    if (!loadMoreRef.current) return undefined;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          onLoadMore();
+        }
+      },
+      {
+        rootMargin: "300px 0px",
+      },
+    );
+
+    observer.observe(loadMoreRef.current);
+
+    return () => observer.disconnect();
+  }, [desktopFeedEnabled, hasMore, loading, loadingMore, onLoadMore, stories.length]);
 
   return (
     <section className="bn-tab bn-home-tab">
@@ -164,6 +208,8 @@ const HomeTab = ({
                 />
               </div>
             ))}
+
+            {desktopFeedEnabled && hasMore ? <div ref={loadMoreRef} className="bn-home-tab__load-trigger" aria-hidden="true" /> : null}
           </div>
 
           <div className="bn-home-tab__mobile-flow">
@@ -202,6 +248,14 @@ const HomeTab = ({
           </div>
         </>
       )}
+
+      {loadingMore ? (
+        <div className="bn-home-tab__loading-more">
+          <StatusMessage variant="accent" showDot>
+            {t("header.refreshingStories")}
+          </StatusMessage>
+        </div>
+      ) : null}
     </section>
   );
 };

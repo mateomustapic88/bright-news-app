@@ -25,6 +25,7 @@ import {
   loadRawArticles,
   loadSavedStoryIds,
   loadStories,
+  loadStoriesPage,
   loadStoriesByIds,
   updateRawArticleReviewStatus,
   upsertProfile,
@@ -66,6 +67,9 @@ import ReviewTab from "./brightnews/tabs/ReviewTab";
 import SavedTab from "./brightnews/tabs/SavedTab";
 import "./brightnews/styles/BrightNews.scss";
 
+const WEB_INITIAL_STORY_LIMIT = 50;
+const WEB_INCREMENTAL_STORY_LIMIT = 10;
+
 const getReadableAuthError = error => {
   const message = String(error?.message || error?.msg || "");
   const normalized = message.toLowerCase();
@@ -85,6 +89,7 @@ const BrightNews = () => {
   const [stories, setStories]     = useState([]);
   const [savedStories, setSavedStories] = useState([]);
   const [loading, setLoading]     = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
   const [region, setRegion]       = useState(() => readPreferredRegion() || inferPreferredRegionCode());
@@ -92,6 +97,9 @@ const BrightNews = () => {
   const [category, setCategory]   = useState("all");
   const [appLanguage, setAppLanguage] = useState(() => readAppLanguage() || inferPreferredAppLanguage());
   const [storyLanguageFilter, setStoryLanguageFilter] = useState(() => readAppLanguage() || inferPreferredAppLanguage());
+  const [desktopViewport, setDesktopViewport] = useState(() => (
+    typeof window !== "undefined" ? window.matchMedia("(min-width: 769px)").matches : false
+  ));
   const [expanded, setExpanded]   = useState(null);
   const [error, setError]         = useState(null);
   const [saved, setSaved]         = useState(readSavedStories);
@@ -112,6 +120,7 @@ const BrightNews = () => {
   const feedbackHref = buildFeedbackMailto();
   const cache = useRef({});
   const abortRef = useRef(null);
+  const activeFeedKeyRef = useRef("");
   const savedRef = useRef(saved);
   const regionInitializedRef = useRef(false);
   const categoryInitializedRef = useRef(false);
@@ -296,6 +305,23 @@ const BrightNews = () => {
   useEffect(() => {
     trackScreenView(tab);
   }, [tab]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    const mediaQuery = window.matchMedia("(min-width: 769px)");
+    const syncViewportMode = event => {
+      setDesktopViewport(event.matches);
+    };
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", syncViewportMode);
+      return () => mediaQuery.removeEventListener("change", syncViewportMode);
+    }
+
+    mediaQuery.addListener(syncViewportMode);
+    return () => mediaQuery.removeListener(syncViewportMode);
+  }, []);
 
   useEffect(() => {
     if (!regionInitializedRef.current) {
@@ -528,9 +554,15 @@ const BrightNews = () => {
 
   const fetchNews = useCallback(async (regionCode, categoryId, force = false) => {
     const cacheKey = `${regionCode}-${categoryId}`;
+    const isWebPagination = !isNativeApp() && desktopViewport;
 
     if (!force && cache.current[cacheKey]) {
-      setStories(cache.current[cacheKey]);
+      activeFeedKeyRef.current = cacheKey;
+      setStories(cache.current[cacheKey].items);
+      setError(null);
+      setExpanded(null);
+      setLoading(false);
+      setLoadingMore(false);
       setFirstLoad(false);
       return;
     }
@@ -539,14 +571,22 @@ const BrightNews = () => {
     abortRef.current = reqId;
 
     setLoading(true);
+    setLoadingMore(false);
     setError(null);
     setExpanded(null);
+    activeFeedKeyRef.current = cacheKey;
 
     try {
-      const result = await loadStories(regionCode, categoryId);
+      const result = isWebPagination
+        ? await loadStoriesPage(regionCode, categoryId, { offset: 0, limit: WEB_INITIAL_STORY_LIMIT })
+        : {
+            items: await loadStories(regionCode, categoryId),
+            hasMore: false,
+            nextOffset: 0,
+          };
       if (abortRef.current !== reqId) return;
       cache.current[cacheKey] = result;
-      setStories(result);
+      setStories(result.items);
       setFirstLoad(false);
       setLoading(false);
     } catch (e) {
@@ -556,7 +596,46 @@ const BrightNews = () => {
       setFirstLoad(false);
       setLoading(false);
     }
-  }, []);
+  }, [desktopViewport]);
+
+  const loadMoreStories = useCallback(async () => {
+    if (isNativeApp() || !desktopViewport) return;
+    if (loading || loadingMore) return;
+
+    const cacheKey = `${region}-${category}`;
+    const currentFeed = cache.current[cacheKey];
+
+    if (!currentFeed?.hasMore) return;
+
+    setLoadingMore(true);
+
+    try {
+      const nextPage = await loadStoriesPage(region, category, {
+        offset: currentFeed.nextOffset || currentFeed.items.length,
+        limit: WEB_INCREMENTAL_STORY_LIMIT,
+      });
+
+      if (activeFeedKeyRef.current !== cacheKey) return;
+
+      const mergedItems = [...currentFeed.items, ...nextPage.items].filter((story, index, items) => (
+        items.findIndex(item => item.id === story.id) === index
+      ));
+
+      cache.current[cacheKey] = {
+        items: mergedItems,
+        hasMore: nextPage.hasMore,
+        nextOffset: (currentFeed.nextOffset || currentFeed.items.length) + nextPage.items.length,
+      };
+
+      setStories(mergedItems);
+    } catch (loadMoreError) {
+      setError(loadMoreError.message || "Unable to load more stories right now.");
+    } finally {
+      if (activeFeedKeyRef.current === cacheKey) {
+        setLoadingMore(false);
+      }
+    }
+  }, [category, desktopViewport, loading, loadingMore, region]);
 
   const availableRegions = getRegionsForCodes(availableRegionCodes);
 
@@ -638,7 +717,12 @@ const BrightNews = () => {
     setStories(current => adjustSavedCount(current, id, delta));
     setSavedStories(current => adjustSavedCount(current, id, delta));
     Object.keys(cache.current).forEach(cacheKey => {
-      cache.current[cacheKey] = adjustSavedCount(cache.current[cacheKey] || [], id, delta);
+      const cachedFeed = cache.current[cacheKey];
+      if (!cachedFeed) return;
+      cache.current[cacheKey] = {
+        ...cachedFeed,
+        items: adjustSavedCount(cachedFeed.items || [], id, delta),
+      };
     });
     trackEvent(isSaved ? "story_unsave" : "story_save", {
       category: story?.category,
@@ -660,7 +744,12 @@ const BrightNews = () => {
       setStories(current => adjustSavedCount(current, id, -delta));
       setSavedStories(current => adjustSavedCount(current, id, -delta));
       Object.keys(cache.current).forEach(cacheKey => {
-        cache.current[cacheKey] = adjustSavedCount(cache.current[cacheKey] || [], id, -delta);
+        const cachedFeed = cache.current[cacheKey];
+        if (!cachedFeed) return;
+        cache.current[cacheKey] = {
+          ...cachedFeed,
+          items: adjustSavedCount(cachedFeed.items || [], id, -delta),
+        };
       });
       setAuthError(saveError.message || t("feedback.saveSyncError"));
     }
@@ -774,10 +863,13 @@ const BrightNews = () => {
             category={category}
             setCategory={setCategory}
             loading={loading}
+            loadingMore={loadingMore}
             firstLoad={firstLoad}
             error={error}
             shareFeedback={shareFeedback}
             stories={visibleStories}
+            hasMore={!isNativeApp() && desktopViewport && Boolean(cache.current[`${region}-${category}`]?.hasMore)}
+            onLoadMore={loadMoreStories}
             expanded={expanded}
             saved={saved}
             setExpanded={setExpanded}
