@@ -67,6 +67,8 @@ const Header = ({
         </div>
       </div>
 
+      <div className="bn-header__divider" aria-hidden="true" />
+
       {showRegions ? (
         <div className="bn-region-context">
           <span className="bn-region-context__label">{t("header.edition")}</span>

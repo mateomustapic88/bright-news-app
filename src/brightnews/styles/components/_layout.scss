@@ -311,6 +311,16 @@
   margin-bottom: 18px;
 }
 
+.bn-header__divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(19, 32, 51, 0.04),
+    rgba(19, 32, 51, 0.12),
+    rgba(19, 32, 51, 0.04)
+  );
+}
+
 .bn-brand {
   display: flex;
   align-items: flex-start;
@@ -836,7 +846,6 @@
     align-items: center;
     gap: 20px;
     padding-bottom: 16px;
-    border-top: 1px solid rgba(19, 32, 51, 0.06);
     padding-top: 16px;
   }
 
@@ -945,6 +954,10 @@
     align-items: center;
     gap: 14px;
     margin-bottom: 10px;
+  }
+
+  .bn-header__divider {
+    display: none;
   }
 
   .bn-brand {
