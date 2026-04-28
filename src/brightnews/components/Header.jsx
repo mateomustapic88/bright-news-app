@@ -10,6 +10,7 @@ const Header = ({
   feedbackHref,
   onFeedbackClick,
   showRegions = true,
+  hideFeedChrome = false,
   t,
   uiLanguage,
 }) => {
@@ -19,7 +20,7 @@ const Header = ({
   const currentRegionLabel = getRegionLabel(region, uiLanguage);
 
   return (
-    <header className="bn-header">
+    <header className={`bn-header${hideFeedChrome ? " is-feed-chrome-hidden" : ""}`}>
       <div className="bn-header__row">
         <div className="bn-brand bn-brand--desktop">
           <div>

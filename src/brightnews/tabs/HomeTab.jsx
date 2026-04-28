@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { CATEGORIES, getCategoryThemeClass } from "../constants";
-import { getCategoryLabel } from "../i18n";
+import { getCategoryLabel, getRegionLabel } from "../i18n";
 import Chip from "../components/Chip";
 import EmptyState from "../components/EmptyState";
 import HeroCard from "../components/HeroCard";
@@ -38,6 +38,9 @@ const getFeaturedStoryScore = story => {
 };
 
 const HomeTab = ({
+  region,
+  regions,
+  setRegion,
   category,
   setCategory,
   loading,
@@ -133,7 +136,21 @@ const HomeTab = ({
       </div>
 
       <div className="bn-home-tab__filters-mobile">
-        <div className="bn-chip-row">
+        <div className="bn-home-tab__mobile-row" aria-label={t("header.edition")}>
+          {regions.map(item => (
+            <button
+              key={item.code}
+              type="button"
+              onClick={() => setRegion(item.code)}
+              className={`bn-region-button${region === item.code ? " is-active" : ""}`}
+            >
+              <span className="bn-region-button__flag">{item.flag}</span>
+              <span>{getRegionLabel(item.code, uiLanguage)}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="bn-chip-row bn-chip-row--mobile-filters" aria-label={t("home.exploreFeed")}>
           {CATEGORIES.map(item => (
             <Chip
               key={item.id}

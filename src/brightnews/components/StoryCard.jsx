@@ -1,6 +1,5 @@
 import { getCategoryMeta, getCategoryThemeClass } from "../constants";
 import { formatStoryPublishedAt, getCategoryLabel } from "../i18n";
-import { getSourceBadge } from "../storyMeta";
 import StoryMedia from "./StoryMedia";
 import StoryImpact from "./StoryImpact";
 import StorySaveButton from "./StorySaveButton";
@@ -12,7 +11,6 @@ const StoryCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave,
   const themeClass = getCategoryThemeClass(story.category);
   const isExpanded = expanded === story.id;
   const isDimmed = firstLoad;
-  const sourceBadge = getSourceBadge(story.location);
   const publishedLabel = formatStoryPublishedAt(story.publishedAt, uiLanguage);
 
   const classes = [
@@ -37,9 +35,6 @@ const StoryCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave,
 
         <div className="bn-story-card__content">
           <div className="bn-story-card__topline">
-            <span className="bn-category-pill">
-              {category.emoji} {getCategoryLabel(story.category, uiLanguage)}
-            </span>
             <div className="bn-story-card__actions">
               <StoryShareButton story={story} handleShareStory={handleShareStory} />
               <StorySaveButton
@@ -53,11 +48,11 @@ const StoryCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave,
 
           <h3 className="bn-card-title">{story.headline}</h3>
           <div className="bn-story-card__source">
-            <span className="bn-story-card__source-badge">{sourceBadge}</span>
-            <div className="bn-story-card__source-copy">
-              <span className="bn-card-location">{story.location}</span>
-              {publishedLabel ? <span className="bn-card-location">{publishedLabel}</span> : null}
-            </div>
+            <span className="bn-category-pill">
+              {category.emoji} {getCategoryLabel(story.category, uiLanguage)}
+            </span>
+            <span className="bn-story-card__source-badge">{story.location}</span>
+            {publishedLabel ? <span className="bn-card-location">{publishedLabel}</span> : null}
           </div>
           <p className={`bn-card-summary bn-card-summary--preview${isExpanded ? " is-expanded" : ""}`}>
             {story.summary}

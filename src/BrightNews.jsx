@@ -117,9 +117,13 @@ const BrightNews = () => {
   const [syncingSaved, setSyncingSaved] = useState(false);
   const [shareFeedback, setShareFeedback] = useState(null);
   const [showOnboarding, setShowOnboarding] = useState(() => !readOnboardingDismissed());
+  const [hideFeedChrome, setHideFeedChrome] = useState(false);
   const feedbackHref = buildFeedbackMailto();
   const cache = useRef({});
   const abortRef = useRef(null);
+  const screenRef = useRef(null);
+  const lastScreenScrollTopRef = useRef(0);
+  const filterChromeInteractionRef = useRef(false);
   const activeFeedKeyRef = useRef("");
   const savedRef = useRef(saved);
   const regionInitializedRef = useRef(false);
@@ -164,6 +168,61 @@ const BrightNews = () => {
   useEffect(() => {
     enableAnalytics();
   }, []);
+
+  useEffect(() => {
+    if (tab !== "home") {
+      setHideFeedChrome(false);
+      return undefined;
+    }
+
+    const scroller = screenRef.current;
+    if (!scroller) return undefined;
+
+    lastScreenScrollTopRef.current = scroller.scrollTop;
+
+    const handleFilterChromeStart = event => {
+      if (!event.target?.closest?.(".bn-region-context, .bn-home-tab__filters-mobile")) return;
+      filterChromeInteractionRef.current = true;
+      setHideFeedChrome(false);
+    };
+
+    const handleFilterChromeEnd = () => {
+      window.setTimeout(() => {
+        filterChromeInteractionRef.current = false;
+        lastScreenScrollTopRef.current = scroller.scrollTop;
+      }, 120);
+    };
+
+    const handleScroll = () => {
+      const nextScrollTop = scroller.scrollTop;
+      const scrollDelta = nextScrollTop - lastScreenScrollTopRef.current;
+
+      if (nextScrollTop <= 8) {
+        setHideFeedChrome(false);
+      } else if (filterChromeInteractionRef.current) {
+        setHideFeedChrome(false);
+      } else if (scrollDelta > 16 && nextScrollTop > 72) {
+        setHideFeedChrome(true);
+      } else if (scrollDelta < -16) {
+        setHideFeedChrome(false);
+      }
+
+      lastScreenScrollTopRef.current = Math.max(0, nextScrollTop);
+    };
+
+    document.addEventListener("touchstart", handleFilterChromeStart, { passive: true, capture: true });
+    document.addEventListener("touchend", handleFilterChromeEnd, { passive: true, capture: true });
+    document.addEventListener("pointerdown", handleFilterChromeStart, { passive: true, capture: true });
+    document.addEventListener("pointerup", handleFilterChromeEnd, { passive: true, capture: true });
+    scroller.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      document.removeEventListener("touchstart", handleFilterChromeStart, { capture: true });
+      document.removeEventListener("touchend", handleFilterChromeEnd, { capture: true });
+      document.removeEventListener("pointerdown", handleFilterChromeStart, { capture: true });
+      document.removeEventListener("pointerup", handleFilterChromeEnd, { capture: true });
+      scroller.removeEventListener("scroll", handleScroll);
+    };
+  }, [tab]);
 
   useEffect(() => {
     if (!supabase) return undefined;
@@ -811,7 +870,7 @@ const BrightNews = () => {
   }));
 
   return (
-    <div className="bright-news">
+    <div className={`bright-news${hideFeedChrome && tab === "home" ? " is-feed-chrome-hidden" : ""}`}>
       {loading ? <LoadingBar /> : null}
 
       <TopBar
@@ -831,7 +890,8 @@ const BrightNews = () => {
         setRegion={setRegion}
         feedbackHref={feedbackHref}
         onFeedbackClick={handleFeedbackClick}
-        showRegions={tab === "home"}
+        showRegions={tab === "home" && desktopViewport}
+        hideFeedChrome={hideFeedChrome && tab === "home" && desktopViewport}
         refreshing={refreshing}
         onRefresh={async () => {
           if (refreshing) return;
@@ -857,9 +917,15 @@ const BrightNews = () => {
         />
       ) : null}
 
-      <div className="bn-screen">
+      <div
+        ref={screenRef}
+        className={`bn-screen${hideFeedChrome && tab === "home" ? " is-feed-chrome-hidden" : ""}`}
+      >
         {tab === "home" && (
           <HomeTab
+            region={region}
+            regions={availableRegions}
+            setRegion={setRegion}
             category={category}
             setCategory={setCategory}
             loading={loading}

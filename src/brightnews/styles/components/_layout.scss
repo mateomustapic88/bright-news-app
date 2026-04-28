@@ -950,6 +950,10 @@
       );
   }
 
+  .bn-header.is-feed-chrome-hidden {
+    display: none;
+  }
+
   .bn-header__row {
     align-items: center;
     gap: 14px;

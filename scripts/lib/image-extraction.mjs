@@ -30,6 +30,21 @@ export const isLikelyImageUrl = value => {
   return IMAGE_QUERY_HINT_PATTERN.test(normalized);
 };
 
+const resolveImageCandidateUrl = (value, baseUrl = "") => {
+  const rawValue = String(value || "").trim();
+  if (!rawValue || /^data:/i.test(rawValue)) return "";
+
+  if (baseUrl && !rawValue.startsWith("//") && !/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(rawValue)) {
+    try {
+      return normalizeExternalUrl(new URL(rawValue, baseUrl).toString());
+    } catch {
+      return "";
+    }
+  }
+
+  return normalizeExternalUrl(rawValue);
+};
+
 const extractAttributeValue = (tag, attributeName) => {
   const cacheKey = `${attributeName}`;
   let matcher = ATTRIBUTE_CACHE.get(cacheKey);
@@ -54,8 +69,8 @@ const extractSrcsetUrl = value => {
   return firstSource.split(/\s+/)[0] || "";
 };
 
-export const resolveHtmlImageCandidate = value => {
-  const candidate = normalizeExternalUrl(value || "");
+export const resolveHtmlImageCandidate = (value, baseUrl = "") => {
+  const candidate = resolveImageCandidateUrl(value, baseUrl);
   if (!isLikelyImageUrl(candidate)) return "";
   if (isBlockedStoryImageUrl(candidate)) return "";
   return candidate;
@@ -85,16 +100,16 @@ const getImageCandidateScore = (value, source = "unknown") => {
   return score;
 };
 
-const selectBestImageCandidate = candidates =>
+const selectBestImageCandidate = (candidates, baseUrl = "") =>
   candidates
     .map(candidate => ({
-      url: resolveHtmlImageCandidate(candidate.url),
+      url: resolveHtmlImageCandidate(candidate.url, baseUrl),
       source: candidate.source || "unknown",
     }))
     .filter(candidate => candidate.url)
     .sort((left, right) => getImageCandidateScore(right.url, right.source) - getImageCandidateScore(left.url, left.source))[0]?.url || "";
 
-export const extractImageUrlFromHtml = value => {
+export const extractImageUrlFromHtml = (value, baseUrl = "") => {
   const input = decodeHtmlEntitiesDeep(String(value || ""));
   if (!input) return "";
   const candidates = [];
@@ -152,7 +167,7 @@ export const extractImageUrlFromHtml = value => {
     });
   }
 
-  return selectBestImageCandidate(candidates);
+  return selectBestImageCandidate(candidates, baseUrl);
 };
 
 export const extractImageUrlFromPayload = payload => {
