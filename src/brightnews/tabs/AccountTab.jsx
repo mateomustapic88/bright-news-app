@@ -15,6 +15,7 @@ const AccountTab = ({
   authError,
   syncingSaved,
   handleGoogleSignIn,
+  handleEmailAuth,
   handleSignOut,
   handleFeedbackClick,
   t,
@@ -35,6 +36,7 @@ const AccountTab = ({
         syncingSaved={syncingSaved}
         handleSignOut={handleSignOut}
         handleGoogleSignIn={handleGoogleSignIn}
+        handleEmailAuth={handleEmailAuth}
         t={t}
       />
 

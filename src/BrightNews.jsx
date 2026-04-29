@@ -70,6 +70,13 @@ import "./brightnews/styles/BrightNews.scss";
 const WEB_INITIAL_STORY_LIMIT = 50;
 const WEB_INCREMENTAL_STORY_LIMIT = 10;
 
+const getAuthProvider = session => (
+  session?.user?.app_metadata?.provider ||
+  session?.user?.app_metadata?.providers?.[0] ||
+  session?.user?.identities?.[0]?.provider ||
+  "unknown"
+);
+
 const getReadableAuthError = error => {
   const message = String(error?.message || error?.msg || "");
   const normalized = message.toLowerCase();
@@ -80,6 +87,22 @@ const getReadableAuthError = error => {
 
   if (normalized.includes("invalid_client")) {
     return "Google OAuth client settings are invalid. Recheck the Google client ID, client secret, and Supabase callback URL.";
+  }
+
+  if (normalized.includes("email not confirmed")) {
+    return "Confirm your email address first, then sign in.";
+  }
+
+  if (normalized.includes("invalid login credentials")) {
+    return "Email or password is incorrect.";
+  }
+
+  if (normalized.includes("user already registered")) {
+    return "An account with this email already exists. Sign in instead.";
+  }
+
+  if (normalized.includes("signup is disabled") || normalized.includes("email provider is disabled")) {
+    return "Email sign-in is not enabled in Supabase yet. Turn on the Email provider in Authentication settings.";
   }
 
   return message || "Unable to start Google sign-in.";
@@ -248,7 +271,7 @@ const BrightNews = () => {
         setAuthMessage(t("feedback.signInSuccess"));
         setAuthError("");
         trackEvent("sign_in_success", {
-          provider: "google",
+          provider: getAuthProvider(nextSession),
           platform: isNativeApp() ? "native" : "web",
         });
       }
@@ -753,6 +776,86 @@ const BrightNews = () => {
     }
   };
 
+  const handleEmailAuth = async ({ mode, email, password, confirmPassword }) => {
+    if (!supabase) {
+      setAuthError("Supabase configuration is missing.");
+      return { ok: false };
+    }
+
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    const normalizedPassword = String(password || "");
+    const normalizedConfirmPassword = String(confirmPassword || "");
+
+    if (!normalizedEmail) {
+      setAuthError(t("auth.enterEmail"));
+      return { ok: false };
+    }
+
+    if (!normalizedPassword) {
+      setAuthError(t("auth.enterPassword"));
+      return { ok: false };
+    }
+
+    if (mode === "register" && normalizedPassword.length < 8) {
+      setAuthError(t("auth.passwordMinLength"));
+      return { ok: false };
+    }
+
+    if (mode === "register" && normalizedPassword !== normalizedConfirmPassword) {
+      setAuthError(t("auth.passwordMismatch"));
+      return { ok: false };
+    }
+
+    setAuthLoading(true);
+    setAuthError("");
+    setAuthMessage("");
+
+    trackEvent(mode === "register" ? "sign_up_start" : "sign_in_start", {
+      provider: "email",
+      platform: isNativeApp() ? "native" : "web",
+    });
+
+    try {
+      if (mode === "register") {
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email: normalizedEmail,
+          password: normalizedPassword,
+          options: {
+            emailRedirectTo: getAuthRedirectUrl(),
+          },
+        });
+
+        if (signUpError) throw signUpError;
+
+        if (data?.user?.identities && data.user.identities.length === 0) {
+          setAuthError(t("auth.emailAlreadyExists"));
+          return { ok: false };
+        }
+
+        if (data?.session) {
+          setAuthMessage(t("auth.accountCreated"));
+          return { ok: true, mode, signedIn: true };
+        } else {
+          setAuthMessage(t("auth.confirmEmailNotice"));
+          return { ok: true, mode, needsEmailConfirmation: true };
+        }
+      } else {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: normalizedEmail,
+          password: normalizedPassword,
+        });
+
+        if (signInError) throw signInError;
+        return { ok: true, mode, signedIn: true };
+      }
+    } catch (submitError) {
+      setAuthError(getReadableAuthError(submitError));
+      return { ok: false };
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
   const handleSignOut = async () => {
     if (!supabase) return;
 
@@ -982,6 +1085,7 @@ const BrightNews = () => {
             syncingSaved={syncingSaved}
             handleSignOut={handleSignOut}
             handleGoogleSignIn={handleGoogleSignIn}
+            handleEmailAuth={handleEmailAuth}
             handleFeedbackClick={handleFeedbackClick}
             t={t}
           />

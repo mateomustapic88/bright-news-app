@@ -30,7 +30,7 @@ const SavedTab = ({
           <EmptyState
             icon="🔐"
             title={t("saved.signInTitle")}
-            description={t("saved.signInDescription")}
+            description={t("saved.signInDescriptionGeneric")}
           />
           <button
             type="button"
