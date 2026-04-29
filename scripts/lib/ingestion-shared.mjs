@@ -343,6 +343,8 @@ const NON_NEWS_TITLE_PATTERNS = [
   /\b(report|experts).*?\b(gaps and risks remain|funding pressures loom)\b/i,
   /\b(price starts|early bird promo|out now|promo|popusti|popust|otvorene prijave|prijave za .*awards)\b/i,
   /\b(sale brings|record low .* sale|price down to|huge discount)\b/i,
+  /\b(uvodi se|uvode se)\s+(plaćanje|placanje)\b/i,
+  /\b(whatsapp|meta)\b.*\b(naknada|naknade|plaćanje|placanje|subscription|fee|fees)\b/i,
   /\b(full year \d{4} results|business highlights|market trends|read full press release)\b/i,
   /\b(build muscle after|weight loss targets|expert tips|proven .* tips)\b/i,
   /\b(stagflation fears|shares .* surge|stock market|housing confidence)\b/i,
