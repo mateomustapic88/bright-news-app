@@ -10,6 +10,7 @@ import {
 
 const OPENAI_API_URL = "https://api.openai.com/v1/responses";
 const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta";
+const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const OPENAI_REVIEW_SCHEMA = {
   type: "object",
   additionalProperties: false,
@@ -74,11 +75,13 @@ const getRequiredEnv = name => {
 
 const supabaseUrl = getEnv("SUPABASE_URL") || getEnv("VITE_SUPABASE_URL");
 const supabaseServiceRoleKey = getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY");
-const reviewProvider = (getEnv("AI_REVIEW_PROVIDER") || "openai").trim().toLowerCase();
+const reviewProvider = (getEnv("AI_REVIEW_PROVIDER") || "groq").trim().toLowerCase();
 const openAiApiKey = getEnv("OPENAI_API_KEY");
 const openAiModel = getEnv("OPENAI_REVIEW_MODEL") || "gpt-5-mini";
 const geminiApiKey = getEnv("GEMINI_API_KEY");
 const geminiModel = getEnv("GEMINI_REVIEW_MODEL") || "gemini-2.0-flash-lite";
+const groqApiKey = getEnv("GROQ_API_KEY");
+const groqModel = getEnv("GROQ_REVIEW_MODEL") || "llama-3.1-8b-instant";
 const reviewLimit = Number(getEnv("OPENAI_REVIEW_LIMIT") || 200);
 const reviewDelayMs = Number(getEnv("OPENAI_REVIEW_DELAY_MS") || 300);
 const maxRetries = Number(getEnv("OPENAI_REVIEW_MAX_RETRIES") || 3);
@@ -264,6 +267,57 @@ const classifyWithGemini = async row => {
   }
 };
 
+const classifyWithGroq = async row => {
+  const articleInput = buildArticleInput(row);
+  const jsonInstructions = [
+    REVIEW_INSTRUCTIONS,
+    "Return only valid JSON with keys: action, confidence, genuinely_uplifting, category, region_code, contains_politics, contains_disaster, reason.",
+    `category must be one of: ${CATEGORY_CONFIG.map(item => item.category).join(", ")}.`,
+    `region_code must be one of: ${REGION_CONFIG.map(item => item.code).join(", ")}.`,
+  ].join(" ");
+
+  for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
+    const response = await fetch(GROQ_API_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${groqApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: groqModel,
+        messages: [
+          { role: "system", content: jsonInstructions },
+          { role: "user", content: `Review this article:\n${articleInput}` },
+        ],
+        temperature: 0,
+        max_completion_tokens: 300,
+        response_format: { type: "json_object" },
+      }),
+    });
+
+    const payload = await response.json();
+
+    if (response.ok) {
+      const outputText = normalizeJsonText(payload.choices?.[0]?.message?.content || "");
+      if (!outputText) {
+        throw new Error("Groq returned no structured output text.");
+      }
+
+      return JSON.parse(outputText);
+    }
+
+    const message = payload?.error?.message || `Groq error ${response.status}`;
+    const shouldRetry = (response.status === 429 || response.status >= 500) && attempt < maxRetries;
+
+    if (shouldRetry) {
+      await sleep(1000 * (attempt + 1));
+      continue;
+    }
+
+    throw new Error(message);
+  }
+};
+
 const getAiReviewer = () => {
   if (reviewProvider === "gemini") {
     if (!geminiApiKey) return null;
@@ -283,10 +337,29 @@ const getAiReviewer = () => {
     };
   }
 
+  if (reviewProvider === "groq") {
+    if (!groqApiKey) return null;
+    return {
+      provider: "groq",
+      model: groqModel,
+      classify: classifyWithGroq,
+    };
+  }
+
   return null;
 };
 
 const buildUpdatePayload = (row, review) => {
+  const normalizedAction = ["approve", "pending", "reject"].includes(review.action)
+    ? review.action
+    : "pending";
+  const confidence = Number.isFinite(Number(review.confidence))
+    ? Math.max(0, Math.min(1, Number(review.confidence)))
+    : 0;
+  const genuinelyUplifting = review.genuinely_uplifting === true;
+  const containsPolitics = review.contains_politics === true;
+  const containsDisaster = review.contains_disaster === true;
+  const reason = String(review.reason || "No reason provided.").slice(0, 500);
   const category = CATEGORY_CONFIG.some(item => item.category === review.category)
     ? review.category
     : row.category;
@@ -298,17 +371,17 @@ const buildUpdatePayload = (row, review) => {
   let rejectedReason = "";
 
   if (
-    review.action === "approve" &&
-    review.genuinely_uplifting &&
-    review.confidence >= minimumConfidence &&
-    !review.contains_politics &&
-    !review.contains_disaster
+    normalizedAction === "approve" &&
+    genuinelyUplifting &&
+    confidence >= minimumConfidence &&
+    !containsPolitics &&
+    !containsDisaster
   ) {
     reviewStatus = "approved";
   } else if (
-    review.action === "reject" ||
-    review.contains_politics ||
-    review.contains_disaster
+    normalizedAction === "reject" ||
+    containsPolitics ||
+    containsDisaster
   ) {
     reviewStatus = "rejected";
     rejectedReason = "ai_final_check";
@@ -320,7 +393,7 @@ const buildUpdatePayload = (row, review) => {
     category,
     region_code: regionCode,
     emoji: getCategoryEmoji(category),
-    review_notes: `AI ${reviewStatus} (${review.confidence.toFixed(2)}): ${review.reason}`,
+    review_notes: `AI ${reviewStatus} (${confidence.toFixed(2)}): ${reason}`,
   };
 };
 

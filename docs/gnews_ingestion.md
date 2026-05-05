@@ -92,7 +92,9 @@ npm run refresh:news
 ## Optional AI review env vars
 
 ```env
-AI_REVIEW_PROVIDER=openai
+AI_REVIEW_PROVIDER=groq
+GROQ_API_KEY=your-groq-api-key
+GROQ_REVIEW_MODEL=llama-3.1-8b-instant
 OPENAI_API_KEY=your-openai-api-key
 OPENAI_REVIEW_MODEL=gpt-5-mini
 GEMINI_API_KEY=your-gemini-api-key
@@ -142,12 +144,14 @@ Optional GitHub repository secrets:
 - `GNEWS_API_KEY`
 - `NEWSDATA_API_KEY`
 - `NEWSCATCHER_API_KEY`
+- `GROQ_API_KEY`
 - `OPENAI_API_KEY`
 - `GEMINI_API_KEY`
 
 Optional GitHub repository variables:
 
 - `AI_REVIEW_PROVIDER`
+- `GROQ_REVIEW_MODEL`
 - `OPENAI_REVIEW_MODEL`
 - `GEMINI_REVIEW_MODEL`
 - `OPENAI_REVIEW_LIMIT`

@@ -46,6 +46,8 @@ jobs:
           NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
           NEWSCATCHER_API_KEY: ${{ secrets.NEWSCATCHER_API_KEY }}
           AI_REVIEW_PROVIDER: ${{ vars.AI_REVIEW_PROVIDER }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_REVIEW_MODEL: ${{ vars.GROQ_REVIEW_MODEL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_REVIEW_MODEL: ${{ vars.OPENAI_REVIEW_MODEL }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
