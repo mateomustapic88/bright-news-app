@@ -89,11 +89,14 @@ npm run refresh:news
 - `refresh:news`
   - runs `ingest:gnews`, `ingest:gdelt`, `ingest:google-news-rss`, `ingest:newscatcher`, `ingest:rss`, `review:pending`, then `publish:approved`
 
-## Optional OpenAI env vars
+## Optional AI review env vars
 
 ```env
+AI_REVIEW_PROVIDER=openai
 OPENAI_API_KEY=your-openai-api-key
 OPENAI_REVIEW_MODEL=gpt-5-mini
+GEMINI_API_KEY=your-gemini-api-key
+GEMINI_REVIEW_MODEL=gemini-2.0-flash-lite
 OPENAI_REVIEW_LIMIT=200
 OPENAI_REVIEW_MIN_CONFIDENCE=0.6
 HEURISTIC_AUTO_APPROVE_SCORE=0.75
@@ -140,10 +143,13 @@ Optional GitHub repository secrets:
 - `NEWSDATA_API_KEY`
 - `NEWSCATCHER_API_KEY`
 - `OPENAI_API_KEY`
+- `GEMINI_API_KEY`
 
 Optional GitHub repository variables:
 
+- `AI_REVIEW_PROVIDER`
 - `OPENAI_REVIEW_MODEL`
+- `GEMINI_REVIEW_MODEL`
 - `OPENAI_REVIEW_LIMIT`
 - `OPENAI_REVIEW_MIN_CONFIDENCE`
 - `HEURISTIC_AUTO_APPROVE_SCORE`
