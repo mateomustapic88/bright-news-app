@@ -2,11 +2,24 @@ import { getCategoryMeta, getCategoryThemeClass } from "../constants";
 import { formatStoryPublishedAt, getCategoryLabel } from "../i18n";
 import StoryMedia from "./StoryMedia";
 import StoryImpact from "./StoryImpact";
+import StoryReportButton from "./StoryReportButton";
 import StorySaveButton from "./StorySaveButton";
+import StorySavedCount from "./StorySavedCount";
 import StoryShareButton from "./StoryShareButton";
 import StorySourceLink from "./StorySourceLink";
 
-const HeroCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave, handleShareStory, t, uiLanguage }) => {
+const HeroCard = ({
+  story,
+  expanded,
+  firstLoad,
+  saved,
+  setExpanded,
+  toggleSave,
+  handleShareStory,
+  handleReportStory,
+  t,
+  uiLanguage,
+}) => {
   const category = getCategoryMeta(story.category);
   const themeClass = getCategoryThemeClass(story.category);
   const isExpanded = expanded === story.id;
@@ -56,6 +69,13 @@ const HeroCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave, 
           <span>📍 {story.location}</span>
           {publishedLabel ? <span>{publishedLabel}</span> : null}
           <span>{story.readTime}</span>
+          <StorySavedCount count={story.savedCount} t={t} uiLanguage={uiLanguage} />
+          <StoryReportButton
+            story={story}
+            onReportStory={handleReportStory}
+            variant="hero"
+            t={t}
+          />
         </div>
 
         <h2 className="bn-card-title bn-card-title--hero">{story.headline}</h2>

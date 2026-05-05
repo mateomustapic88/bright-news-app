@@ -167,7 +167,20 @@
   "story": {
     "save": "Salvar história",
     "removeSaved": "Remover história salva",
-    "readSource": "Ler fonte"
+    "readSource": "Ler fonte",
+    "savedCount": "Salva {count} vezes",
+    "reportNotPositive": "Não é positiva?",
+    "reportClose": "Fechar denúncia",
+    "reportEyebrow": "Denunciar história",
+    "reportTitle": "Por que isso não é positivo?",
+    "reportDescription": "Escolha o motivo mais próximo. As denúncias ajudam a melhorar os filtros do BrightNews.",
+    "reportReasons": {
+      "negative_scary": "Negativa ou assustadora",
+      "political": "Política",
+      "violence_crime": "Violência ou crime",
+      "misleading_category": "Categoria enganosa",
+      "other": "Outro"
+    }
   },
   "feedback": {
     "signInSuccess": "Login realizado com sucesso.",
@@ -175,6 +188,9 @@
     "shareError": "Não foi possível compartilhar esta história agora.",
     "loadAccountError": "Não foi possível carregar sua conta.",
     "syncSavedError": "Não foi possível sincronizar as histórias salvas.",
+    "reportSubmitted": "Obrigado. Vamos revisar esta história.",
+    "reportSignInRequired": "Entre para denunciar histórias e evitar denúncias duplicadas.",
+    "reportError": "Não foi possível enviar esta denúncia agora.",
     "loadReviewError": "Não foi possível carregar a fila de revisão.",
     "approveError": "Não foi possível aprovar o artigo.",
     "rejectError": "Não foi possível rejeitar o artigo.",

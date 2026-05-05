@@ -167,7 +167,20 @@
   "story": {
     "save": "Story speichern",
     "removeSaved": "Gespeicherte Story entfernen",
-    "readSource": "Quelle lesen"
+    "readSource": "Quelle lesen",
+    "savedCount": "{count} Mal gespeichert",
+    "reportNotPositive": "Nicht positiv?",
+    "reportClose": "Meldedialog schließen",
+    "reportEyebrow": "Story melden",
+    "reportTitle": "Warum ist das nicht positiv?",
+    "reportDescription": "Wähle den passendsten Grund. Meldungen helfen, die BrightNews-Filter zu verbessern.",
+    "reportReasons": {
+      "negative_scary": "Negativ oder beängstigend",
+      "political": "Politisch",
+      "violence_crime": "Gewalt oder Kriminalität",
+      "misleading_category": "Irreführende Kategorie",
+      "other": "Sonstiges"
+    }
   },
   "feedback": {
     "signInSuccess": "Erfolgreich angemeldet.",
@@ -175,6 +188,9 @@
     "shareError": "Diese Story kann derzeit nicht geteilt werden.",
     "loadAccountError": "Dein Konto konnte nicht geladen werden.",
     "syncSavedError": "Gespeicherte Stories konnten nicht synchronisiert werden.",
+    "reportSubmitted": "Danke. Wir prüfen diese Story.",
+    "reportSignInRequired": "Melde dich an, um Stories zu melden und doppelte Meldungen zu vermeiden.",
+    "reportError": "Diese Meldung kann gerade nicht gesendet werden.",
     "loadReviewError": "Die Prüfwarteschlange konnte nicht geladen werden.",
     "approveError": "Der Artikel konnte nicht genehmigt werden.",
     "rejectError": "Der Artikel konnte nicht abgelehnt werden.",

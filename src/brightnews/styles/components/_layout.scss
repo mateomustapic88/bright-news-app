@@ -60,6 +60,106 @@
   animation: bn-spin 0.8s linear infinite;
 }
 
+.bn-report-dialog {
+  width: min(100%, 420px);
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+  border-radius: 26px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), #fffdf7);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
+}
+
+.bn-report-dialog__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+
+  h2 {
+    margin: 2px 0 0;
+    color: var(--bn-text-strong);
+    font-family: var(--bn-font-display);
+    font-size: 1.55rem;
+    font-weight: 650;
+    letter-spacing: -0.03em;
+  }
+}
+
+.bn-report-dialog__eyebrow {
+  margin: 0;
+  color: var(--bn-error);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.bn-report-dialog__close {
+  @include button-reset;
+
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(19, 32, 51, 0.06);
+  color: var(--bn-text-strong);
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+
+  &:disabled {
+    cursor: wait;
+    opacity: 0.55;
+  }
+}
+
+.bn-report-dialog__story,
+.bn-report-dialog__description {
+  margin: 0;
+  color: var(--bn-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.55;
+}
+
+.bn-report-dialog__story {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(19, 32, 51, 0.05);
+  color: var(--bn-text-strong);
+}
+
+.bn-report-dialog__reasons {
+  display: grid;
+  gap: 8px;
+}
+
+.bn-report-dialog__reason {
+  @include button-reset;
+
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(19, 32, 51, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--bn-text-strong);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 850;
+  text-align: left;
+
+  &:hover {
+    border-color: rgba(239, 68, 68, 0.22);
+    background: rgba(254, 242, 242, 0.92);
+    color: var(--bn-error);
+  }
+
+  &:disabled {
+    cursor: wait;
+    opacity: 0.6;
+  }
+}
+
 .bn-top-bar {
   position: relative;
   display: flex;

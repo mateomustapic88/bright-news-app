@@ -198,7 +198,20 @@
   "story": {
     "save": "Save story",
     "removeSaved": "Remove saved story",
-    "readSource": "Read source"
+    "readSource": "Read source",
+    "savedCount": "Saved {count} times",
+    "reportNotPositive": "Not positive?",
+    "reportClose": "Close report dialog",
+    "reportEyebrow": "Story report",
+    "reportTitle": "Why is this not positive?",
+    "reportDescription": "Choose the closest reason. Reports help improve BrightNews filtering.",
+    "reportReasons": {
+      "negative_scary": "Negative or scary",
+      "political": "Political",
+      "violence_crime": "Violence or crime",
+      "misleading_category": "Misleading category",
+      "other": "Other"
+    }
   },
   "feedback": {
     "signInSuccess": "Signed in successfully.",
@@ -206,6 +219,9 @@
     "shareError": "Unable to share this story right now.",
     "loadAccountError": "Unable to load your account.",
     "syncSavedError": "Unable to sync saved stories.",
+    "reportSubmitted": "Thanks. We’ll review this story.",
+    "reportSignInRequired": "Sign in to report stories so we can prevent duplicate reports.",
+    "reportError": "Unable to submit this report right now.",
     "loadReviewError": "Unable to load review queue.",
     "approveError": "Unable to approve article.",
     "rejectError": "Unable to reject article.",

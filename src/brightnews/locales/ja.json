@@ -167,7 +167,20 @@
   "story": {
     "save": "ストーリーを保存",
     "removeSaved": "保存したストーリーを削除",
-    "readSource": "ソースを読む"
+    "readSource": "ソースを読む",
+    "savedCount": "{count}回保存",
+    "reportNotPositive": "ポジティブではない？",
+    "reportClose": "報告ダイアログを閉じる",
+    "reportEyebrow": "ストーリー報告",
+    "reportTitle": "なぜポジティブではありませんか？",
+    "reportDescription": "最も近い理由を選んでください。報告はBrightNewsのフィルター改善に役立ちます。",
+    "reportReasons": {
+      "negative_scary": "ネガティブまたは怖い",
+      "political": "政治的",
+      "violence_crime": "暴力または犯罪",
+      "misleading_category": "カテゴリが不適切",
+      "other": "その他"
+    }
   },
   "feedback": {
     "signInSuccess": "サインインしました。",
@@ -175,6 +188,9 @@
     "shareError": "このストーリーは現在共有できません。",
     "loadAccountError": "アカウントを読み込めません。",
     "syncSavedError": "保存したストーリーを同期できません。",
+    "reportSubmitted": "ありがとうございます。このストーリーを確認します。",
+    "reportSignInRequired": "重複報告を防ぐため、ストーリーを報告するにはサインインしてください。",
+    "reportError": "現在、この報告を送信できません。",
     "loadReviewError": "レビューキューを読み込めません。",
     "approveError": "記事を承認できません。",
     "rejectError": "記事を却下できません。",

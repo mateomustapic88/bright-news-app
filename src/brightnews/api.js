@@ -45,11 +45,18 @@ export const loadStories = async (regionCode, categoryId, options = {}) => {
     limit,
   } = options;
 
+  const rankBySaves = categoryId && categoryId !== "all";
+
   let query = supabase
     .from("stories")
     .select("*")
-    .order("is_pinned", { ascending: false })
-    .order("published_at", { ascending: false });
+    .order("is_pinned", { ascending: false });
+
+  if (rankBySaves) {
+    query = query.order("saved_count", { ascending: false });
+  }
+
+  query = query.order("published_at", { ascending: false });
 
   query = applyStoryFilters(query, regionCode, categoryId);
 
@@ -236,4 +243,16 @@ export const deleteSavedStory = async (userId, storyId) => {
     .eq("story_id", storyId);
 
   if (error) throw new Error(error.message);
+};
+
+export const createStoryReport = async (userId, storyId, reason) => {
+  if (!supabase) return;
+
+  const { error } = await supabase
+    .from("story_reports")
+    .insert({ user_id: userId, story_id: storyId, reason });
+
+  if (error && error.code !== "23505") {
+    throw new Error(error.message);
+  }
 };

@@ -167,7 +167,20 @@
   "story": {
     "save": "Sačuvaj priču",
     "removeSaved": "Ukloni sačuvanu priču",
-    "readSource": "Pročitaj izvor"
+    "readSource": "Pročitaj izvor",
+    "savedCount": "Sačuvano {count} puta",
+    "reportNotPositive": "Nije pozitivno?",
+    "reportClose": "Zatvori prijavu",
+    "reportEyebrow": "Prijava priče",
+    "reportTitle": "Zašto ovo nije pozitivno?",
+    "reportDescription": "Izaberi najbliži razlog. Prijave pomažu da poboljšamo BrightNews filtere.",
+    "reportReasons": {
+      "negative_scary": "Negativno ili zastrašujuće",
+      "political": "Politički sadržaj",
+      "violence_crime": "Nasilje ili kriminal",
+      "misleading_category": "Pogrešna kategorija",
+      "other": "Ostalo"
+    }
   },
   "feedback": {
     "signInSuccess": "Uspešno prijavljen.",
@@ -175,6 +188,9 @@
     "shareError": "Ovu priču trenutno nije moguće podeliti.",
     "loadAccountError": "Nije moguće učitati nalog.",
     "syncSavedError": "Nije moguće sinhronizovati sačuvane priče.",
+    "reportSubmitted": "Hvala. Pregledaćemo ovu priču.",
+    "reportSignInRequired": "Prijavi se za prijavu priča kako bismo sprečili duple prijave.",
+    "reportError": "Trenutno nije moguće poslati prijavu.",
     "loadReviewError": "Nije moguće učitati red za pregled.",
     "approveError": "Nije moguće odobriti članak.",
     "rejectError": "Nije moguće odbiti članak.",

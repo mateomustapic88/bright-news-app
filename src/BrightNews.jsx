@@ -19,6 +19,7 @@ import {
 } from "./lib/mobileAuth";
 import {
   createSavedStory,
+  createStoryReport,
   deleteSavedStory,
   loadAvailableRegionCodes,
   loadProfile,
@@ -59,6 +60,7 @@ import Header from "./brightnews/components/Header";
 import LoadingBar from "./brightnews/components/LoadingBar";
 import OnboardingModal from "./brightnews/components/OnboardingModal";
 import StatusDialog from "./brightnews/components/StatusDialog";
+import StoryReportDialog from "./brightnews/components/StoryReportDialog";
 import TopBar from "./brightnews/components/TopBar";
 import DiscoverTab from "./brightnews/tabs/DiscoverTab";
 import AccountTab from "./brightnews/tabs/AccountTab";
@@ -139,6 +141,8 @@ const BrightNews = () => {
   const [authError, setAuthError] = useState("");
   const [syncingSaved, setSyncingSaved] = useState(false);
   const [shareFeedback, setShareFeedback] = useState(null);
+  const [reportStory, setReportStory] = useState(null);
+  const [reportingStory, setReportingStory] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(() => !readOnboardingDismissed());
   const [hideFeedChrome, setHideFeedChrome] = useState(false);
   const feedbackHref = buildFeedbackMailto();
@@ -941,6 +945,54 @@ const BrightNews = () => {
     }
   };
 
+  const handleReportStory = (story, event) => {
+    event?.stopPropagation();
+    setReportStory(story);
+  };
+
+  const submitStoryReport = async reason => {
+    if (!reportStory) return;
+
+    if (!session?.user) {
+      setReportStory(null);
+      setShareFeedback({
+        variant: "info",
+        message: t("feedback.reportSignInRequired"),
+      });
+      trackEvent("story_report_sign_in_required", {
+        reason,
+        category: reportStory.category,
+        region: reportStory.regionCode,
+        language: reportStory.languageCode,
+      });
+      return;
+    }
+
+    setReportingStory(true);
+
+    try {
+      await createStoryReport(session.user.id, reportStory.id, reason);
+      trackEvent("story_report", {
+        reason,
+        category: reportStory.category,
+        region: reportStory.regionCode,
+        language: reportStory.languageCode,
+      });
+      setReportStory(null);
+      setShareFeedback({
+        variant: "accent",
+        message: t("feedback.reportSubmitted"),
+      });
+    } catch (reportError) {
+      setShareFeedback({
+        variant: "error",
+        message: reportError.message || t("feedback.reportError"),
+      });
+    } finally {
+      setReportingStory(false);
+    }
+  };
+
   const handleApproveRawArticle = async rawArticleId => {
     try {
       await updateRawArticleReviewStatus(rawArticleId, "approved");
@@ -1020,6 +1072,16 @@ const BrightNews = () => {
         />
       ) : null}
 
+      {reportStory ? (
+        <StoryReportDialog
+          story={reportStory}
+          onClose={() => setReportStory(null)}
+          onSubmit={submitStoryReport}
+          reporting={reportingStory}
+          t={t}
+        />
+      ) : null}
+
       <div
         ref={screenRef}
         className={`bn-screen${hideFeedChrome && tab === "home" ? " is-feed-chrome-hidden" : ""}`}
@@ -1044,6 +1106,7 @@ const BrightNews = () => {
             setExpanded={setExpanded}
             toggleSave={toggleSave}
             handleShareStory={handleShareStory}
+            handleReportStory={handleReportStory}
             t={t}
             uiLanguage={uiLanguage}
           />

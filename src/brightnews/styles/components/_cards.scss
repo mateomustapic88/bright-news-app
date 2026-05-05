@@ -220,6 +220,22 @@
   line-height: 1.25;
 }
 
+.bn-saved-count-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 4px 9px;
+  border: 1px solid color-mix(in srgb, var(--bn-category-color) 22%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bn-category-bg) 78%, white);
+  color: var(--bn-category-color);
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
 .bn-saved-card {
   @include surface-card(14px);
 

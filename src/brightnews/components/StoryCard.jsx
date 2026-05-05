@@ -2,11 +2,24 @@ import { getCategoryMeta, getCategoryThemeClass } from "../constants";
 import { formatStoryPublishedAt, getCategoryLabel } from "../i18n";
 import StoryMedia from "./StoryMedia";
 import StoryImpact from "./StoryImpact";
+import StoryReportButton from "./StoryReportButton";
 import StorySaveButton from "./StorySaveButton";
+import StorySavedCount from "./StorySavedCount";
 import StoryShareButton from "./StoryShareButton";
 import StorySourceLink from "./StorySourceLink";
 
-const StoryCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave, handleShareStory, t, uiLanguage }) => {
+const StoryCard = ({
+  story,
+  expanded,
+  firstLoad,
+  saved,
+  setExpanded,
+  toggleSave,
+  handleShareStory,
+  handleReportStory,
+  t,
+  uiLanguage,
+}) => {
   const category = getCategoryMeta(story.category);
   const themeClass = getCategoryThemeClass(story.category);
   const isExpanded = expanded === story.id;
@@ -53,6 +66,8 @@ const StoryCard = ({ story, expanded, firstLoad, saved, setExpanded, toggleSave,
             </span>
             <span className="bn-story-card__source-badge">{story.location}</span>
             {publishedLabel ? <span className="bn-card-location">{publishedLabel}</span> : null}
+            <StorySavedCount count={story.savedCount} t={t} uiLanguage={uiLanguage} />
+            <StoryReportButton story={story} onReportStory={handleReportStory} t={t} />
           </div>
           <p className={`bn-card-summary bn-card-summary--preview${isExpanded ? " is-expanded" : ""}`}>
             {story.summary}

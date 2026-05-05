@@ -167,7 +167,20 @@
   "story": {
     "save": "Enregistrer l'histoire",
     "removeSaved": "Retirer l'histoire enregistrée",
-    "readSource": "Lire la source"
+    "readSource": "Lire la source",
+    "savedCount": "Enregistré {count} fois",
+    "reportNotPositive": "Pas positif ?",
+    "reportClose": "Fermer le signalement",
+    "reportEyebrow": "Signalement",
+    "reportTitle": "Pourquoi ce contenu n’est-il pas positif ?",
+    "reportDescription": "Choisissez la raison la plus proche. Les signalements aident à améliorer les filtres BrightNews.",
+    "reportReasons": {
+      "negative_scary": "Négatif ou inquiétant",
+      "political": "Politique",
+      "violence_crime": "Violence ou crime",
+      "misleading_category": "Catégorie trompeuse",
+      "other": "Autre"
+    }
   },
   "feedback": {
     "signInSuccess": "Connexion réussie.",
@@ -175,6 +188,9 @@
     "shareError": "Impossible de partager cette histoire pour le moment.",
     "loadAccountError": "Impossible de charger votre compte.",
     "syncSavedError": "Impossible de synchroniser les histoires enregistrées.",
+    "reportSubmitted": "Merci. Nous examinerons cette histoire.",
+    "reportSignInRequired": "Connectez-vous pour signaler des histoires et éviter les doublons.",
+    "reportError": "Impossible d’envoyer ce signalement pour le moment.",
     "loadReviewError": "Impossible de charger la file de révision.",
     "approveError": "Impossible d'approuver l'article.",
     "rejectError": "Impossible de rejeter l'article.",

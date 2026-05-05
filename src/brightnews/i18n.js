@@ -80,6 +80,12 @@ export const formatStoryPublishedAt = (publishedAt, languageId) => {
   return formatUiShortDate(date, languageId);
 };
 
+export const formatCompactNumber = (value, languageId) =>
+  new Intl.NumberFormat(UI_LOCALES[getUiLanguage(languageId)] || UI_LOCALES.en, {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(Number(value || 0));
+
 export const createTranslator = languageId => {
   const uiLanguage = getUiLanguage(languageId);
   const languageStrings = STRINGS[uiLanguage] || STRINGS.en;

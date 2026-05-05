@@ -9,6 +9,20 @@ import StatusMessage from "../components/StatusMessage";
 import StoryCard from "../components/StoryCard";
 
 const FEATURED_POOL_SIZE = 12;
+const getFeaturedStory = (stories, category) => {
+  const featuredPool = stories.slice(0, FEATURED_POOL_SIZE);
+
+  if (category && category !== "all") {
+    return featuredPool[0] || null;
+  }
+
+  return featuredPool.reduce((best, story) => {
+    if (!best) return story;
+    if (getFeaturedStoryScore(story) > getFeaturedStoryScore(best)) return story;
+    return best;
+  }, null);
+};
+
 const getFeaturedStoryScore = story => {
   if (!story) return -Infinity;
 
@@ -56,6 +70,7 @@ const HomeTab = ({
   setExpanded,
   toggleSave,
   handleShareStory,
+  handleReportStory,
   t,
   uiLanguage,
 }) => {
@@ -63,13 +78,7 @@ const HomeTab = ({
   const [desktopFeedEnabled, setDesktopFeedEnabled] = useState(() => (
     typeof window !== "undefined" ? window.matchMedia("(min-width: 769px)").matches : false
   ));
-  const featuredPool = stories.slice(0, FEATURED_POOL_SIZE);
-
-  const featuredStory = featuredPool.reduce((best, story) => {
-    if (!best) return story;
-    if (getFeaturedStoryScore(story) > getFeaturedStoryScore(best)) return story;
-    return best;
-  }, null);
+  const featuredStory = getFeaturedStory(stories, category);
 
   const remainingStories = stories.filter(story => story.id !== featuredStory?.id);
 
@@ -202,6 +211,7 @@ const HomeTab = ({
                 setExpanded={setExpanded}
                 toggleSave={toggleSave}
                 handleShareStory={handleShareStory}
+                handleReportStory={handleReportStory}
                 t={t}
                 uiLanguage={uiLanguage}
               />
@@ -220,6 +230,7 @@ const HomeTab = ({
                   setExpanded={setExpanded}
                   toggleSave={toggleSave}
                   handleShareStory={handleShareStory}
+                  handleReportStory={handleReportStory}
                   t={t}
                   uiLanguage={uiLanguage}
                 />
@@ -240,6 +251,7 @@ const HomeTab = ({
                 setExpanded={setExpanded}
                 toggleSave={toggleSave}
                 handleShareStory={handleShareStory}
+                handleReportStory={handleReportStory}
                 t={t}
                 uiLanguage={uiLanguage}
               />
@@ -257,6 +269,7 @@ const HomeTab = ({
                   setExpanded={setExpanded}
                   toggleSave={toggleSave}
                   handleShareStory={handleShareStory}
+                  handleReportStory={handleReportStory}
                   t={t}
                   uiLanguage={uiLanguage}
                 />

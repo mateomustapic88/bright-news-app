@@ -167,7 +167,20 @@
   "story": {
     "save": "Shrani zgodbo",
     "removeSaved": "Odstrani shranjeno zgodbo",
-    "readSource": "Preberi vir"
+    "readSource": "Preberi vir",
+    "savedCount": "Shranjeno {count}-krat",
+    "reportNotPositive": "Ni pozitivno?",
+    "reportClose": "Zapri prijavo",
+    "reportEyebrow": "Prijava zgodbe",
+    "reportTitle": "Zakaj to ni pozitivno?",
+    "reportDescription": "Izberite najbližji razlog. Prijave pomagajo izboljšati filtre BrightNews.",
+    "reportReasons": {
+      "negative_scary": "Negativno ali strašljivo",
+      "political": "Politično",
+      "violence_crime": "Nasilje ali kriminal",
+      "misleading_category": "Zavajajoča kategorija",
+      "other": "Drugo"
+    }
   },
   "feedback": {
     "signInSuccess": "Uspešno prijavljen.",
@@ -175,6 +188,9 @@
     "shareError": "Te zgodbe trenutno ni mogoče deliti.",
     "loadAccountError": "Računa ni bilo mogoče naložiti.",
     "syncSavedError": "Shranjevanja zgodb ni bilo mogoče sinhronizirati.",
+    "reportSubmitted": "Hvala. Pregledali bomo to zgodbo.",
+    "reportSignInRequired": "Prijavite se za prijavo zgodb, da preprečimo podvojene prijave.",
+    "reportError": "Te prijave trenutno ni mogoče poslati.",
     "loadReviewError": "Čakalne vrste za pregled ni bilo mogoče naložiti.",
     "approveError": "Članka ni bilo mogoče odobriti.",
     "rejectError": "Članka ni bilo mogoče zavrniti.",
