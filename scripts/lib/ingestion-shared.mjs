@@ -120,7 +120,11 @@ export const CATEGORY_CONFIG = [
 
 export const TRUSTED_AUTO_APPROVE_VENDORS = new Set(["goodnewsnetwork", "positive_news"]);
 const MIN_POSITIVE_SCORE = 0.6;
-const hasOpenAiReviewer = Boolean(process.env.OPENAI_API_KEY);
+const hasOpenAiReviewer = Boolean(
+  process.env.OPENAI_API_KEY ||
+  process.env.GROQ_API_KEY ||
+  process.env.GEMINI_API_KEY,
+);
 const HEURISTIC_AUTO_APPROVE_SCORE = Number(process.env.HEURISTIC_AUTO_APPROVE_SCORE || 0.66);
 const MIN_SOURCE_QUALITY_SCORE = Number(process.env.MIN_SOURCE_QUALITY_SCORE || 0.38);
 const AUTO_APPROVE_MIN_SOURCE_QUALITY_SCORE = Number(process.env.AUTO_APPROVE_MIN_SOURCE_QUALITY_SCORE || 0.62);

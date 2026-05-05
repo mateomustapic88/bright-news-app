@@ -86,6 +86,8 @@ const reviewLimit = Number(getEnv("OPENAI_REVIEW_LIMIT") || 200);
 const reviewDelayMs = Number(getEnv("OPENAI_REVIEW_DELAY_MS") || 300);
 const maxRetries = Number(getEnv("OPENAI_REVIEW_MAX_RETRIES") || 3);
 const minimumConfidence = Number(getEnv("OPENAI_REVIEW_MIN_CONFIDENCE") || 0.6);
+const maxDescriptionChars = Number(getEnv("AI_REVIEW_MAX_DESCRIPTION_CHARS") || 1200);
+const maxContentChars = Number(getEnv("AI_REVIEW_MAX_CONTENT_CHARS") || 2200);
 
 if (!supabaseUrl) {
   throw new Error("Missing required environment variable: SUPABASE_URL or VITE_SUPABASE_URL");
@@ -93,11 +95,18 @@ if (!supabaseUrl) {
 
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
+const truncateText = (value, maxChars) => {
+  const text = String(value || "").trim();
+  if (!maxChars || text.length <= maxChars) return text;
+
+  return `${text.slice(0, maxChars).trim()}… [truncated]`;
+};
+
 const buildArticleInput = row => JSON.stringify({
   source_name: row.source_name,
-  title: row.title,
-  description: row.description,
-  content: row.content,
+  title: truncateText(row.title, 240),
+  description: truncateText(row.description, maxDescriptionChars),
+  content: truncateText(row.content, maxContentChars),
   current_category: row.category,
   current_region_code: row.region_code,
   source_url: row.source_url,
