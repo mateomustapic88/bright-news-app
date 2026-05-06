@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { formatUiDate, getRegionLabel } from "../i18n";
+import BrandMark from "./BrandMark";
 
 const Header = ({
   region,
@@ -34,7 +35,9 @@ const Header = ({
         </div>
 
         <div className="bn-brand bn-brand--mobile">
-          <div className="bn-brand__icon">☀️</div>
+          <div className="bn-brand__icon">
+            <BrandMark />
+          </div>
           <div>
             <div className="bn-brand__name">BrightNews</div>
             <p className="bn-brand__meta">{t("header.meta", { date: todayLabel })}</p>

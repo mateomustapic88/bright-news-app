@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { getLanguageLabel, getLanguageShortLabel } from "../i18n";
+import BrandMark from "./BrandMark";
 
 const getInitials = value =>
   String(value || "")
@@ -32,7 +33,9 @@ const TopBar = ({
   return (
     <div className="bn-top-bar">
       <button type="button" className="bn-top-bar__brand" onClick={() => setTab("home")}>
-        <span className="bn-top-bar__brand-mark">☀️</span>
+        <span className="bn-top-bar__brand-mark">
+          <BrandMark />
+        </span>
         <span className="bn-top-bar__brand-name">BrightNews</span>
       </button>
 
