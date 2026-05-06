@@ -45,7 +45,7 @@ export const loadStories = async (regionCode, categoryId, options = {}) => {
     limit,
   } = options;
 
-  const rankBySaves = categoryId && categoryId !== "all";
+  const rankBySaves = categoryId;
 
   let query = supabase
     .from("stories")

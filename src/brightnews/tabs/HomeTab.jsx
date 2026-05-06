@@ -18,9 +18,15 @@ const getFeaturedStory = (stories, category) => {
 
   return featuredPool.reduce((best, story) => {
     if (!best) return story;
-    if (getFeaturedStoryScore(story) > getFeaturedStoryScore(best)) return story;
+    if (getAllCategoryFeaturedStoryScore(story) > getAllCategoryFeaturedStoryScore(best)) return story;
     return best;
   }, null);
+};
+
+const getAllCategoryFeaturedStoryScore = story => {
+  if (!story) return -Infinity;
+
+  return (Number(story.savedCount || 0) * 1000) + getFeaturedStoryScore(story);
 };
 
 const getFeaturedStoryScore = story => {
