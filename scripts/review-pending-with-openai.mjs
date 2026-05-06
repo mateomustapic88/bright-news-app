@@ -450,7 +450,7 @@ export const run = async () => {
 
     const fallbackResult = {
       skipped: false,
-      fallback: "trusted-source-heuristic",
+      fallback: "heuristic-review",
       reviewed: rows?.length || 0,
       approved,
       pending,

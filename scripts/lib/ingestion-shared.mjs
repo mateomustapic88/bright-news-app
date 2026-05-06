@@ -120,7 +120,7 @@ export const CATEGORY_CONFIG = [
 
 export const TRUSTED_AUTO_APPROVE_VENDORS = new Set(["goodnewsnetwork", "positive_news"]);
 const MIN_POSITIVE_SCORE = 0.6;
-const hasOpenAiReviewer = Boolean(
+const hasAiReviewer = Boolean(
   process.env.OPENAI_API_KEY ||
   process.env.GROQ_API_KEY ||
   process.env.GEMINI_API_KEY,
@@ -1074,7 +1074,7 @@ export const inferReviewDecision = ({
     LOCAL_INFORMATIVE_KEYWORDS,
     TRUSTED_AUTO_APPROVE_VENDORS,
     SOURCE_QUALITY_PROFILES,
-    hasOpenAiReviewer,
+    hasAiReviewer,
     thresholds: {
       minPositiveScore: MIN_POSITIVE_SCORE,
       heuristicAutoApproveScore: HEURISTIC_AUTO_APPROVE_SCORE,

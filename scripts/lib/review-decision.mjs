@@ -65,7 +65,7 @@ export const inferReviewDecision = ({
     LOCAL_INFORMATIVE_KEYWORDS,
     TRUSTED_AUTO_APPROVE_VENDORS,
     SOURCE_QUALITY_PROFILES,
-    hasOpenAiReviewer,
+    hasAiReviewer = false,
     thresholds,
   } = config;
 
@@ -157,29 +157,29 @@ export const inferReviewDecision = ({
     sourceQualityScore >= thresholds.autoApproveMinSourceQualityScore &&
     sourceAdjustedScore >= effectiveAutoApproveScore;
 
-  if (isTrustedVendor && !hasOpenAiReviewer) {
+  if (isTrustedVendor && !hasAiReviewer) {
     return {
       reviewStatus: "approved",
       rejectedReason: "",
-      reviewNotes: `Auto-approved from trusted curated source without OpenAI review (positive ${candidateScore.toFixed(2)}, source ${sourceQualityScore.toFixed(2)}).`,
+      reviewNotes: `Auto-approved from trusted curated source because AI review is unavailable (positive ${candidateScore.toFixed(2)}, source ${sourceQualityScore.toFixed(2)}).`,
     };
   }
 
-  if (!hasOpenAiReviewer &&
+  if (!hasAiReviewer &&
       sourceQualityScore >= thresholds.autoApproveMinSourceQualityScore &&
       sourceAdjustedScore >= effectiveAutoApproveScore) {
     return {
       reviewStatus: "approved",
       rejectedReason: "",
-      reviewNotes: `Auto-approved by heuristic score without OpenAI review (positive ${candidateScore.toFixed(2)}, source ${sourceQualityScore.toFixed(2)}, blended ${sourceAdjustedScore.toFixed(2)}).`,
+      reviewNotes: `Auto-approved by heuristic score because AI review is unavailable (positive ${candidateScore.toFixed(2)}, source ${sourceQualityScore.toFixed(2)}, blended ${sourceAdjustedScore.toFixed(2)}).`,
     };
   }
 
-  if (canAutoApproveStrongLocal) {
+  if (!hasAiReviewer && canAutoApproveStrongLocal) {
     return {
       reviewStatus: "approved",
       rejectedReason: "",
-      reviewNotes: `Auto-approved from strong local positive signal (positive ${candidateScore.toFixed(2)}, source ${sourceQualityScore.toFixed(2)}, blended ${sourceAdjustedScore.toFixed(2)}).`,
+      reviewNotes: `Auto-approved from strong local positive signal because AI review is unavailable (positive ${candidateScore.toFixed(2)}, source ${sourceQualityScore.toFixed(2)}, blended ${sourceAdjustedScore.toFixed(2)}).`,
     };
   }
 
@@ -194,6 +194,6 @@ export const inferReviewDecision = ({
   return {
     reviewStatus: "pending",
     rejectedReason: "",
-    reviewNotes: `Awaiting OpenAI review. Positive ${candidateScore.toFixed(2)}, source ${sourceQualityScore.toFixed(2)}, blended ${sourceAdjustedScore.toFixed(2)}.`,
+    reviewNotes: `Awaiting AI review. Positive ${candidateScore.toFixed(2)}, source ${sourceQualityScore.toFixed(2)}, blended ${sourceAdjustedScore.toFixed(2)}.`,
   };
 };
