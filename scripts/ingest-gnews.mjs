@@ -110,7 +110,7 @@ export const run = async () => {
       for (const article of articles) {
         if (!article.url || !article.title) continue;
 
-        const row = buildRawArticleRow({
+        const row = await buildRawArticleRow({
           vendor: "gnews",
           sourceName: article.source?.name || "GNews",
           article: {

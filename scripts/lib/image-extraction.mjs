@@ -19,6 +19,9 @@ const CLOUDINARY_IMAGE_PATTERN = /\/image\/upload\//i;
 const TRANSFORMED_IMAGE_PATTERN = /\/f_(?:jpe?g|png|webp|gif|avif)\b/i;
 const IMAGE_QUERY_HINT_PATTERN = /[?&](?:format|fm|width|height|resize|crop|quality)=/i;
 const ATTRIBUTE_CACHE = new Map();
+const DEFAULT_HTML_FETCH_TIMEOUT_MS = 8000;
+const DEFAULT_HTML_FETCH_USER_AGENT =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36 BrightNews/1.0";
 
 export const isLikelyImageUrl = value => {
   const normalized = normalizeExternalUrl(value || "");
@@ -168,6 +171,35 @@ export const extractImageUrlFromHtml = (value, baseUrl = "") => {
   }
 
   return selectBestImageCandidate(candidates, baseUrl);
+};
+
+export const fetchHtmlForUrl = async (
+  sourceUrl,
+  {
+    timeoutMs = DEFAULT_HTML_FETCH_TIMEOUT_MS,
+    userAgent = DEFAULT_HTML_FETCH_USER_AGENT,
+  } = {},
+) => {
+  const normalizedSourceUrl = normalizeExternalUrl(sourceUrl || "");
+  if (!normalizedSourceUrl) return { html: "", finalUrl: "" };
+
+  const response = await fetch(normalizedSourceUrl, {
+    headers: {
+      "user-agent": userAgent,
+      accept: "text/html,application/xhtml+xml",
+    },
+    signal: AbortSignal.timeout(timeoutMs),
+    redirect: "follow",
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTML fetch returned ${response.status}`);
+  }
+
+  return {
+    html: await response.text(),
+    finalUrl: response.url || normalizedSourceUrl,
+  };
 };
 
 export const extractImageUrlFromPayload = payload => {

@@ -164,7 +164,7 @@ export const run = async () => {
       const articles = await fetchArticles({ region, category });
 
       for (const article of articles) {
-        const row = buildRawArticleRow({
+        const row = await buildRawArticleRow({
           vendor: "newsdata",
           sourceName: article.source_name || article.source_id || "NewsData.io",
           article: {

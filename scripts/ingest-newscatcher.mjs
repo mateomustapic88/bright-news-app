@@ -137,7 +137,7 @@ export const run = async () => {
       const articles = await fetchArticles({ region, category });
 
       for (const article of articles) {
-        const row = buildRawArticleRow({
+        const row = await buildRawArticleRow({
           vendor: "newscatcher",
           sourceName: article.name_source || article.clean_url || "NewsCatcher",
           article: {

@@ -215,7 +215,7 @@ export const run = async () => {
           })
           : region.code;
 
-        const row = buildRawArticleRow({
+        const row = await buildRawArticleRow({
           vendor: "google_news_rss",
           sourceName,
           article: {

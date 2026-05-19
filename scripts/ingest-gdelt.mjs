@@ -124,7 +124,7 @@ export const run = async () => {
           })
           : region.code;
 
-        const row = buildRawArticleRow({
+        const row = await buildRawArticleRow({
           vendor: "gdelt",
           sourceName: deriveSourceName(item.link),
           article: {

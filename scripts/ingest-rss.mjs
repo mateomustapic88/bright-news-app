@@ -594,7 +594,7 @@ export const run = async () => {
           tags: item.categories,
         });
 
-        const row = buildRawArticleRow({
+        const row = await buildRawArticleRow({
           vendor: feed.vendor,
           sourceName: feed.sourceName,
           article: {

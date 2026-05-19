@@ -3,14 +3,17 @@ import { countKeywordHits, matchesKeyword, normalizeHaystack, stripHtml, toSente
 import {
   extractImageUrlFromArticle,
   extractImageUrlFromHtml,
+  fetchHtmlForUrl,
   isLikelyImageUrl,
 } from "./image-extraction.mjs";
+import { isBlockedStoryImageUrl } from "../../src/lib/storyImages.js";
 import { inferReviewDecision as inferReviewDecisionWithConfig } from "./review-decision.mjs";
 
 export { stripHtml, toSentence } from "./html-text.mjs";
 export {
   extractImageUrlFromArticle,
   extractImageUrlFromHtml,
+  fetchHtmlForUrl,
 } from "./image-extraction.mjs";
 
 export const REGION_CONFIG = [
@@ -1088,7 +1091,134 @@ export const inferReviewDecision = ({
   },
 });
 
-export const buildRawArticleRow = ({
+const imageFallbackDisabledByCli = process.argv.includes("--no-image-fallback");
+const imageFallbackSeenSourceUrls = new Set();
+const imageFallbackConcurrencyEnv = Number(process.env.INGEST_IMAGE_FALLBACK_CONCURRENCY || 4);
+const maxImageFallbackConcurrency = Number.isFinite(imageFallbackConcurrencyEnv)
+  ? Math.max(1, imageFallbackConcurrencyEnv)
+  : 4;
+let activeImageFallbackFetches = 0;
+const pendingImageFallbackFetches = [];
+
+const acquireImageFallbackSlot = async () => {
+  if (activeImageFallbackFetches < maxImageFallbackConcurrency) {
+    activeImageFallbackFetches += 1;
+    return;
+  }
+
+  await new Promise(resolve => pendingImageFallbackFetches.push(resolve));
+  activeImageFallbackFetches += 1;
+};
+
+const releaseImageFallbackSlot = () => {
+  activeImageFallbackFetches = Math.max(0, activeImageFallbackFetches - 1);
+  const next = pendingImageFallbackFetches.shift();
+  if (next) next();
+};
+
+const withImageFallbackSlot = async callback => {
+  await acquireImageFallbackSlot();
+
+  try {
+    return await callback();
+  } finally {
+    releaseImageFallbackSlot();
+  }
+};
+
+const isAggregatorSourceUrl = sourceUrl => {
+  try {
+    const url = new URL(sourceUrl);
+    const hostname = url.hostname.replace(/^www\./, "").toLowerCase();
+    return (
+      hostname === "news.google.com" ||
+      (hostname === "google.com" && url.pathname.startsWith("/url"))
+    );
+  } catch {
+    return true;
+  }
+};
+
+const logImageFallback = details => {
+  console.log(JSON.stringify({
+    scope: "ingest_image_fallback",
+    ...details,
+  }));
+};
+
+const resolveArticleImageUrl = async ({
+  article,
+  rawPayload,
+  sourceUrl,
+  vendor,
+  title,
+  imageFallback = !imageFallbackDisabledByCli,
+}) => {
+  const imageUrl = extractImageUrlFromArticle({ ...article, raw_payload: rawPayload }) || "";
+  const logBase = {
+    vendor,
+    sourceUrl,
+    title: title.slice(0, 100),
+  };
+
+  if (imageUrl) {
+    logImageFallback({ ...logBase, ran: false, reason: "existing_image", imageUrl });
+    return imageUrl;
+  }
+
+  if (!imageFallback) {
+    logImageFallback({ ...logBase, ran: false, reason: "disabled", imageUrl: "" });
+    return "";
+  }
+
+  if (!sourceUrl) {
+    logImageFallback({ ...logBase, ran: false, reason: "missing_source_url", imageUrl: "" });
+    return "";
+  }
+
+  if (isAggregatorSourceUrl(sourceUrl)) {
+    logImageFallback({ ...logBase, ran: false, reason: "aggregator_source_url", imageUrl: "" });
+    return "";
+  }
+
+  if (imageFallbackSeenSourceUrls.has(sourceUrl)) {
+    logImageFallback({ ...logBase, ran: false, reason: "already_seen_source_url", imageUrl: "" });
+    return "";
+  }
+
+  imageFallbackSeenSourceUrls.add(sourceUrl);
+
+  try {
+    const fallbackImageUrl = await withImageFallbackSlot(async () => {
+      const { html, finalUrl } = await fetchHtmlForUrl(sourceUrl, { timeoutMs: 8000 });
+      return extractImageUrlFromHtml(html, finalUrl);
+    });
+
+    const usableImageUrl = fallbackImageUrl && !isBlockedStoryImageUrl(fallbackImageUrl)
+      ? fallbackImageUrl
+      : "";
+
+    logImageFallback({
+      ...logBase,
+      ran: true,
+      reason: usableImageUrl ? "picked" : "not_found",
+      imageUrl: usableImageUrl,
+    });
+
+    return usableImageUrl;
+  } catch (error) {
+    logImageFallback({
+      ...logBase,
+      ran: true,
+      reason: "failed",
+      error: error?.message || "Unknown image fallback error",
+      imageUrl: "",
+    });
+    return "";
+  }
+};
+
+export const buildRawArticleRow = async ({
   vendor,
   sourceName,
   article,
@@ -1098,6 +1228,7 @@ export const buildRawArticleRow = ({
   emoji,
   tags = [],
   rawPayload = article,
+  imageFallback,
 }) => {
   const sourceUrl = normalizeExternalUrl(article.url || article.link || article.source_url);
   if (!sourceUrl) return null;
@@ -1107,7 +1238,14 @@ export const buildRawArticleRow = ({
 
   const description = toSentence(article.description || article.summary || "");
   const content = toSentence(article.content || article.content_encoded || "");
-  const imageUrl = extractImageUrlFromArticle({ ...article, raw_payload: rawPayload }) || "";
+  const imageUrl = await resolveArticleImageUrl({
+    article,
+    rawPayload,
+    sourceUrl,
+    vendor,
+    title,
+    imageFallback,
+  });
   const publishedAt = article.publishedAt || article.published_at || article.pubDate || null;
   const decision = inferReviewDecision({
     vendor,

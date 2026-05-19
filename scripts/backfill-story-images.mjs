@@ -3,6 +3,7 @@ import { pathToFileURL } from "node:url";
 import {
   extractImageUrlFromArticle,
   extractImageUrlFromHtml,
+  fetchHtmlForUrl,
   sleep,
 } from "./lib/ingestion-shared.mjs";
 import { isBlockedStoryImageUrl } from "../src/lib/storyImages.js";
@@ -69,22 +70,7 @@ const fetchImageFromSourceUrl = async sourceUrl => {
   }
 
   try {
-    const response = await fetch(sourceUrl, {
-      headers: {
-        "user-agent": "Mozilla/5.0 (compatible; BrightNewsImageBackfill/1.0; +https://brightnews.app)",
-        accept: "text/html,application/xhtml+xml",
-      },
-      signal: AbortSignal.timeout(fetchTimeoutMs),
-      redirect: "follow",
-    });
-
-    if (!response.ok) {
-      fetchedImageBySourceUrl.set(sourceUrl, "");
-      return "";
-    }
-
-    const finalUrl = response.url || sourceUrl;
-    const html = await response.text();
+    const { html, finalUrl } = await fetchHtmlForUrl(sourceUrl, { timeoutMs: fetchTimeoutMs });
     const imageUrl = extractImageUrlFromHtml(html, finalUrl);
     fetchedImageBySourceUrl.set(sourceUrl, imageUrl);
     return imageUrl;

@@ -169,7 +169,7 @@ export const run = async () => {
           continue;
         }
 
-        const row = buildRawArticleRow({
+        const row = await buildRawArticleRow({
           vendor: "guardian",
           sourceName: "The Guardian",
           article: {
