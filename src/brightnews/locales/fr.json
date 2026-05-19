@@ -117,7 +117,7 @@
     "sendBetaFeedback": "Envoyer un retour",
     "support": "Assistance",
     "privacyPolicy": "Politique de confidentialité",
-    "accountDeletion": "Demander la suppression du compte",
+    "accountDeletion": "Supprimer le compte",
     "resourcesHint": "L'e-mail de retour s'ouvre avec un modèle prérempli afin que les utilisateurs puissent décrire rapidement les bugs, les parcours confus ou les problèmes de qualité des histoires."
   },
   "auth": {

@@ -118,7 +118,7 @@
     "sendBetaFeedback": "Send feedback",
     "support": "Support",
     "privacyPolicy": "Privacy policy",
-    "accountDeletion": "Request account deletion",
+    "accountDeletion": "Delete account",
     "resourcesHint": "The feedback email opens with a prefilled template so people can quickly describe bugs, confusing flows, or story quality issues."
   },
   "auth": {

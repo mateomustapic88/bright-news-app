@@ -117,7 +117,7 @@
     "sendBetaFeedback": "Pošalji povratne informacije",
     "support": "Podrška",
     "privacyPolicy": "Pravila privatnosti",
-    "accountDeletion": "Zatraži brisanje računa",
+    "accountDeletion": "Obriši račun",
     "resourcesHint": "Email za povratne informacije otvara se s unaprijed pripremljenim predloškom kako bi korisnici brzo opisali bugove, zbunjujuće tokove ili probleme s kvalitetom vijesti."
   },
   "auth": {

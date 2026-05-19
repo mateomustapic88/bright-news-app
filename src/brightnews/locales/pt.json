@@ -117,7 +117,7 @@
     "sendBetaFeedback": "Enviar feedback",
     "support": "Suporte",
     "privacyPolicy": "Política de privacidade",
-    "accountDeletion": "Solicitar exclusão da conta",
+    "accountDeletion": "Excluir conta",
     "resourcesHint": "O email de feedback abre com um modelo preenchido para que as pessoas descrevam rapidamente bugs, fluxos confusos ou problemas de qualidade das histórias."
   },
   "auth": {

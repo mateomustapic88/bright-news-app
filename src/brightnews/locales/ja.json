@@ -117,7 +117,7 @@
     "sendBetaFeedback": "フィードバックを送信",
     "support": "サポート",
     "privacyPolicy": "プライバシーポリシー",
-    "accountDeletion": "アカウント削除を依頼",
+    "accountDeletion": "アカウントを削除",
     "resourcesHint": "フィードバックメールはあらかじめ入力されたテンプレートで開くため、ユーザーはバグ、分かりにくい操作、記事品質の問題をすぐに共有できます。"
   },
   "auth": {

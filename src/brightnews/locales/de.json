@@ -117,7 +117,7 @@
     "sendBetaFeedback": "Feedback senden",
     "support": "Support",
     "privacyPolicy": "Datenschutz",
-    "accountDeletion": "Kontolöschung anfordern",
+    "accountDeletion": "Konto löschen",
     "resourcesHint": "Die Feedback-E-Mail wird mit einer Vorlage geöffnet, damit Nutzer Bugs, verwirrende Abläufe oder Probleme mit der Story-Qualität schnell beschreiben können."
   },
   "auth": {

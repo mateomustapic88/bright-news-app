@@ -347,13 +347,15 @@
 
 .bn-auth-field__input {
   width: 100%;
-  min-height: 48px;
-  padding: 0 14px;
-  border: 1px solid rgba(19, 32, 51, 0.12);
-  border-radius: 16px;
+  min-height: 42px;
+  padding: 0 13px;
+  border: 1px solid var(--bn-divider);
+  border-radius: 14px;
   background: var(--bn-surface-raised);
   color: var(--bn-text-strong);
-  font: inherit;
+  font-family: var(--bn-font);
+  font-size: 13px;
+  font-weight: 600;
   transition:
     border-color var(--bn-transition),
     box-shadow var(--bn-transition),
@@ -361,12 +363,14 @@
 
   &::placeholder {
     color: var(--bn-text-subtle);
+    font-size: 13px;
+    font-weight: 500;
   }
 
   &:focus {
     outline: none;
-    border-color: rgba(37, 99, 235, 0.35);
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+    border-color: color-mix(in srgb, var(--bn-link) 45%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--bn-link) 14%, transparent);
     background: var(--bn-surface-raised-strong);
   }
 
