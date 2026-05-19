@@ -14,7 +14,7 @@
   margin-top: 16px;
   border: 1px solid rgba(224, 163, 66, 0.22);
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255, 245, 214, 0.92), rgba(255, 250, 237, 0.9));
+  background: linear-gradient(180deg, var(--bn-accent-bg), var(--bn-surface-tint));
   padding: 14px 16px;
   color: var(--bn-text);
 
@@ -43,10 +43,10 @@
 }
 
 .bn-discover-region {
-  border: 1px solid rgba(19, 32, 51, 0.08);
+  border: 1px solid var(--bn-divider);
   border-radius: var(--bn-radius-xl);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 252, 247, 0.94)),
+    linear-gradient(180deg, var(--bn-surface-raised), var(--bn-surface-raised)),
     radial-gradient(circle at top left, rgba(243, 201, 111, 0.14), transparent 40%);
   padding: 28px 20px;
   cursor: pointer;
@@ -55,9 +55,13 @@
   box-shadow: var(--bn-shadow-card);
 
   &.is-active {
-    border-color: rgba(19, 32, 51, 0.22);
-    background: linear-gradient(180deg, #132033, #20314a);
-    color: #fffdf7;
+    border-color: var(--bn-border-strong);
+    background: linear-gradient(
+      180deg,
+      var(--bn-text-strong),
+      color-mix(in srgb, var(--bn-text-strong) 88%, var(--bn-link))
+    );
+    color: var(--bn-bg);
     transform: translateY(-1px);
   }
 }

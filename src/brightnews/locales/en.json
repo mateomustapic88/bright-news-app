@@ -64,7 +64,12 @@
   "topbar": {
     "account": "Account",
     "signIn": "Sign In",
-    "language": "Language"
+    "language": "Language",
+    "themeSystem": "System theme",
+    "themeLight": "Light theme",
+    "themeDark": "Dark theme",
+    "themeSwitchedLight": "Switched to light mode",
+    "themeSwitchedDark": "Switched to dark mode"
   },
   "header": {
     "eyebrow": "Today's brief",

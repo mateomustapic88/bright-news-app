@@ -64,7 +64,12 @@
   "topbar": {
     "account": "Conta",
     "signIn": "Entrar",
-    "language": "Idioma"
+    "language": "Idioma",
+    "themeSystem": "Tema do sistema",
+    "themeLight": "Tema claro",
+    "themeDark": "Tema escuro",
+    "themeSwitchedLight": "Alterado para o modo claro",
+    "themeSwitchedDark": "Alterado para o modo escuro"
   },
   "header": {
     "eyebrow": "Resumo do dia",

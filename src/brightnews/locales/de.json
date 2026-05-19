@@ -64,7 +64,12 @@
   "topbar": {
     "account": "Konto",
     "signIn": "Anmelden",
-    "language": "Sprache"
+    "language": "Sprache",
+    "themeSystem": "Systemdesign",
+    "themeLight": "Helles Design",
+    "themeDark": "Dunkles Design",
+    "themeSwitchedLight": "Zum hellen Modus gewechselt",
+    "themeSwitchedDark": "Zum dunklen Modus gewechselt"
   },
   "header": {
     "eyebrow": "Tagesüberblick",

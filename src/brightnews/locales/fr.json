@@ -64,7 +64,12 @@
   "topbar": {
     "account": "Compte",
     "signIn": "Connexion",
-    "language": "Langue"
+    "language": "Langue",
+    "themeSystem": "Thème système",
+    "themeLight": "Thème clair",
+    "themeDark": "Thème sombre",
+    "themeSwitchedLight": "Passé en mode clair",
+    "themeSwitchedDark": "Passé en mode sombre"
   },
   "header": {
     "eyebrow": "Le brief du jour",

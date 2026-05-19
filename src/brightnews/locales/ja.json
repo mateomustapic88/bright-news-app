@@ -64,7 +64,12 @@
   "topbar": {
     "account": "アカウント",
     "signIn": "サインイン",
-    "language": "言語"
+    "language": "言語",
+    "themeSystem": "システムテーマ",
+    "themeLight": "ライトテーマ",
+    "themeDark": "ダークテーマ",
+    "themeSwitchedLight": "ライトモードに切り替えました",
+    "themeSwitchedDark": "ダークモードに切り替えました"
   },
   "header": {
     "eyebrow": "今日のブリーフ",

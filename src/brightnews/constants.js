@@ -73,6 +73,9 @@ export const ONBOARDING_DISMISSED_KEY = "brightnews.onboardingDismissed";
 export const PREFERRED_REGION_KEY = "brightnews.preferredRegion";
 export const APP_LANGUAGE_KEY = "brightnews.appLanguage";
 export const STORY_LANGUAGE_FILTER_KEY = "brightnews.storyLanguageFilter";
+export const THEME_PREFERENCE_KEY = "brightnews.themePreference";
+
+export const THEME_PREFERENCES = ["system", "light", "dark"];
 
 export const getCategoryMeta = id =>
   CATEGORIES.find(category => category.id === id) || CATEGORIES[1];

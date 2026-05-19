@@ -8,7 +8,7 @@
   padding: 18px;
   border: 1px solid var(--bn-border);
   border-radius: var(--bn-radius-xl);
-  background: linear-gradient(180deg, rgba(249, 237, 208, 0.55), rgba(255, 255, 255, 0.96));
+  background: linear-gradient(180deg, rgba(249, 237, 208, 0.55), var(--bn-surface-raised-strong));
   box-shadow: var(--bn-shadow-card);
 
   h3 {

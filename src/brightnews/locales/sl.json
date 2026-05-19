@@ -64,7 +64,12 @@
   "topbar": {
     "account": "Račun",
     "signIn": "Prijava",
-    "language": "Jezik"
+    "language": "Jezik",
+    "themeSystem": "Sistemska tema",
+    "themeLight": "Svetla tema",
+    "themeDark": "Temna tema",
+    "themeSwitchedLight": "Preklopljeno na svetli način",
+    "themeSwitchedDark": "Preklopljeno na temni način"
   },
   "header": {
     "eyebrow": "Današnji pregled",

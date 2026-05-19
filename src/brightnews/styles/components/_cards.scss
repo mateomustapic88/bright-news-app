@@ -1,10 +1,10 @@
 @use "../mixins" as *;
 
 .bn-hero-card {
-  border: 1px solid rgba(19, 32, 51, 0.08);
+  border: 1px solid var(--bn-divider);
   border-radius: var(--bn-radius-2xl);
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.88);
+  background: var(--bn-surface-raised);
   box-shadow: var(--bn-shadow-card-strong);
   cursor: pointer;
   transition:
@@ -40,7 +40,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(19, 32, 51, 0.04), rgba(19, 32, 51, 0.08));
+    background: linear-gradient(180deg, rgba(19, 32, 51, 0.04), var(--bn-divider));
     pointer-events: none;
   }
 }
@@ -81,7 +81,7 @@
 
 .bn-hero-card__emoji {
   font-size: 84px;
-  filter: drop-shadow(0 8px 16px rgba(19, 32, 51, 0.08));
+  filter: drop-shadow(0 8px 16px var(--bn-divider));
   position: relative;
   z-index: 1;
 }
@@ -93,8 +93,8 @@
   z-index: 2;
   padding: 7px 14px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 12px 24px rgba(19, 32, 51, 0.08);
+  background: var(--bn-surface-raised-strong);
+  box-shadow: 0 12px 24px var(--bn-divider);
   color: var(--bn-category-color);
   font-size: 12px;
   font-weight: 800;
@@ -107,7 +107,7 @@
 .bn-story-card {
   @include surface-card(18px 18px);
 
-  border: 1px solid rgba(19, 32, 51, 0.08);
+  border: 1px solid var(--bn-divider);
   cursor: pointer;
   transition:
     opacity 0.4s,
@@ -186,7 +186,7 @@
 .bn-story-card__details {
   margin-top: 14px;
   padding-top: 14px;
-  border-top: 1px solid rgba(19, 32, 51, 0.08);
+  border-top: 1px solid var(--bn-divider);
 }
 
 .bn-story-card__source {
@@ -213,7 +213,7 @@
   max-width: 100%;
   padding: 4px 9px;
   border-radius: 8px;
-  background: rgba(19, 32, 51, 0.06);
+  background: var(--bn-divider-soft);
   color: var(--bn-text-strong);
   font-size: 11px;
   font-weight: 800;
@@ -241,7 +241,7 @@
 
   display: flex;
   gap: 12px;
-  border: 1px solid rgba(19, 32, 51, 0.08);
+  border: 1px solid var(--bn-divider);
 }
 
 .bn-saved-card__media {
@@ -257,7 +257,7 @@
 .bn-raw-article-card {
   @include surface-card(14px);
 
-  border: 1px solid rgba(19, 32, 51, 0.08);
+  border: 1px solid var(--bn-divider);
 }
 
 .bn-raw-article-card__header,
@@ -306,7 +306,7 @@
 
 .bn-raw-article-card p {
   margin: 0 0 8px;
-  color: #475569;
+  color: var(--bn-on-surface-muted);
   font-size: 12px;
   line-height: 1.7;
 }

@@ -50,10 +50,12 @@ import {
   readOnboardingDismissed,
   readPreferredRegion,
   readSavedStories,
+  readThemePreference,
   writeAppLanguage,
   writeOnboardingDismissed,
   writePreferredRegion,
   writeStoryLanguageFilter,
+  writeThemePreference,
 } from "./brightnews/storage";
 import BottomNav from "./brightnews/components/BottomNav";
 import Header from "./brightnews/components/Header";
@@ -122,6 +124,16 @@ const BrightNews = () => {
   const [category, setCategory]   = useState("all");
   const [appLanguage, setAppLanguage] = useState(() => readAppLanguage() || inferPreferredAppLanguage());
   const [storyLanguageFilter, setStoryLanguageFilter] = useState(() => readAppLanguage() || inferPreferredAppLanguage());
+  const [themePreference, setThemePreference] = useState(readThemePreference);
+  const [systemPrefersDark, setSystemPrefersDark] = useState(() => (
+    typeof window !== "undefined" && window.matchMedia
+      ? window.matchMedia("(prefers-color-scheme: dark)").matches
+      : false
+  ));
+  const [themeFeedback, setThemeFeedback] = useState(null);
+  const resolvedTheme = themePreference === "system"
+    ? (systemPrefersDark ? "dark" : "light")
+    : themePreference;
   const [desktopViewport, setDesktopViewport] = useState(() => (
     typeof window !== "undefined" ? window.matchMedia("(min-width: 769px)").matches : false
   ));
@@ -191,6 +203,39 @@ const BrightNews = () => {
   useEffect(() => {
     writeStoryLanguageFilter(storyLanguageFilter);
   }, [storyLanguageFilter]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const root = document.documentElement;
+    if (themePreference === "system") {
+      root.removeAttribute("data-theme");
+    } else {
+      root.setAttribute("data-theme", themePreference);
+    }
+    writeThemePreference(themePreference);
+  }, [themePreference]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return undefined;
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = event => setSystemPrefersDark(event.matches);
+    mediaQuery.addEventListener("change", handler);
+    return () => mediaQuery.removeEventListener("change", handler);
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    setThemePreference(() => {
+      const next = resolvedTheme === "dark" ? "light" : "dark";
+      setThemeFeedback({ theme: next, id: Date.now() });
+      return next;
+    });
+  }, [resolvedTheme]);
+
+  useEffect(() => {
+    if (!themeFeedback) return undefined;
+    const timer = window.setTimeout(() => setThemeFeedback(null), 2200);
+    return () => window.clearTimeout(timer);
+  }, [themeFeedback]);
 
   useEffect(() => {
     enableAnalytics();
@@ -1028,6 +1073,23 @@ const BrightNews = () => {
     <div className={`bright-news${hideFeedChrome && tab === "home" ? " is-feed-chrome-hidden" : ""}`}>
       {loading ? <LoadingBar /> : null}
 
+      {themeFeedback ? (
+        <div
+          key={themeFeedback.id}
+          className="bn-theme-toast"
+          role="status"
+          aria-live="polite"
+          data-theme-state={themeFeedback.theme}
+        >
+          <span aria-hidden="true" className="bn-theme-toast__glyph">
+            {themeFeedback.theme === "dark" ? "🌙" : "☀️"}
+          </span>
+          <span>
+            {t(themeFeedback.theme === "dark" ? "topbar.themeSwitchedDark" : "topbar.themeSwitchedLight")}
+          </span>
+        </div>
+      ) : null}
+
       <TopBar
         session={session}
         tab={tab}
@@ -1036,6 +1098,8 @@ const BrightNews = () => {
         appLanguage={appLanguage}
         appLanguages={appLanguages}
         setAppLanguage={setAppLanguage}
+        resolvedTheme={resolvedTheme}
+        onToggleTheme={toggleTheme}
         t={t}
         uiLanguage={uiLanguage}
       />

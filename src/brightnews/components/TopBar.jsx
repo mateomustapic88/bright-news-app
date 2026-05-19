@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { getLanguageLabel, getLanguageShortLabel } from "../i18n";
 import BrandMark from "./BrandMark";
+import ThemeSwitch from "./ThemeSwitch";
 
 const getInitials = value =>
   String(value || "")
@@ -18,6 +19,8 @@ const TopBar = ({
   appLanguage,
   appLanguages,
   setAppLanguage,
+  resolvedTheme = "light",
+  onToggleTheme,
   t,
   uiLanguage,
 }) => {
@@ -53,6 +56,15 @@ const TopBar = ({
       </nav>
 
       <div className="bn-top-bar__controls">
+        {onToggleTheme ? (
+          <ThemeSwitch
+            resolvedTheme={resolvedTheme}
+            onToggle={onToggleTheme}
+            lightLabel={t("topbar.themeLight")}
+            darkLabel={t("topbar.themeDark")}
+          />
+        ) : null}
+
         {appLanguages.length > 1 ? (
           <div className="bn-language-menu">
             <button

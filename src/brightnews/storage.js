@@ -4,6 +4,8 @@ import {
   PREFERRED_REGION_KEY,
   SAVED_STORIES_KEY,
   STORY_LANGUAGE_FILTER_KEY,
+  THEME_PREFERENCE_KEY,
+  THEME_PREFERENCES,
 } from "./constants";
 
 export const readSavedStories = () => {
@@ -110,5 +112,31 @@ export const writeStoryLanguageFilter = languageCode => {
     window.localStorage.setItem(STORY_LANGUAGE_FILTER_KEY, languageCode);
   } catch {
     // Keep story language filter non-blocking if storage is unavailable.
+  }
+};
+
+export const readThemePreference = () => {
+  if (typeof window === "undefined") return "system";
+
+  try {
+    const value = window.localStorage.getItem(THEME_PREFERENCE_KEY);
+    return THEME_PREFERENCES.includes(value) ? value : "system";
+  } catch {
+    return "system";
+  }
+};
+
+export const writeThemePreference = value => {
+  if (typeof window === "undefined") return;
+
+  try {
+    if (!THEME_PREFERENCES.includes(value) || value === "system") {
+      window.localStorage.removeItem(THEME_PREFERENCE_KEY);
+      return;
+    }
+
+    window.localStorage.setItem(THEME_PREFERENCE_KEY, value);
+  } catch {
+    // Keep theme preference non-blocking if storage is unavailable.
   }
 };

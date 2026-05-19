@@ -10,11 +10,11 @@
 .bn-home-tab__filters-surface {
   margin-bottom: 24px;
   padding: 18px 20px;
-  border: 1px solid rgba(19, 32, 51, 0.08);
+  border: 1px solid var(--bn-divider);
   border-radius: 24px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(250, 247, 240, 0.9)),
-    radial-gradient(circle at top left, rgba(243, 201, 111, 0.12), transparent 38%);
+    linear-gradient(180deg, var(--bn-surface-raised), var(--bn-surface-tint)),
+    radial-gradient(circle at top left, color-mix(in srgb, var(--bn-accent) 18%, transparent), transparent 38%);
   box-shadow: var(--bn-shadow-card);
 }
 
@@ -138,8 +138,8 @@
     gap: 8px;
     margin: -14px -14px 10px;
     padding: 10px 14px 8px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.92));
-    border-bottom: 1px solid rgba(19, 32, 51, 0.05);
+    background: linear-gradient(180deg, var(--bn-surface-raised-strong), var(--bn-surface-raised));
+    border-bottom: 1px solid var(--bn-divider-soft);
     opacity: 1;
     transform: translateY(0);
     transition: opacity 0.18s ease, transform 0.18s ease;
