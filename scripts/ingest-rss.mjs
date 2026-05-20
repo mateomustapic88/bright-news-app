@@ -481,6 +481,27 @@ const FEED_CONFIG = [
     category: "Health",
   },
   {
+    vendor: "globalnews_health_ca",
+    sourceName: "Global News Health",
+    feedUrl: "https://globalnews.ca/health/feed/",
+    regionCode: "ca",
+    category: "Health",
+  },
+  {
+    vendor: "globalnews_environment_ca",
+    sourceName: "Global News Environment",
+    feedUrl: "https://globalnews.ca/environment/feed/",
+    regionCode: "ca",
+    category: "Environment",
+  },
+  {
+    vendor: "globalnews_sports_ca",
+    sourceName: "Global News Sports",
+    feedUrl: "https://globalnews.ca/sports/feed/",
+    regionCode: "ca",
+    category: "Sports",
+  },
+  {
     vendor: "thehindu_science",
     sourceName: "The Hindu Science",
     feedUrl: "https://www.thehindu.com/sci-tech/science/feeder/default.rss",

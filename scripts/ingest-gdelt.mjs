@@ -23,6 +23,7 @@ const REGION_QUERY_TERMS = {
   hr: "(Croatia OR Croatian)",
   de: "(Germany OR German)",
   fr: "(France OR French)",
+  ca: "(Canada OR Canadian)",
   jp: "(Japan OR Japanese)",
   au: "(Australia OR Australian)",
   br: "(Brazil OR Brazilian)",

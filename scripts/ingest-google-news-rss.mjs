@@ -26,6 +26,7 @@ const GOOGLE_NEWS_REGION_CONFIG = {
   ba: { hl: "bs", gl: "BA", ceid: "BA:bs" },
   de: { hl: "de", gl: "DE", ceid: "DE:de" },
   fr: { hl: "fr", gl: "FR", ceid: "FR:fr" },
+  ca: { hl: "en-CA", gl: "CA", ceid: "CA:en" },
   jp: { hl: "ja", gl: "JP", ceid: "JP:ja" },
   au: { hl: "en-AU", gl: "AU", ceid: "AU:en" },
   br: { hl: "pt-BR", gl: "BR", ceid: "BR:pt-419" },
