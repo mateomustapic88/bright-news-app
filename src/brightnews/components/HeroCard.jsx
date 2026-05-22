@@ -17,6 +17,8 @@ const HeroCard = ({
   toggleSave,
   handleShareStory,
   handleReportStory,
+  handleReadSource,
+  sourceReadState,
   t,
   uiLanguage,
 }) => {
@@ -84,7 +86,13 @@ const HeroCard = ({
           <div className="bn-card-details">
             <p className="bn-card-summary">{story.summary}</p>
             <StoryImpact impact={story.impact} themeClass={themeClass} />
-            <StorySourceLink sourceUrl={story.sourceUrl} label={t("story.readSource")} />
+            <StorySourceLink
+              story={story}
+              sourceUrl={story.sourceUrl}
+              label={t("story.readSource")}
+              sourceReadState={sourceReadState}
+              onReadSource={handleReadSource}
+            />
           </div>
         )}
 

@@ -27,7 +27,8 @@
     "review:pending": "node --env-file=.env scripts/review-pending-with-openai.mjs",
     "publish:approved": "node --env-file=.env scripts/publish-approved-stories.mjs",
     "backfill:source-urls": "node --env-file=.env scripts/backfill-source-urls.mjs",
-    "refresh:news": "node --env-file=.env scripts/refresh-news.mjs"
+    "refresh:news": "node --env-file=.env scripts/refresh-news.mjs",
+    "post:x": "node --env-file=.env scripts/post-stories-to-x.mjs"
   },
   "dependencies": {
     "@capacitor-firebase/analytics": "^8.1.0",

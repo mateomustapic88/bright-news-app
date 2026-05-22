@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { getContinentIdForRegionCode, getRegionContinentGroups } from "../constants";
 import { formatUiDate, getRegionLabel } from "../i18n";
 import BrandMark from "./BrandMark";
 
@@ -17,6 +18,13 @@ const Header = ({
 }) => {
   const todayLabel = formatUiDate(new Date(), uiLanguage);
   const [isRegionPickerOpen, setIsRegionPickerOpen] = useState(false);
+  const [activeContinentId, setActiveContinentId] = useState(null);
+  const continentGroups = useMemo(() => getRegionContinentGroups(regions), [regions]);
+  const visibleContinentId = region === "world"
+    ? activeContinentId
+    : getContinentIdForRegionCode(region);
+  const activeContinent = continentGroups.find(item => item.id === visibleContinentId) || null;
+  const worldRegion = regions.find(item => item.code === "world");
   const currentRegion = regions.find(item => item.code === region) || regions[0];
   const currentRegionLabel = getRegionLabel(region, uiLanguage);
 
@@ -99,20 +107,57 @@ const Header = ({
 
             {isRegionPickerOpen ? (
               <div className="bn-globe-selector__panel" role="dialog" aria-label={t("header.edition")}>
-                {regions.map(item => (
-                  <button
-                    key={item.code}
-                    type="button"
-                    onClick={() => {
-                      setRegion(item.code);
-                      setIsRegionPickerOpen(false);
-                    }}
-                    className={`bn-globe-selector__option${region === item.code ? " is-active" : ""}`}
-                  >
-                    <span>{item.flag}</span>
-                    <span>{getRegionLabel(item.code, uiLanguage)}</span>
-                  </button>
-                ))}
+                <div className="bn-globe-selector__continents" role="tablist" aria-label="Continents">
+                  {worldRegion ? (
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={region === "world" && !activeContinent}
+                      onClick={() => {
+                        setRegion("world");
+                        setActiveContinentId(null);
+                        setIsRegionPickerOpen(false);
+                      }}
+                      className={`bn-globe-selector__continent${region === "world" && !activeContinent ? " is-active" : ""}`}
+                    >
+                      <span>{worldRegion.flag}</span>
+                      <span>{getRegionLabel("world", uiLanguage)}</span>
+                    </button>
+                  ) : null}
+
+                  {continentGroups.map(continent => (
+                    <button
+                      key={continent.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={activeContinent?.id === continent.id}
+                      onClick={() => setActiveContinentId(continent.id)}
+                      className={`bn-globe-selector__continent${activeContinent?.id === continent.id ? " is-active" : ""}`}
+                    >
+                      <span>{continent.emoji}</span>
+                      <span>{continent.label}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="bn-globe-selector__countries">
+                  {activeContinent ? activeContinent.regions.map(item => (
+                    <button
+                      key={item.code}
+                      type="button"
+                      onClick={() => {
+                        setRegion(item.code);
+                        setIsRegionPickerOpen(false);
+                      }}
+                      className={`bn-globe-selector__option${region === item.code ? " is-active" : ""}`}
+                    >
+                      <span>{item.flag}</span>
+                      <span>{getRegionLabel(item.code, uiLanguage)}</span>
+                    </button>
+                  )) : (
+                    <p className="bn-globe-selector__hint">Choose a continent to see countries.</p>
+                  )}
+                </div>
               </div>
             ) : null}
           </div>

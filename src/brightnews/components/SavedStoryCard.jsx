@@ -5,7 +5,16 @@ import StorySaveButton from "./StorySaveButton";
 import StoryShareButton from "./StoryShareButton";
 import StorySourceLink from "./StorySourceLink";
 
-const SavedStoryCard = ({ story, saved, toggleSave, handleShareStory, t, uiLanguage }) => {
+const SavedStoryCard = ({
+  story,
+  saved,
+  toggleSave,
+  handleShareStory,
+  handleReadSource,
+  sourceReadState,
+  t,
+  uiLanguage,
+}) => {
   const category = getCategoryMeta(story.category);
   const themeClass = getCategoryThemeClass(story.category);
   const publishedLabel = formatStoryPublishedAt(story.publishedAt, uiLanguage);
@@ -39,7 +48,14 @@ const SavedStoryCard = ({ story, saved, toggleSave, handleShareStory, t, uiLangu
           <span className="bn-card-location">📍 {story.location}</span>
           {publishedLabel ? <span className="bn-card-location">{publishedLabel}</span> : null}
         </div>
-        <StorySourceLink sourceUrl={story.sourceUrl} compact label={t("story.readSource")} />
+        <StorySourceLink
+          story={story}
+          sourceUrl={story.sourceUrl}
+          compact
+          label={t("story.readSource")}
+          sourceReadState={sourceReadState}
+          onReadSource={handleReadSource}
+        />
       </div>
     </article>
   );

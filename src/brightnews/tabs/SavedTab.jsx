@@ -10,6 +10,8 @@ const SavedTab = ({
   shareFeedback,
   toggleSave,
   handleShareStory,
+  handleReadSource,
+  sourceReadState,
   t,
   uiLanguage,
 }) => {
@@ -54,6 +56,8 @@ const SavedTab = ({
               saved={saved}
               toggleSave={toggleSave}
               handleShareStory={handleShareStory}
+              handleReadSource={handleReadSource}
+              sourceReadState={sourceReadState}
               t={t}
               uiLanguage={uiLanguage}
             />

@@ -17,6 +17,8 @@ const StoryCard = ({
   toggleSave,
   handleShareStory,
   handleReportStory,
+  handleReadSource,
+  sourceReadState,
   t,
   uiLanguage,
 }) => {
@@ -78,7 +80,14 @@ const StoryCard = ({
       {isExpanded && (
         <div className="bn-story-card__details">
           <StoryImpact impact={story.impact} compact themeClass={themeClass} />
-          <StorySourceLink sourceUrl={story.sourceUrl} compact label={t("story.readSource")} />
+          <StorySourceLink
+            story={story}
+            sourceUrl={story.sourceUrl}
+            compact
+            label={t("story.readSource")}
+            sourceReadState={sourceReadState}
+            onReadSource={handleReadSource}
+          />
         </div>
       )}
     </article>

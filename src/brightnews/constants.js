@@ -15,6 +15,14 @@ export const REGIONS = [
   { code: "in", flag: "🇮🇳", label: "India" },
 ];
 
+export const REGION_CONTINENTS = [
+  { id: "north_america", label: "North America", emoji: "🌎", regionCodes: ["us", "ca"] },
+  { id: "europe", label: "Europe", emoji: "🌍", regionCodes: ["uk", "hr", "si", "rs", "ba", "de", "fr"] },
+  { id: "asia", label: "Asia", emoji: "🌏", regionCodes: ["jp", "in"] },
+  { id: "oceania", label: "Oceania", emoji: "🌊", regionCodes: ["au"] },
+  { id: "south_america", label: "South America", emoji: "🌎", regionCodes: ["br"] },
+];
+
 export const LANGUAGE_META = {
   all: { id: "all", label: "All languages", shortLabel: "All", emoji: "🌐" },
   en: { id: "en", label: "English", shortLabel: "English", emoji: "🇬🇧" },
@@ -76,8 +84,19 @@ export const PREFERRED_REGION_KEY = "brightnews.preferredRegion";
 export const APP_LANGUAGE_KEY = "brightnews.appLanguage";
 export const STORY_LANGUAGE_FILTER_KEY = "brightnews.storyLanguageFilter";
 export const THEME_PREFERENCE_KEY = "brightnews.themePreference";
+export const SOURCE_READS_KEY = "brightnews.sourceReads";
+export const PREMIUM_PREVIEW_KEY = "brightnews.premiumPreview";
+export const USER_PREFERENCES_KEY = "brightnews.userPreferences";
+
+export const FREE_SOURCE_READ_LIMIT = 5;
+export const PREMIUM_PRODUCT_ID = "brightnews_premium_monthly";
+export const PREMIUM_PRICE_LABEL = "€4.99/month";
 
 export const THEME_PREFERENCES = ["system", "light", "dark"];
+
+export const isPremiumProfile = profile =>
+  profile?.plan === "premium" ||
+  (profile?.premium_until && new Date(profile.premium_until).getTime() > Date.now());
 
 export const getCategoryMeta = id =>
   CATEGORIES.find(category => category.id === id) || CATEGORIES[1];
@@ -98,6 +117,23 @@ export const getRegionsForCodes = regionCodes => {
   const allowed = new Set(regionCodes);
   return REGIONS.filter(region => allowed.has(region.code));
 };
+
+export const getRegionContinentGroups = regions => {
+  const regionByCode = new Map(regions.map(region => [region.code, region]));
+
+  return REGION_CONTINENTS
+    .map(continent => ({
+      ...continent,
+      regions: continent.regionCodes
+        .map(code => regionByCode.get(code))
+        .filter(Boolean),
+    }))
+    .filter(continent => continent.regions.length > 0);
+};
+
+export const getContinentIdForRegionCode = regionCode =>
+  REGION_CONTINENTS.find(continent => continent.regionCodes.includes(regionCode))?.id ||
+  REGION_CONTINENTS[0]?.id;
 
 export const getLanguageForRegionCode = regionCode =>
   REGION_LANGUAGE_BY_CODE[regionCode] || "en";

@@ -42,6 +42,33 @@
   gap: 14px;
 }
 
+.bn-region-grid--world {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.bn-discover-continents {
+  display: grid;
+  gap: 18px;
+}
+
+.bn-discover-continent {
+  display: grid;
+  gap: 10px;
+}
+
+.bn-discover-continent__header {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--bn-text-strong);
+  font-size: 13px;
+  font-weight: 900;
+
+  span {
+    font-size: 18px;
+  }
+}
+
 .bn-discover-region {
   border: 1px solid var(--bn-divider);
   border-radius: var(--bn-radius-xl);
@@ -79,5 +106,9 @@
 @media (min-width: 769px) {
   .bn-region-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .bn-region-grid--world {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

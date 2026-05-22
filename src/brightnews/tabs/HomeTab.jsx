@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { CATEGORIES, getCategoryThemeClass } from "../constants";
+import {
+  CATEGORIES,
+  getContinentIdForRegionCode,
+  getRegionContinentGroups,
+  getCategoryThemeClass,
+} from "../constants";
 import { getCategoryLabel, getRegionLabel } from "../i18n";
 import Chip from "../components/Chip";
 import EmptyState from "../components/EmptyState";
@@ -77,13 +82,23 @@ const HomeTab = ({
   toggleSave,
   handleShareStory,
   handleReportStory,
+  handleReadSource,
+  sourceReadState,
   t,
   uiLanguage,
 }) => {
   const loadMoreRef = useRef(null);
   const [desktopFeedEnabled, setDesktopFeedEnabled] = useState(() => (
-    typeof window !== "undefined" ? window.matchMedia("(min-width: 769px)").matches : false
+    typeof window !== "undefined" ? window.matchMedia("(min-width: 1025px)").matches : false
   ));
+  const [mobileFilterPanel, setMobileFilterPanel] = useState(null);
+  const [activeMobileContinentId, setActiveMobileContinentId] = useState(null);
+  const continentGroups = getRegionContinentGroups(regions);
+  const selectedRegionContinentId = region === "world" ? null : getContinentIdForRegionCode(region);
+  const visibleMobileContinentId = activeMobileContinentId || selectedRegionContinentId;
+  const worldRegion = regions.find(item => item.code === "world");
+  const selectedRegion = regions.find(item => item.code === region) || worldRegion || regions[0];
+  const selectedCategory = CATEGORIES.find(item => item.id === category) || CATEGORIES[0];
   const featuredStory = getFeaturedStory(stories, category);
 
   const remainingStories = stories.filter(story => story.id !== featuredStory?.id);
@@ -91,7 +106,7 @@ const HomeTab = ({
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
 
-    const mediaQuery = window.matchMedia("(min-width: 769px)");
+    const mediaQuery = window.matchMedia("(min-width: 1025px)");
     const syncDesktopMode = event => {
       setDesktopFeedEnabled(event.matches);
     };
@@ -151,33 +166,111 @@ const HomeTab = ({
       </div>
 
       <div className="bn-home-tab__filters-mobile">
-        <div className="bn-home-tab__mobile-row" aria-label={t("header.edition")}>
-          {regions.map(item => (
-            <button
-              key={item.code}
-              type="button"
-              onClick={() => setRegion(item.code)}
-              className={`bn-region-button${region === item.code ? " is-active" : ""}`}
-            >
-              <span className="bn-region-button__flag">{item.flag}</span>
-              <span>{getRegionLabel(item.code, uiLanguage)}</span>
-            </button>
-          ))}
+        <div className="bn-home-tab__mobile-filter-bar">
+          <button
+            type="button"
+            className={`bn-mobile-filter-button${mobileFilterPanel === "region" ? " is-open" : ""}`}
+            onClick={() => setMobileFilterPanel(current => (current === "region" ? null : "region"))}
+            aria-expanded={mobileFilterPanel === "region"}
+          >
+            <span className="bn-mobile-filter-button__icon">{selectedRegion?.flag || "🌍"}</span>
+            <span className="bn-mobile-filter-button__copy">
+              <small>{t("header.edition")}</small>
+              <strong>{selectedRegion ? getRegionLabel(selectedRegion.code, uiLanguage) : getRegionLabel("world", uiLanguage)}</strong>
+            </span>
+            <span className="bn-mobile-filter-button__chevron" aria-hidden="true">⌄</span>
+          </button>
+
+          <button
+            type="button"
+            className={`bn-mobile-filter-button bn-mobile-filter-button--category ${getCategoryThemeClass(selectedCategory.id)}${mobileFilterPanel === "category" ? " is-open" : ""}`}
+            onClick={() => setMobileFilterPanel(current => (current === "category" ? null : "category"))}
+            aria-expanded={mobileFilterPanel === "category"}
+          >
+            <span className="bn-mobile-filter-button__copy">
+              <small>{t("home.category")}</small>
+              <strong>{getCategoryLabel(selectedCategory.id, uiLanguage)}</strong>
+            </span>
+            <span className="bn-mobile-filter-button__chevron" aria-hidden="true">⌄</span>
+          </button>
         </div>
 
-        <div className="bn-chip-row bn-chip-row--mobile-filters" aria-label={t("home.exploreFeed")}>
-          {CATEGORIES.map(item => (
-            <Chip
-              key={item.id}
-              active={category === item.id}
-              onClick={() => setCategory(item.id)}
-              className={`bn-chip--category ${getCategoryThemeClass(item.id)}`}
-            >
-              <span>{item.emoji}</span>
-              <span>{getCategoryLabel(item.id, uiLanguage)}</span>
-            </Chip>
-          ))}
-        </div>
+        {mobileFilterPanel === "region" ? (
+          <div className="bn-mobile-filter-panel" aria-label={t("header.edition")}>
+            <div className="bn-mobile-filter-panel__options">
+              {worldRegion ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRegion("world");
+                    setActiveMobileContinentId(null);
+                    setMobileFilterPanel(null);
+                  }}
+                  className={`bn-region-button${region === "world" ? " is-active" : ""}`}
+                >
+                  <span className="bn-region-button__flag">{worldRegion.flag}</span>
+                  <span>{getRegionLabel("world", uiLanguage)}</span>
+                </button>
+              ) : null}
+
+              {continentGroups.map(item => (
+                <div key={item.id} className="bn-mobile-filter-panel__continent-group">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveMobileContinentId(current => (current === item.id ? null : item.id));
+                    }}
+                    className={`bn-region-button bn-region-button--continent${visibleMobileContinentId === item.id ? " is-active" : ""}`}
+                    aria-expanded={visibleMobileContinentId === item.id}
+                  >
+                    <span className="bn-region-button__flag">{item.emoji}</span>
+                    <span>{item.label}</span>
+                    <span className="bn-region-button__chevron" aria-hidden="true">⌄</span>
+                  </button>
+
+                  {visibleMobileContinentId === item.id ? (
+                    <div className="bn-mobile-filter-panel__countries">
+                      {item.regions.map(regionItem => (
+                        <button
+                          key={regionItem.code}
+                          type="button"
+                          onClick={() => {
+                            setRegion(regionItem.code);
+                            setActiveMobileContinentId(item.id);
+                            setMobileFilterPanel(null);
+                          }}
+                          className={`bn-region-button bn-region-button--country${region === regionItem.code ? " is-active" : ""}`}
+                        >
+                          <span className="bn-region-button__flag">{regionItem.flag}</span>
+                          <span>{getRegionLabel(regionItem.code, uiLanguage)}</span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {mobileFilterPanel === "category" ? (
+          <div className="bn-mobile-filter-panel bn-mobile-filter-panel--categories" aria-label={t("home.category")}>
+            {CATEGORIES.map(item => (
+              <Chip
+                key={item.id}
+                active={category === item.id}
+                onClick={() => {
+                  setCategory(item.id);
+                  setMobileFilterPanel(null);
+                }}
+                className={`bn-chip--category ${getCategoryThemeClass(item.id)}`}
+              >
+                <span>{item.emoji}</span>
+                <span>{getCategoryLabel(item.id, uiLanguage)}</span>
+              </Chip>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       {loading && firstLoad && (
@@ -218,6 +311,8 @@ const HomeTab = ({
                 toggleSave={toggleSave}
                 handleShareStory={handleShareStory}
                 handleReportStory={handleReportStory}
+                handleReadSource={handleReadSource}
+                sourceReadState={sourceReadState}
                 t={t}
                 uiLanguage={uiLanguage}
               />
@@ -237,6 +332,8 @@ const HomeTab = ({
                   toggleSave={toggleSave}
                   handleShareStory={handleShareStory}
                   handleReportStory={handleReportStory}
+                  handleReadSource={handleReadSource}
+                  sourceReadState={sourceReadState}
                   t={t}
                   uiLanguage={uiLanguage}
                 />
@@ -258,6 +355,8 @@ const HomeTab = ({
                 toggleSave={toggleSave}
                 handleShareStory={handleShareStory}
                 handleReportStory={handleReportStory}
+                handleReadSource={handleReadSource}
+                sourceReadState={sourceReadState}
                 t={t}
                 uiLanguage={uiLanguage}
               />
@@ -276,6 +375,8 @@ const HomeTab = ({
                   toggleSave={toggleSave}
                   handleShareStory={handleShareStory}
                   handleReportStory={handleReportStory}
+                  handleReadSource={handleReadSource}
+                  sourceReadState={sourceReadState}
                   t={t}
                   uiLanguage={uiLanguage}
                 />

@@ -298,6 +298,7 @@
 .bn-source-link {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 6px;
   margin-top: 14px;
   color: var(--bn-link);
@@ -315,6 +316,16 @@
   &.is-compact {
     margin-top: 10px;
   }
+}
+
+.bn-source-link__helper {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--bn-accent-bg);
+  color: var(--bn-accent-strong);
+  font-size: 10px;
+  font-weight: 850;
+  line-height: 1.3;
 }
 
 .bn-story-impact {

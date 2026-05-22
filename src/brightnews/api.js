@@ -148,6 +148,33 @@ export const loadProfile = async userId => {
   return data;
 };
 
+export const loadSourceReadCountToday = async userId => {
+  if (!supabase || !userId) return 0;
+
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const { count, error } = await supabase
+    .from("source_link_reads")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("opened_at", startOfDay.toISOString());
+
+  if (error) throw new Error(error.message);
+
+  return Number(count || 0);
+};
+
+export const createSourceRead = async (userId, storyId) => {
+  if (!supabase || !userId || !storyId) return;
+
+  const { error } = await supabase
+    .from("source_link_reads")
+    .insert({ user_id: userId, story_id: storyId });
+
+  if (error) throw new Error(error.message);
+};
+
 export const loadRawArticles = async reviewStatus => {
   if (!supabase) return [];
 
@@ -206,7 +233,6 @@ export const upsertProfile = async user => {
     id: user.id,
     email: user.email || "",
     display_name: displayName,
-    plan: "free",
     onboarding_completed: false,
   };
 

@@ -1,12 +1,17 @@
 import {
   APP_LANGUAGE_KEY,
+  SOURCE_READS_KEY,
   ONBOARDING_DISMISSED_KEY,
+  PREMIUM_PREVIEW_KEY,
   PREFERRED_REGION_KEY,
   SAVED_STORIES_KEY,
   STORY_LANGUAGE_FILTER_KEY,
   THEME_PREFERENCE_KEY,
   THEME_PREFERENCES,
+  USER_PREFERENCES_KEY,
 } from "./constants";
+
+const getTodayKey = () => new Date().toISOString().slice(0, 10);
 
 export const readSavedStories = () => {
   if (typeof window === "undefined") return [];
@@ -138,5 +143,84 @@ export const writeThemePreference = value => {
     window.localStorage.setItem(THEME_PREFERENCE_KEY, value);
   } catch {
     // Keep theme preference non-blocking if storage is unavailable.
+  }
+};
+
+export const readLocalSourceReadCount = () => {
+  if (typeof window === "undefined") return 0;
+
+  try {
+    const stored = window.localStorage.getItem(SOURCE_READS_KEY);
+    const parsed = stored ? JSON.parse(stored) : {};
+    const today = getTodayKey();
+    return Number(parsed?.[today] || 0);
+  } catch {
+    return 0;
+  }
+};
+
+export const incrementLocalSourceReadCount = () => {
+  if (typeof window === "undefined") return 0;
+
+  try {
+    const stored = window.localStorage.getItem(SOURCE_READS_KEY);
+    const parsed = stored ? JSON.parse(stored) : {};
+    const today = getTodayKey();
+    const nextCount = Number(parsed?.[today] || 0) + 1;
+    window.localStorage.setItem(SOURCE_READS_KEY, JSON.stringify({ [today]: nextCount }));
+    return nextCount;
+  } catch {
+    return 0;
+  }
+};
+
+export const readPremiumPreview = () => {
+  if (typeof window === "undefined") return false;
+
+  try {
+    return window.localStorage.getItem(PREMIUM_PREVIEW_KEY) === "true";
+  } catch {
+    return false;
+  }
+};
+
+export const writePremiumPreview = value => {
+  if (typeof window === "undefined") return;
+
+  try {
+    if (!value) {
+      window.localStorage.removeItem(PREMIUM_PREVIEW_KEY);
+      return;
+    }
+
+    window.localStorage.setItem(PREMIUM_PREVIEW_KEY, "true");
+  } catch {
+    // Keep premium preview non-blocking if storage is unavailable.
+  }
+};
+
+export const readUserPreferences = () => {
+  if (typeof window === "undefined") return { preferredRegions: [], preferredCategories: [], strictPositiveFilter: false };
+
+  try {
+    const stored = window.localStorage.getItem(USER_PREFERENCES_KEY);
+    const parsed = stored ? JSON.parse(stored) : {};
+    return {
+      preferredRegions: Array.isArray(parsed.preferredRegions) ? parsed.preferredRegions : [],
+      preferredCategories: Array.isArray(parsed.preferredCategories) ? parsed.preferredCategories : [],
+      strictPositiveFilter: Boolean(parsed.strictPositiveFilter),
+    };
+  } catch {
+    return { preferredRegions: [], preferredCategories: [], strictPositiveFilter: false };
+  }
+};
+
+export const writeUserPreferences = preferences => {
+  if (typeof window === "undefined") return;
+
+  try {
+    window.localStorage.setItem(USER_PREFERENCES_KEY, JSON.stringify(preferences));
+  } catch {
+    // Keep preference preview non-blocking if storage is unavailable.
   }
 };

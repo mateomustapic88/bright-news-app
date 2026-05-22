@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "769326710543",
+    "project_id": "bright-news-cefe0",
+    "storage_bucket": "bright-news-cefe0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:769326710543:android:f460cf01cf88c6c470087a",
+        "android_client_info": {
+          "package_name": "com.mateomustapic.brightnews"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdT7Cqy4Jmr2ZPB31HhKCqn5WLI84IlGM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

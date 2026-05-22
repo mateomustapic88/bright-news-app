@@ -19,11 +19,13 @@ import {
 } from "./lib/mobileAuth";
 import {
   createSavedStory,
+  createSourceRead,
   createStoryReport,
   deleteSavedStory,
   loadAvailableRegionCodes,
   loadProfile,
   loadRawArticles,
+  loadSourceReadCountToday,
   loadSavedStoryIds,
   loadStories,
   loadStoriesPage,
@@ -33,11 +35,13 @@ import {
 } from "./brightnews/api";
 import {
   getAvailableAppLanguages,
+  FREE_SOURCE_READ_LIMIT,
   inferPreferredRegionCode,
   inferPreferredAppLanguage,
   getLanguageFiltersForStories,
   getRegionsForCodes,
   getVisibleTabs,
+  isPremiumProfile,
   SAVED_STORIES_KEY,
 } from "./brightnews/constants";
 import {
@@ -47,20 +51,27 @@ import {
 } from "./brightnews/i18n";
 import {
   readAppLanguage,
+  incrementLocalSourceReadCount,
+  readLocalSourceReadCount,
   readOnboardingDismissed,
+  readPremiumPreview,
   readPreferredRegion,
   readSavedStories,
   readThemePreference,
+  readUserPreferences,
   writeAppLanguage,
   writeOnboardingDismissed,
+  writePremiumPreview,
   writePreferredRegion,
   writeStoryLanguageFilter,
   writeThemePreference,
+  writeUserPreferences,
 } from "./brightnews/storage";
 import BottomNav from "./brightnews/components/BottomNav";
 import Header from "./brightnews/components/Header";
 import LoadingBar from "./brightnews/components/LoadingBar";
 import OnboardingModal from "./brightnews/components/OnboardingModal";
+import PremiumUpgradeDialog from "./brightnews/components/PremiumUpgradeDialog";
 import StatusDialog from "./brightnews/components/StatusDialog";
 import StoryReportDialog from "./brightnews/components/StoryReportDialog";
 import TopBar from "./brightnews/components/TopBar";
@@ -73,6 +84,13 @@ import "./brightnews/styles/BrightNews.scss";
 
 const WEB_INITIAL_STORY_LIMIT = 50;
 const WEB_INCREMENTAL_STORY_LIMIT = 10;
+
+const getReadLimitMessage = (used, limit, t) => {
+  const remaining = Math.max(0, limit - used);
+  return remaining === 1
+    ? t("premium.oneReadLeft")
+    : t("premium.readsLeft", { count: remaining });
+};
 
 const getAuthProvider = session => (
   session?.user?.app_metadata?.provider ||
@@ -144,6 +162,10 @@ const BrightNews = () => {
   const [session, setSession]     = useState(null);
   const [profile, setProfile]     = useState(null);
   const [profileLoading, setProfileLoading] = useState(false);
+  const [premiumPreview, setPremiumPreview] = useState(readPremiumPreview);
+  const [sourceReadsUsed, setSourceReadsUsed] = useState(readLocalSourceReadCount);
+  const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
+  const [userPreferences, setUserPreferences] = useState(readUserPreferences);
   const [rawArticles, setRawArticles] = useState([]);
   const [rawLoading, setRawLoading] = useState(false);
   const [rawError, setRawError] = useState("");
@@ -171,6 +193,18 @@ const BrightNews = () => {
   const storyLanguageInitializedRef = useRef(false);
   const uiLanguage = getUiLanguage(appLanguage);
   const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const effectiveProfile = useMemo(() => (
+    premiumPreview ? { ...(profile || {}), plan: "premium" } : profile
+  ), [premiumPreview, profile]);
+  const isPremium = isPremiumProfile(effectiveProfile);
+  const sourceReadState = useMemo(() => ({
+    isPremium,
+    used: sourceReadsUsed,
+    limit: FREE_SOURCE_READ_LIMIT,
+    remaining: Math.max(0, FREE_SOURCE_READ_LIMIT - sourceReadsUsed),
+    remainingLabel: getReadLimitMessage(sourceReadsUsed, FREE_SOURCE_READ_LIMIT, t),
+    premiumLabel: t("premium.unlimitedSources"),
+  }), [isPremium, sourceReadsUsed, t]);
 
   const adjustSavedCount = useCallback((items, storyId, delta) => (
     items.map(story => (
@@ -183,6 +217,14 @@ const BrightNews = () => {
   useEffect(() => {
     window.localStorage.setItem(SAVED_STORIES_KEY, JSON.stringify(saved));
   }, [saved]);
+
+  useEffect(() => {
+    writePremiumPreview(premiumPreview);
+  }, [premiumPreview]);
+
+  useEffect(() => {
+    writeUserPreferences(userPreferences);
+  }, [userPreferences]);
 
   useEffect(() => {
     savedRef.current = saved;
@@ -521,12 +563,41 @@ const BrightNews = () => {
   }, [session?.user, t]);
 
   useEffect(() => {
+    let active = true;
+
+    const loadSourceReads = async () => {
+      if (isPremium) {
+        setSourceReadsUsed(0);
+        return;
+      }
+
+      if (!session?.user) {
+        setSourceReadsUsed(readLocalSourceReadCount());
+        return;
+      }
+
+      try {
+        const count = await loadSourceReadCountToday(session.user.id);
+        if (active) setSourceReadsUsed(count);
+      } catch {
+        if (active) setSourceReadsUsed(readLocalSourceReadCount());
+      }
+    };
+
+    loadSourceReads();
+
+    return () => {
+      active = false;
+    };
+  }, [isPremium, session?.user]);
+
+  useEffect(() => {
     if (!session?.user) return;
 
     setAnalyticsUserProperty("signed_in", "true");
-    setAnalyticsUserProperty("plan", profile?.plan || "free");
-    setAnalyticsUserProperty("is_admin", profile?.is_admin ? "true" : "false");
-  }, [profile?.is_admin, profile?.plan, session?.user]);
+    setAnalyticsUserProperty("plan", isPremium ? "premium" : "free");
+    setAnalyticsUserProperty("is_admin", effectiveProfile?.is_admin ? "true" : "false");
+  }, [effectiveProfile?.is_admin, isPremium, session?.user]);
 
   const handleDismissOnboarding = () => {
     writeOnboardingDismissed(true);
@@ -990,6 +1061,100 @@ const BrightNews = () => {
     }
   };
 
+  const handlePreviewPremium = () => {
+    setPremiumPreview(true);
+    setUpgradeDialogOpen(false);
+    setShareFeedback({
+      variant: "accent",
+      message: t("premium.previewEnabled"),
+    });
+    trackEvent("premium_preview_enabled", {
+      signed_in: Boolean(session?.user),
+    });
+  };
+
+  const handleDisablePremiumPreview = () => {
+    setPremiumPreview(false);
+    setShareFeedback({
+      variant: "info",
+      message: t("premium.previewDisabled"),
+    });
+    trackEvent("premium_preview_disabled", {
+      signed_in: Boolean(session?.user),
+    });
+  };
+
+  const handlePreferenceChange = updates => {
+    setUserPreferences(current => ({
+      ...current,
+      ...updates,
+    }));
+    trackEvent("premium_preferences_change", {
+      signed_in: Boolean(session?.user),
+      is_premium: isPremium,
+    });
+  };
+
+  const openSourceUrl = async normalizedUrl => {
+    if (isNativeApp()) {
+      await Browser.open({
+        url: normalizedUrl,
+        presentationStyle: "popover",
+      });
+      return;
+    }
+
+    window.open(normalizedUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const handleReadSource = async (story, normalizedUrl, event) => {
+    event?.stopPropagation();
+
+    if (!normalizedUrl || !story) return;
+
+    if (!isPremium && sourceReadsUsed >= FREE_SOURCE_READ_LIMIT) {
+      setUpgradeDialogOpen(true);
+      trackEvent("source_read_limit_reached", {
+        category: story.category,
+        region: story.regionCode,
+        language: story.languageCode,
+        signed_in: Boolean(session?.user),
+      });
+      return;
+    }
+
+    try {
+      await openSourceUrl(normalizedUrl);
+
+      if (!isPremium) {
+        if (session?.user) {
+          try {
+            await createSourceRead(session.user.id, story.id);
+            const count = await loadSourceReadCountToday(session.user.id);
+            setSourceReadsUsed(count);
+          } catch {
+            setSourceReadsUsed(incrementLocalSourceReadCount());
+          }
+        } else {
+          setSourceReadsUsed(incrementLocalSourceReadCount());
+        }
+      }
+
+      trackEvent("story_read_source", {
+        category: story.category,
+        region: story.regionCode,
+        language: story.languageCode,
+        is_premium: isPremium,
+        signed_in: Boolean(session?.user),
+      });
+    } catch {
+      setShareFeedback({
+        variant: "error",
+        message: t("feedback.sourceOpenError"),
+      });
+    }
+  };
+
   const handleReportStory = (story, event) => {
     event?.stopPropagation();
     setReportStory(story);
@@ -1146,6 +1311,14 @@ const BrightNews = () => {
         />
       ) : null}
 
+      <PremiumUpgradeDialog
+        open={upgradeDialogOpen}
+        onClose={() => setUpgradeDialogOpen(false)}
+        onPreviewPremium={handlePreviewPremium}
+        readLimit={FREE_SOURCE_READ_LIMIT}
+        t={t}
+      />
+
       <div
         ref={screenRef}
         className={`bn-screen${hideFeedChrome && tab === "home" ? " is-feed-chrome-hidden" : ""}`}
@@ -1171,6 +1344,8 @@ const BrightNews = () => {
             toggleSave={toggleSave}
             handleShareStory={handleShareStory}
             handleReportStory={handleReportStory}
+            handleReadSource={handleReadSource}
+            sourceReadState={sourceReadState}
             t={t}
             uiLanguage={uiLanguage}
           />
@@ -1196,6 +1371,8 @@ const BrightNews = () => {
             shareFeedback={shareFeedback}
             toggleSave={toggleSave}
             handleShareStory={handleShareStory}
+            handleReadSource={handleReadSource}
+            sourceReadState={sourceReadState}
             t={t}
             uiLanguage={uiLanguage}
           />
@@ -1204,17 +1381,24 @@ const BrightNews = () => {
         {tab === "account" && (
           <AccountTab
             session={session}
-            profile={profile}
+            profile={effectiveProfile}
             profileLoading={profileLoading}
             authLoading={authLoading}
             authMessage={authMessage}
             authError={authError}
             syncingSaved={syncingSaved}
+            sourceReadState={sourceReadState}
+            regions={availableRegions}
+            userPreferences={userPreferences}
+            handlePreferenceChange={handlePreferenceChange}
+            handlePreviewPremium={handlePreviewPremium}
+            handleDisablePremiumPreview={handleDisablePremiumPreview}
             handleSignOut={handleSignOut}
             handleGoogleSignIn={handleGoogleSignIn}
             handleEmailAuth={handleEmailAuth}
             handleFeedbackClick={handleFeedbackClick}
             t={t}
+            uiLanguage={uiLanguage}
           />
         )}
 

@@ -1,4 +1,6 @@
 import AuthPanel from "../components/AuthPanel";
+import { CATEGORIES, FREE_SOURCE_READ_LIMIT, PREMIUM_PRICE_LABEL, isPremiumProfile } from "../constants";
+import { getCategoryLabel, getRegionLabel } from "../i18n";
 import {
   buildFeedbackMailto,
   LEGAL_LINKS,
@@ -22,11 +24,18 @@ const AccountTab = ({
   authMessage,
   authError,
   syncingSaved,
+  sourceReadState,
+  regions,
+  userPreferences,
+  handlePreferenceChange,
+  handlePreviewPremium,
+  handleDisablePremiumPreview,
   handleGoogleSignIn,
   handleEmailAuth,
   handleSignOut,
   handleFeedbackClick,
   t,
+  uiLanguage,
 }) => {
   const feedbackMailto = buildFeedbackMailto();
   const displayName =
@@ -37,7 +46,18 @@ const AccountTab = ({
     t("auth.defaultReader");
   const accountEmail = session?.user?.email || "";
   const avatarUrl = session?.user?.user_metadata?.avatar_url || "";
-  const planLabel = (profile?.plan || "free").toUpperCase();
+  const isPremium = isPremiumProfile(profile);
+  const planLabel = isPremium ? t("premium.planPremium") : t("premium.planFree");
+  const preferredRegions = userPreferences?.preferredRegions || [];
+  const preferredCategories = userPreferences?.preferredCategories || [];
+  const strictPositiveFilter = Boolean(userPreferences?.strictPositiveFilter);
+  const togglePreference = (field, value) => {
+    const current = field === "preferredRegions" ? preferredRegions : preferredCategories;
+    const next = current.includes(value)
+      ? current.filter(item => item !== value)
+      : [...current, value];
+    handlePreferenceChange({ [field]: next });
+  };
 
   return (
     <section className="bn-tab bn-account-tab">
@@ -82,6 +102,117 @@ const AccountTab = ({
       {syncingSaved && <p className="bn-feedback bn-feedback--accent">{t("auth.syncingSaved")}</p>}
       {authMessage && <p className="bn-feedback bn-feedback--info">{authMessage}</p>}
       {authError && <p className="bn-feedback bn-feedback--error">{authError}</p>}
+
+      <section className={`bn-account-card bn-premium-card${isPremium ? " is-premium" : ""}`}>
+        <div className="bn-premium-card__header">
+          <div>
+            <p className="bn-premium-card__eyebrow">{t("premium.eyebrow")}</p>
+            <h2>{isPremium ? t("premium.accountTitlePremium") : t("premium.accountTitleFree")}</h2>
+          </div>
+          <span className="bn-premium-card__price">{PREMIUM_PRICE_LABEL}</span>
+        </div>
+
+        <p className="bn-premium-card__description">
+          {isPremium
+            ? t("premium.accountDescriptionPremium")
+            : t("premium.accountDescriptionFree", { limit: FREE_SOURCE_READ_LIMIT })}
+        </p>
+
+        <div className="bn-premium-card__meter">
+          <div>
+            <span>{t("premium.sourceReadsToday")}</span>
+            <strong>
+              {isPremium
+                ? t("premium.unlimited")
+                : `${sourceReadState?.remaining ?? FREE_SOURCE_READ_LIMIT}/${FREE_SOURCE_READ_LIMIT}`}
+            </strong>
+          </div>
+          {!isPremium ? (
+            <div className="bn-premium-card__meter-track" aria-hidden="true">
+              <span
+                style={{
+                  width: `${Math.min(100, ((sourceReadState?.used || 0) / FREE_SOURCE_READ_LIMIT) * 100)}%`,
+                }}
+              />
+            </div>
+          ) : null}
+        </div>
+
+        <div className="bn-premium-card__features">
+          <span>✓ {t("premium.benefitUnlimitedSources")}</span>
+          <span>✓ {t("premium.benefitPersonalization")}</span>
+          <span>✓ {t("premium.benefitStrictFilter")}</span>
+        </div>
+
+        {isPremium ? (
+          <button type="button" className="bn-button bn-button--secondary" onClick={handleDisablePremiumPreview}>
+            {t("premium.disablePreview")}
+          </button>
+        ) : (
+          <button type="button" className="bn-button bn-button--primary" onClick={handlePreviewPremium}>
+            {t("premium.previewButton")}
+          </button>
+        )}
+      </section>
+
+      <section className={`bn-account-card bn-personalization-card${!isPremium ? " is-locked" : ""}`}>
+        <div className="bn-personalization-card__header">
+          <div>
+            <p className="bn-premium-card__eyebrow">{t("premium.personalizationEyebrow")}</p>
+            <h2>{t("premium.personalizationTitle")}</h2>
+          </div>
+          {!isPremium ? <span className="bn-personalization-card__lock">{t("premium.premiumOnly")}</span> : null}
+        </div>
+
+        <p className="bn-premium-card__description">{t("premium.personalizationDescription")}</p>
+
+        <div className="bn-personalization-card__group">
+          <span>{t("premium.preferredCountries")}</span>
+          <div className="bn-personalization-card__chips">
+            {regions.filter(item => item.code !== "world").map(item => (
+              <button
+                key={item.code}
+                type="button"
+                className={preferredRegions.includes(item.code) ? "is-active" : ""}
+                onClick={() => togglePreference("preferredRegions", item.code)}
+                disabled={!isPremium}
+              >
+                {item.flag} {getRegionLabel(item.code, uiLanguage)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="bn-personalization-card__group">
+          <span>{t("premium.preferredCategories")}</span>
+          <div className="bn-personalization-card__chips">
+            {CATEGORIES.filter(item => item.id !== "all").map(item => (
+              <button
+                key={item.id}
+                type="button"
+                className={preferredCategories.includes(item.id) ? "is-active" : ""}
+                onClick={() => togglePreference("preferredCategories", item.id)}
+                disabled={!isPremium}
+              >
+                {item.emoji} {getCategoryLabel(item.id, uiLanguage)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <label className="bn-personalization-card__toggle">
+          <input
+            type="checkbox"
+            checked={strictPositiveFilter}
+            onChange={event => handlePreferenceChange({ strictPositiveFilter: event.target.checked })}
+            disabled={!isPremium}
+          />
+          <span>
+            <strong>{t("premium.strictFilterTitle")}</strong>
+            <small>{t("premium.strictFilterDescription")}</small>
+          </span>
+        </label>
+      </section>
 
       <footer className="bn-account-footer">
         <div className="bn-account-footer__links">
