@@ -26,12 +26,14 @@ import {
   loadProfile,
   loadRawArticles,
   loadSourceReadCountToday,
+  loadUserPreferences,
   loadSavedStoryIds,
   loadStories,
   loadStoriesPage,
   loadStoriesByIds,
   updateRawArticleReviewStatus,
   upsertProfile,
+  upsertUserPreferences,
 } from "./brightnews/api";
 import {
   getAvailableAppLanguages,
@@ -54,14 +56,12 @@ import {
   incrementLocalSourceReadCount,
   readLocalSourceReadCount,
   readOnboardingDismissed,
-  readPremiumPreview,
   readPreferredRegion,
   readSavedStories,
   readThemePreference,
   readUserPreferences,
   writeAppLanguage,
   writeOnboardingDismissed,
-  writePremiumPreview,
   writePreferredRegion,
   writeStoryLanguageFilter,
   writeThemePreference,
@@ -98,6 +98,64 @@ const getAuthProvider = session => (
   session?.user?.identities?.[0]?.provider ||
   "unknown"
 );
+
+const hasPreferenceValues = preferences => (
+  (preferences?.preferredRegions || []).length > 0 ||
+  (preferences?.preferredCategories || []).length > 0 ||
+  Boolean(preferences?.strictPositiveFilter)
+);
+
+const strictPositiveBlocklist = [
+  "attack",
+  "crash",
+  "crisis",
+  "dead",
+  "death",
+  "dies",
+  "disaster",
+  "killed",
+  "murder",
+  "scandal",
+  "violence",
+  "war",
+];
+const strictPositivePattern = new RegExp(`\\b(${strictPositiveBlocklist.join("|")})\\b`, "i");
+
+const applyPremiumStoryPreferences = (items, {
+  isPremium,
+  preferences,
+  selectedRegion,
+  selectedCategory,
+}) => {
+  if (!isPremium) return items;
+
+  const preferredRegions = preferences?.preferredRegions || [];
+  const preferredCategories = preferences?.preferredCategories || [];
+  const strictPositiveFilter = Boolean(preferences?.strictPositiveFilter);
+
+  let nextItems = items;
+
+  if (selectedRegion === "world" && preferredRegions.length > 0) {
+    nextItems = nextItems.filter(story => preferredRegions.includes(story.regionCode));
+  }
+
+  if (selectedCategory === "all" && preferredCategories.length > 0) {
+    nextItems = nextItems.filter(story => preferredCategories.includes(story.category));
+  }
+
+  if (strictPositiveFilter) {
+    const strictItems = nextItems.filter(story => {
+      const text = `${story.headline || ""} ${story.summary || ""}`.toLowerCase();
+      return !strictPositivePattern.test(text);
+    });
+
+    if (strictItems.length > 0) {
+      nextItems = strictItems;
+    }
+  }
+
+  return nextItems.length > 0 ? nextItems : items;
+};
 
 const getReadableAuthError = error => {
   const message = String(error?.message || error?.msg || "");
@@ -162,7 +220,6 @@ const BrightNews = () => {
   const [session, setSession]     = useState(null);
   const [profile, setProfile]     = useState(null);
   const [profileLoading, setProfileLoading] = useState(false);
-  const [premiumPreview, setPremiumPreview] = useState(readPremiumPreview);
   const [sourceReadsUsed, setSourceReadsUsed] = useState(readLocalSourceReadCount);
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
   const [userPreferences, setUserPreferences] = useState(readUserPreferences);
@@ -193,9 +250,7 @@ const BrightNews = () => {
   const storyLanguageInitializedRef = useRef(false);
   const uiLanguage = getUiLanguage(appLanguage);
   const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
-  const effectiveProfile = useMemo(() => (
-    premiumPreview ? { ...(profile || {}), plan: "premium" } : profile
-  ), [premiumPreview, profile]);
+  const effectiveProfile = profile;
   const isPremium = isPremiumProfile(effectiveProfile);
   const sourceReadState = useMemo(() => ({
     isPremium,
@@ -217,10 +272,6 @@ const BrightNews = () => {
   useEffect(() => {
     window.localStorage.setItem(SAVED_STORIES_KEY, JSON.stringify(saved));
   }, [saved]);
-
-  useEffect(() => {
-    writePremiumPreview(premiumPreview);
-  }, [premiumPreview]);
 
   useEffect(() => {
     writeUserPreferences(userPreferences);
@@ -281,6 +332,11 @@ const BrightNews = () => {
 
   useEffect(() => {
     enableAnalytics();
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.removeItem("brightnews.premiumPreview");
   }, []);
 
   useEffect(() => {
@@ -356,6 +412,7 @@ const BrightNews = () => {
       setSession(nextSession);
       if (!nextSession?.user) {
         setProfile(null);
+        setUserPreferences(readUserPreferences());
       }
 
       if (event === "SIGNED_IN") {
@@ -621,9 +678,15 @@ const BrightNews = () => {
   }, [availableRegionCodes, region]);
 
   const languageFilters = getLanguageFiltersForStories(stories);
-  const visibleStories = stories.filter(story => (
+  const languageFilteredStories = stories.filter(story => (
     storyLanguageFilter === "all" || story.languageCode === storyLanguageFilter
   ));
+  const visibleStories = applyPremiumStoryPreferences(languageFilteredStories, {
+    isPremium,
+    preferences: userPreferences,
+    selectedRegion: region,
+    selectedCategory: category,
+  });
   const appLanguages = getAvailableAppLanguages();
 
   useEffect(() => {
@@ -699,6 +762,42 @@ const BrightNews = () => {
       active = false;
     };
   }, [session?.user, t]);
+
+  useEffect(() => {
+    if (!session?.user) {
+      setUserPreferences(readUserPreferences());
+      return undefined;
+    }
+
+    let active = true;
+
+    const syncPreferences = async () => {
+      const localPreferences = readUserPreferences();
+
+      try {
+        const remotePreferences = await loadUserPreferences(session.user.id);
+        const nextPreferences = remotePreferences || localPreferences;
+
+        if (active) {
+          setUserPreferences(nextPreferences);
+        }
+
+        if (!remotePreferences && isPremium && hasPreferenceValues(localPreferences)) {
+          await upsertUserPreferences(session.user.id, localPreferences);
+        }
+      } catch {
+        if (active) {
+          setUserPreferences(localPreferences);
+        }
+      }
+    };
+
+    syncPreferences();
+
+    return () => {
+      active = false;
+    };
+  }, [isPremium, session?.user]);
 
   useEffect(() => {
     let active = true;
@@ -1061,34 +1160,42 @@ const BrightNews = () => {
     }
   };
 
-  const handlePreviewPremium = () => {
-    setPremiumPreview(true);
+  const handleViewPlans = () => {
     setUpgradeDialogOpen(false);
-    setShareFeedback({
-      variant: "accent",
-      message: t("premium.previewEnabled"),
-    });
-    trackEvent("premium_preview_enabled", {
+    setTab("account");
+    trackEvent("premium_view_plans", {
       signed_in: Boolean(session?.user),
+      is_premium: isPremium,
     });
   };
 
-  const handleDisablePremiumPreview = () => {
-    setPremiumPreview(false);
-    setShareFeedback({
-      variant: "info",
-      message: t("premium.previewDisabled"),
-    });
-    trackEvent("premium_preview_disabled", {
-      signed_in: Boolean(session?.user),
-    });
-  };
+  const handlePreferenceChange = async updates => {
+    if (!isPremium) {
+      setUpgradeDialogOpen(true);
+      trackEvent("premium_locked_preference_click", {
+        signed_in: Boolean(session?.user),
+      });
+      return;
+    }
 
-  const handlePreferenceChange = updates => {
-    setUserPreferences(current => ({
-      ...current,
+    const nextPreferences = {
+      ...userPreferences,
       ...updates,
-    }));
+    };
+
+    setUserPreferences(nextPreferences);
+
+    if (session?.user) {
+      try {
+        await upsertUserPreferences(session.user.id, nextPreferences);
+      } catch {
+        setShareFeedback({
+          variant: "error",
+          message: t("feedback.preferencesSyncError"),
+        });
+      }
+    }
+
     trackEvent("premium_preferences_change", {
       signed_in: Boolean(session?.user),
       is_premium: isPremium,
@@ -1314,7 +1421,7 @@ const BrightNews = () => {
       <PremiumUpgradeDialog
         open={upgradeDialogOpen}
         onClose={() => setUpgradeDialogOpen(false)}
-        onPreviewPremium={handlePreviewPremium}
+        onViewPlans={handleViewPlans}
         readLimit={FREE_SOURCE_READ_LIMIT}
         t={t}
       />
@@ -1391,8 +1498,7 @@ const BrightNews = () => {
             regions={availableRegions}
             userPreferences={userPreferences}
             handlePreferenceChange={handlePreferenceChange}
-            handlePreviewPremium={handlePreviewPremium}
-            handleDisablePremiumPreview={handleDisablePremiumPreview}
+            handleViewPlans={handleViewPlans}
             handleSignOut={handleSignOut}
             handleGoogleSignIn={handleGoogleSignIn}
             handleEmailAuth={handleEmailAuth}

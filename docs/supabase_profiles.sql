@@ -7,7 +7,7 @@ create table if not exists public.profiles (
   onboarding_completed boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  constraint profiles_plan_check check (plan in ('free', 'pro'))
+  constraint profiles_plan_check check (plan in ('free', 'premium', 'pro'))
 );
 
 create or replace function public.set_profiles_updated_at()

@@ -225,6 +225,13 @@
   }
 }
 
+.bn-premium-card__status {
+  margin: 0;
+  color: var(--bn-success);
+  font-size: 12px;
+  font-weight: 900;
+}
+
 .bn-personalization-card {
   display: grid;
   gap: 16px;

@@ -85,7 +85,6 @@ export const APP_LANGUAGE_KEY = "brightnews.appLanguage";
 export const STORY_LANGUAGE_FILTER_KEY = "brightnews.storyLanguageFilter";
 export const THEME_PREFERENCE_KEY = "brightnews.themePreference";
 export const SOURCE_READS_KEY = "brightnews.sourceReads";
-export const PREMIUM_PREVIEW_KEY = "brightnews.premiumPreview";
 export const USER_PREFERENCES_KEY = "brightnews.userPreferences";
 
 export const FREE_SOURCE_READ_LIMIT = 5;
@@ -96,6 +95,7 @@ export const THEME_PREFERENCES = ["system", "light", "dark"];
 
 export const isPremiumProfile = profile =>
   profile?.plan === "premium" ||
+  profile?.plan === "pro" ||
   (profile?.premium_until && new Date(profile.premium_until).getTime() > Date.now());
 
 export const getCategoryMeta = id =>

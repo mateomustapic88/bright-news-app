@@ -4,6 +4,12 @@ add column if not exists premium_until timestamptz,
 add column if not exists google_play_purchase_token text,
 add column if not exists google_play_product_id text;
 
+alter table public.profiles
+drop constraint if exists profiles_plan_check;
+
+alter table public.profiles
+add constraint profiles_plan_check check (plan in ('free', 'premium', 'pro'));
+
 create table if not exists public.source_link_reads (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,

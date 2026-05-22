@@ -2,7 +2,6 @@ import {
   APP_LANGUAGE_KEY,
   SOURCE_READS_KEY,
   ONBOARDING_DISMISSED_KEY,
-  PREMIUM_PREVIEW_KEY,
   PREFERRED_REGION_KEY,
   SAVED_STORIES_KEY,
   STORY_LANGUAGE_FILTER_KEY,
@@ -171,31 +170,6 @@ export const incrementLocalSourceReadCount = () => {
     return nextCount;
   } catch {
     return 0;
-  }
-};
-
-export const readPremiumPreview = () => {
-  if (typeof window === "undefined") return false;
-
-  try {
-    return window.localStorage.getItem(PREMIUM_PREVIEW_KEY) === "true";
-  } catch {
-    return false;
-  }
-};
-
-export const writePremiumPreview = value => {
-  if (typeof window === "undefined") return;
-
-  try {
-    if (!value) {
-      window.localStorage.removeItem(PREMIUM_PREVIEW_KEY);
-      return;
-    }
-
-    window.localStorage.setItem(PREMIUM_PREVIEW_KEY, "true");
-  } catch {
-    // Keep premium preview non-blocking if storage is unavailable.
   }
 };
 

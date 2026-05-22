@@ -4,7 +4,7 @@ import DialogOverlay from "./DialogOverlay";
 const PremiumUpgradeDialog = ({
   open,
   onClose,
-  onPreviewPremium,
+  onViewPlans,
   readLimit,
   t,
 }) => {
@@ -53,14 +53,14 @@ const PremiumUpgradeDialog = ({
       </div>
 
       <div className="bn-premium-dialog__actions">
-        <button type="button" className="bn-button bn-button--primary" onClick={onPreviewPremium}>
-          {t("premium.previewButton")}
+        <button type="button" className="bn-button bn-button--primary" onClick={onViewPlans}>
+          {t("premium.viewPlans")}
         </button>
         <button type="button" className="bn-button bn-button--secondary" onClick={onClose}>
           {t("premium.notNow")}
         </button>
       </div>
-      <p className="bn-premium-dialog__note">{t("premium.previewNote")}</p>
+      <p className="bn-premium-dialog__note">{t("premium.billingNote")}</p>
     </DialogOverlay>
   );
 };

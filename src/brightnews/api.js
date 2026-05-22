@@ -175,6 +175,48 @@ export const createSourceRead = async (userId, storyId) => {
   if (error) throw new Error(error.message);
 };
 
+const mapUserPreferences = row => ({
+  preferredRegions: Array.isArray(row?.preferred_regions) ? row.preferred_regions : [],
+  preferredCategories: Array.isArray(row?.preferred_categories) ? row.preferred_categories : [],
+  strictPositiveFilter: Boolean(row?.strict_positive_filter),
+});
+
+export const loadUserPreferences = async userId => {
+  if (!supabase || !userId) return null;
+
+  const { data, error } = await supabase
+    .from("user_preferences")
+    .select("preferred_regions, preferred_categories, strict_positive_filter")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+
+  return data ? mapUserPreferences(data) : null;
+};
+
+export const upsertUserPreferences = async (userId, preferences) => {
+  if (!supabase || !userId) return null;
+
+  const payload = {
+    user_id: userId,
+    preferred_regions: Array.isArray(preferences?.preferredRegions) ? preferences.preferredRegions : [],
+    preferred_categories: Array.isArray(preferences?.preferredCategories) ? preferences.preferredCategories : [],
+    strict_positive_filter: Boolean(preferences?.strictPositiveFilter),
+    updated_at: new Date().toISOString(),
+  };
+
+  const { data, error } = await supabase
+    .from("user_preferences")
+    .upsert(payload, { onConflict: "user_id" })
+    .select("preferred_regions, preferred_categories, strict_positive_filter")
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  return mapUserPreferences(data);
+};
+
 export const loadRawArticles = async reviewStatus => {
   if (!supabase) return [];
 
