@@ -49,6 +49,19 @@
     color: var(--bn-text-strong);
   }
 
+  .bn-premium-dialog {
+    background:
+      radial-gradient(circle at top right, rgba(242, 189, 110, 0.18), transparent 32%),
+      radial-gradient(circle at bottom left, rgba(122, 184, 232, 0.14), transparent 34%),
+      #101b2d;
+    border-color: var(--bn-border-strong);
+    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.62);
+  }
+
+  .bn-premium-dialog__price {
+    background: #17243a;
+  }
+
   .bn-discover-region:not(.is-active) {
     background:
       linear-gradient(180deg, var(--bn-surface-raised), var(--bn-surface-tint)),
