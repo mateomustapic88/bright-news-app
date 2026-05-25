@@ -75,6 +75,7 @@ import Header from "./brightnews/components/Header";
 import LoadingBar from "./brightnews/components/LoadingBar";
 import OnboardingModal from "./brightnews/components/OnboardingModal";
 import PremiumUpgradeDialog from "./brightnews/components/PremiumUpgradeDialog";
+import SourceReadMeter from "./brightnews/components/SourceReadMeter";
 import StatusDialog from "./brightnews/components/StatusDialog";
 import StoryReportDialog from "./brightnews/components/StoryReportDialog";
 import TopBar from "./brightnews/components/TopBar";
@@ -1515,6 +1516,15 @@ const BrightNews = () => {
     });
   };
 
+  const handleSourceMeterClick = () => {
+    setUpgradeDialogOpen(true);
+    trackEvent("source_read_meter_click", {
+      signed_in: Boolean(session?.user),
+      used: sourceReadState.used,
+      limit: sourceReadState.limit,
+    });
+  };
+
   const tabs = getVisibleTabs(session, profile);
   const localizedTabs = tabs.map(item => ({
     ...item,
@@ -1716,6 +1726,12 @@ const BrightNews = () => {
           />
         )}
       </div>
+
+      <SourceReadMeter
+        sourceReadState={sourceReadState}
+        onUpgradeClick={handleSourceMeterClick}
+        t={t}
+      />
 
       <BottomNav tabs={localizedTabs} tab={tab} setTab={setTab} />
 
