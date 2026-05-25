@@ -6,6 +6,7 @@ const PremiumUpgradeDialog = ({
   onClose,
   onStartPremiumPurchase,
   purchaseLoading = false,
+  purchaseStatus = "",
   readLimit,
   t,
 }) => {
@@ -66,7 +67,9 @@ const PremiumUpgradeDialog = ({
           {t("premium.notNow")}
         </button>
       </div>
-      <p className="bn-premium-dialog__note">{t("premium.billingNote")}</p>
+      <p className="bn-premium-dialog__note">
+        {purchaseStatus || t("premium.billingNote")}
+      </p>
     </DialogOverlay>
   );
 };

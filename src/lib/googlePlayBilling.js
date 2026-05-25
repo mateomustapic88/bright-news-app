@@ -1,4 +1,4 @@
-import { registerPlugin } from "@capacitor/core";
+import { Capacitor, registerPlugin } from "@capacitor/core";
 import { supabase } from "./supabase";
 import { PREMIUM_PRODUCT_ID } from "../brightnews/constants";
 import { isNativeApp } from "./mobileAuth";
@@ -8,6 +8,10 @@ const GooglePlayBilling = registerPlugin("GooglePlayBilling");
 export const purchasePremiumSubscription = async () => {
   if (!isNativeApp()) {
     throw new Error("Premium purchases are available in the Android app.");
+  }
+
+  if (!Capacitor.isPluginAvailable("GooglePlayBilling")) {
+    throw new Error("Google Play Billing is not available in this app build. Update BrightNews from Google Play and try again.");
   }
 
   const purchase = await GooglePlayBilling.purchaseSubscription({

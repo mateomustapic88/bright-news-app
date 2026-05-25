@@ -1303,7 +1303,7 @@ const BrightNews = () => {
 
     setPremiumPurchaseLoading(true);
     setAuthError("");
-    setAuthMessage("");
+    setAuthMessage(t("premium.openingGooglePlay"));
     setShareFeedback(null);
     trackEvent("premium_purchase_start", {
       signed_in: true,
@@ -1335,6 +1335,9 @@ const BrightNews = () => {
         signed_in: true,
       });
     } catch (purchaseError) {
+      setUpgradeDialogOpen(false);
+      setTab("account");
+      setAuthMessage("");
       setAuthError(purchaseError?.message || t("premium.purchaseError"));
       setShareFeedback({
         variant: "error",
@@ -1627,6 +1630,7 @@ const BrightNews = () => {
         onClose={() => setUpgradeDialogOpen(false)}
         onStartPremiumPurchase={handleStartPremiumPurchase}
         purchaseLoading={premiumPurchaseLoading}
+        purchaseStatus={premiumPurchaseLoading ? t("premium.openingGooglePlay") : ""}
         readLimit={FREE_SOURCE_READ_LIMIT}
         t={t}
       />

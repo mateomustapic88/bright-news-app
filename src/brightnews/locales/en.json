@@ -254,6 +254,7 @@
     "active": "Premium is active",
     "signInToUpgrade": "Sign in first to upgrade to Premium.",
     "androidOnly": "Premium purchases are available in the Android app installed from Google Play.",
+    "openingGooglePlay": "Opening Google Play checkout...",
     "purchasePending": "Your Premium purchase is pending. It will activate after Google Play confirms payment.",
     "purchaseSuccess": "Premium is active.",
     "purchaseError": "Unable to complete Premium purchase right now.",
