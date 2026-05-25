@@ -198,6 +198,7 @@ const BrightNews = () => {
   const [region, setRegion]       = useState(() => readPreferredRegion() || inferPreferredRegionCode());
   const [availableRegionCodes, setAvailableRegionCodes] = useState(["world"]);
   const [category, setCategory]   = useState("all");
+  const [feedMode, setFeedMode] = useState("standard");
   const [appLanguage, setAppLanguage] = useState(() => readAppLanguage() || inferPreferredAppLanguage());
   const [storyLanguageFilter, setStoryLanguageFilter] = useState(() => readAppLanguage() || inferPreferredAppLanguage());
   const [themePreference, setThemePreference] = useState(readThemePreference);
@@ -260,6 +261,7 @@ const BrightNews = () => {
     remainingLabel: getReadLimitMessage(sourceReadsUsed, FREE_SOURCE_READ_LIMIT, t),
     premiumLabel: t("premium.unlimitedSources"),
   }), [isPremium, sourceReadsUsed, t]);
+  const personalizedFeedAvailable = isPremium && hasPreferenceValues(userPreferences);
 
   const adjustSavedCount = useCallback((items, storyId, delta) => (
     items.map(story => (
@@ -284,6 +286,11 @@ const BrightNews = () => {
   useEffect(() => {
     writePreferredRegion(region);
   }, [region]);
+
+  useEffect(() => {
+    if (personalizedFeedAvailable || feedMode !== "personalized") return;
+    setFeedMode("standard");
+  }, [feedMode, personalizedFeedAvailable]);
 
   useEffect(() => {
     writeAppLanguage(appLanguage);
@@ -682,10 +689,10 @@ const BrightNews = () => {
     storyLanguageFilter === "all" || story.languageCode === storyLanguageFilter
   ));
   const visibleStories = applyPremiumStoryPreferences(languageFilteredStories, {
-    isPremium,
+    isPremium: feedMode === "personalized" && personalizedFeedAvailable,
     preferences: userPreferences,
-    selectedRegion: region,
-    selectedCategory: category,
+    selectedRegion: "world",
+    selectedCategory: "all",
   });
   const appLanguages = getAvailableAppLanguages();
 
@@ -939,6 +946,28 @@ const BrightNews = () => {
   }, [category, desktopViewport, loading, loadingMore, region]);
 
   const availableRegions = getRegionsForCodes(availableRegionCodes);
+
+  const handleSetRegion = useCallback(nextRegion => {
+    setFeedMode("standard");
+    setRegion(nextRegion);
+  }, []);
+
+  const handleSetCategory = useCallback(nextCategory => {
+    setFeedMode("standard");
+    setCategory(nextCategory);
+  }, []);
+
+  const handleSelectPersonalizedFeed = useCallback(() => {
+    if (!personalizedFeedAvailable) return;
+    setFeedMode("personalized");
+    setRegion("world");
+    setCategory("all");
+    trackEvent("personalized_feed_select", {
+      preferred_regions: (userPreferences?.preferredRegions || []).length,
+      preferred_categories: (userPreferences?.preferredCategories || []).length,
+      strict_positive_filter: Boolean(userPreferences?.strictPositiveFilter),
+    });
+  }, [personalizedFeedAvailable, userPreferences]);
 
   useEffect(() => {
     const timer = setTimeout(() => fetchNews(region, category), 400);
@@ -1378,7 +1407,7 @@ const BrightNews = () => {
       <Header
         region={region}
         regions={availableRegions}
-        setRegion={setRegion}
+        setRegion={handleSetRegion}
         feedbackHref={feedbackHref}
         onFeedbackClick={handleFeedbackClick}
         showRegions={tab === "home" && desktopViewport}
@@ -1434,9 +1463,13 @@ const BrightNews = () => {
           <HomeTab
             region={region}
             regions={availableRegions}
-            setRegion={setRegion}
+            setRegion={handleSetRegion}
             category={category}
-            setCategory={setCategory}
+            setCategory={handleSetCategory}
+            feedMode={feedMode}
+            setFeedMode={setFeedMode}
+            personalizedFeedAvailable={personalizedFeedAvailable}
+            handleSelectPersonalizedFeed={handleSelectPersonalizedFeed}
             loading={loading}
             loadingMore={loadingMore}
             firstLoad={firstLoad}
@@ -1462,7 +1495,7 @@ const BrightNews = () => {
           <DiscoverTab
             region={region}
             regions={availableRegions}
-            setRegion={setRegion}
+            setRegion={handleSetRegion}
             setTab={setTab}
             t={t}
             uiLanguage={uiLanguage}

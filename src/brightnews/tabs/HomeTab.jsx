@@ -68,6 +68,9 @@ const HomeTab = ({
   setRegion,
   category,
   setCategory,
+  feedMode = "standard",
+  personalizedFeedAvailable = false,
+  handleSelectPersonalizedFeed,
   loading,
   loadingMore,
   firstLoad,
@@ -99,6 +102,9 @@ const HomeTab = ({
   const worldRegion = regions.find(item => item.code === "world");
   const selectedRegion = regions.find(item => item.code === region) || worldRegion || regions[0];
   const selectedCategory = CATEGORIES.find(item => item.id === category) || CATEGORIES[0];
+  const categoryButtonLabel = feedMode === "personalized"
+    ? t("home.personalizedFeed")
+    : getCategoryLabel(selectedCategory.id, uiLanguage);
   const featuredStory = getFeaturedStory(stories, category);
 
   const remainingStories = stories.filter(story => story.id !== featuredStory?.id);
@@ -150,6 +156,16 @@ const HomeTab = ({
 
         <div className="bn-home-tab__filters">
           <div className="bn-chip-row bn-chip-row--surface">
+            {personalizedFeedAvailable ? (
+              <Chip
+                active={feedMode === "personalized"}
+                onClick={handleSelectPersonalizedFeed}
+                className="bn-chip--category bn-chip--personalized bn-theme--all"
+              >
+                <span>✨</span>
+                <span>{t("home.personalizedFeed")}</span>
+              </Chip>
+            ) : null}
             {CATEGORIES.map(item => (
               <Chip
                 key={item.id}
@@ -189,7 +205,7 @@ const HomeTab = ({
           >
             <span className="bn-mobile-filter-button__copy">
               <small>{t("home.category")}</small>
-              <strong>{getCategoryLabel(selectedCategory.id, uiLanguage)}</strong>
+              <strong>{categoryButtonLabel}</strong>
             </span>
             <span className="bn-mobile-filter-button__chevron" aria-hidden="true">⌄</span>
           </button>
@@ -255,6 +271,19 @@ const HomeTab = ({
 
         {mobileFilterPanel === "category" ? (
           <div className="bn-mobile-filter-panel bn-mobile-filter-panel--categories" aria-label={t("home.category")}>
+            {personalizedFeedAvailable ? (
+              <Chip
+                active={feedMode === "personalized"}
+                onClick={() => {
+                  handleSelectPersonalizedFeed?.();
+                  setMobileFilterPanel(null);
+                }}
+                className="bn-chip--category bn-chip--personalized bn-theme--all"
+              >
+                <span>✨</span>
+                <span>{t("home.personalizedFeed")}</span>
+              </Chip>
+            ) : null}
             {CATEGORIES.map(item => (
               <Chip
                 key={item.id}

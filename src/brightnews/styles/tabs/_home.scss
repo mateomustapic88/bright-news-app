@@ -55,6 +55,12 @@
   margin-bottom: 0;
 }
 
+.bn-chip--personalized {
+  border-color: color-mix(in srgb, var(--bn-accent) 34%, var(--bn-divider));
+  background: color-mix(in srgb, var(--bn-accent-bg) 78%, var(--bn-surface-raised));
+  color: var(--bn-accent-strong);
+}
+
 .bn-home-tab__intro {
   display: block;
   margin-bottom: 20px;
