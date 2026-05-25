@@ -1287,9 +1287,14 @@ const BrightNews = () => {
     }
 
     if (!isNativeApp()) {
+      setUpgradeDialogOpen(false);
+      setTab("account");
       setShareFeedback({
         variant: "info",
         message: t("premium.androidOnly"),
+      });
+      trackEvent("premium_android_required", {
+        signed_in: true,
       });
       return;
     }
