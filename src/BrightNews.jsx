@@ -238,6 +238,7 @@ const BrightNews = () => {
   const [sourceReadsUsed, setSourceReadsUsed] = useState(readLocalSourceReadCount);
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
   const [premiumPurchaseLoading, setPremiumPurchaseLoading] = useState(false);
+  const [personalizationSaving, setPersonalizationSaving] = useState(false);
   const [userPreferences, setUserPreferences] = useState(readUserPreferences);
   const [rawArticles, setRawArticles] = useState([]);
   const [rawLoading, setRawLoading] = useState(false);
@@ -937,6 +938,43 @@ const BrightNews = () => {
     }
   }, [desktopViewport, feedMode, personalizedFeedAvailable, userPreferences]);
 
+  const primePersonalizedFeed = useCallback(async preferences => {
+    const cacheKey = getPersonalizedFeedCacheKey(preferences);
+    const isWebPagination = !isNativeApp() && desktopViewport;
+    const reqId = Date.now();
+    abortRef.current = reqId;
+
+    setLoading(true);
+    setLoadingMore(false);
+    setError(null);
+    setExpanded(null);
+    activeFeedKeyRef.current = cacheKey;
+
+    try {
+      const result = isWebPagination
+        ? await loadPersonalizedStoriesPage(preferences, { offset: 0, limit: WEB_INITIAL_STORY_LIMIT })
+        : {
+            items: await loadPersonalizedStories(preferences),
+            hasMore: false,
+            nextOffset: 0,
+          };
+
+      if (abortRef.current !== reqId) return;
+
+      cache.current[cacheKey] = result;
+      setStories(result.items);
+      setFirstLoad(false);
+      setLoading(false);
+    } catch (loadError) {
+      if (abortRef.current !== reqId) return;
+
+      setStories([]);
+      setError(loadError.message || "Unable to load stories right now.");
+      setFirstLoad(false);
+      setLoading(false);
+    }
+  }, [desktopViewport]);
+
   const loadMoreStories = useCallback(async () => {
     if (isNativeApp() || !desktopViewport) return;
     if (loading || loadingMore) return;
@@ -1299,7 +1337,7 @@ const BrightNews = () => {
     }
   };
 
-  const handlePreferenceChange = async updates => {
+  const handleConfirmPersonalization = async nextPreferences => {
     if (!isPremium) {
       setUpgradeDialogOpen(true);
       trackEvent("premium_locked_preference_click", {
@@ -1308,28 +1346,40 @@ const BrightNews = () => {
       return;
     }
 
-    const nextPreferences = {
-      ...userPreferences,
-      ...updates,
-    };
-
+    setPersonalizationSaving(true);
     setUserPreferences(nextPreferences);
+    setFeedMode("personalized");
+    setRegion("world");
+    setCategory("all");
+    setStoryLanguageFilter("all");
 
-    if (session?.user) {
-      try {
+    try {
+      if (session?.user) {
         await upsertUserPreferences(session.user.id, nextPreferences);
-      } catch {
-        setShareFeedback({
-          variant: "error",
-          message: t("feedback.preferencesSyncError"),
-        });
       }
-    }
 
-    trackEvent("premium_preferences_change", {
-      signed_in: Boolean(session?.user),
-      is_premium: isPremium,
-    });
+      await primePersonalizedFeed(nextPreferences);
+
+      setTab("home");
+      setShareFeedback({
+        variant: "accent",
+        message: t("premium.personalizationReady"),
+      });
+      trackEvent("premium_preferences_apply", {
+        signed_in: Boolean(session?.user),
+        is_premium: isPremium,
+        preferred_regions: (nextPreferences?.preferredRegions || []).length,
+        preferred_categories: (nextPreferences?.preferredCategories || []).length,
+        strict_positive_filter: Boolean(nextPreferences?.strictPositiveFilter),
+      });
+    } catch {
+      setShareFeedback({
+        variant: "error",
+        message: t("feedback.preferencesSyncError"),
+      });
+    } finally {
+      setPersonalizationSaving(false);
+    }
   };
 
   const openSourceUrl = async normalizedUrl => {
@@ -1625,6 +1675,7 @@ const BrightNews = () => {
 
         {tab === "account" && (
           <AccountTab
+            key={JSON.stringify(userPreferences || {})}
             session={session}
             profile={effectiveProfile}
             profileLoading={profileLoading}
@@ -1635,7 +1686,8 @@ const BrightNews = () => {
             sourceReadState={sourceReadState}
             regions={availableRegions}
             userPreferences={userPreferences}
-            handlePreferenceChange={handlePreferenceChange}
+            handleConfirmPersonalization={handleConfirmPersonalization}
+            personalizationSaving={personalizationSaving}
             handleStartPremiumPurchase={handleStartPremiumPurchase}
             premiumPurchaseLoading={premiumPurchaseLoading}
             handleSignOut={handleSignOut}

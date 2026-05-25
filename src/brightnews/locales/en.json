@@ -260,6 +260,11 @@
     "premiumOnly": "Premium",
     "preferredCountries": "Preferred countries",
     "preferredCategories": "Preferred categories",
+    "applyPersonalization": "Apply personalized feed",
+    "applyingPersonalization": "Applying...",
+    "personalizationApplied": "Personalized feed is ready.",
+    "personalizationUnsaved": "Changes are not applied yet.",
+    "personalizationReady": "Personalized feed is ready on Home.",
     "strictFilterTitle": "Extra-strict positive filter",
     "strictFilterDescription": "Prefer safer, more clearly uplifting stories when filtering improves."
   },

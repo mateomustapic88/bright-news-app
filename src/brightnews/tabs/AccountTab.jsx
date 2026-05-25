@@ -1,3 +1,4 @@
+import { useState } from "react";
 import AuthPanel from "../components/AuthPanel";
 import { CATEGORIES, FREE_SOURCE_READ_LIMIT, PREMIUM_PRICE_LABEL, isPremiumProfile } from "../constants";
 import { getCategoryLabel, getRegionLabel } from "../i18n";
@@ -27,7 +28,8 @@ const AccountTab = ({
   sourceReadState,
   regions,
   userPreferences,
-  handlePreferenceChange,
+  handleConfirmPersonalization,
+  personalizationSaving = false,
   handleStartPremiumPurchase,
   premiumPurchaseLoading = false,
   handleGoogleSignIn,
@@ -48,15 +50,23 @@ const AccountTab = ({
   const avatarUrl = session?.user?.user_metadata?.avatar_url || "";
   const isPremium = isPremiumProfile(profile);
   const planLabel = isPremium ? t("premium.planPremium") : t("premium.planFree");
-  const preferredRegions = userPreferences?.preferredRegions || [];
-  const preferredCategories = userPreferences?.preferredCategories || [];
-  const strictPositiveFilter = Boolean(userPreferences?.strictPositiveFilter);
+  const [draftPreferences, setDraftPreferences] = useState(userPreferences || {});
+  const preferredRegions = draftPreferences?.preferredRegions || [];
+  const preferredCategories = draftPreferences?.preferredCategories || [];
+  const strictPositiveFilter = Boolean(draftPreferences?.strictPositiveFilter);
+  const hasDraftPreferences = preferredRegions.length > 0 || preferredCategories.length > 0 || strictPositiveFilter;
+  const preferencesChanged =
+    JSON.stringify(draftPreferences || {}) !== JSON.stringify(userPreferences || {});
+
   const togglePreference = (field, value) => {
     const current = field === "preferredRegions" ? preferredRegions : preferredCategories;
     const next = current.includes(value)
       ? current.filter(item => item !== value)
       : [...current, value];
-    handlePreferenceChange({ [field]: next });
+    setDraftPreferences(currentPreferences => ({
+      ...currentPreferences,
+      [field]: next,
+    }));
   };
 
   return (
@@ -207,7 +217,10 @@ const AccountTab = ({
           <input
             type="checkbox"
             checked={strictPositiveFilter}
-            onChange={event => handlePreferenceChange({ strictPositiveFilter: event.target.checked })}
+            onChange={event => setDraftPreferences(currentPreferences => ({
+              ...currentPreferences,
+              strictPositiveFilter: event.target.checked,
+            }))}
             disabled={!isPremium}
           />
           <span>
@@ -215,6 +228,24 @@ const AccountTab = ({
             <small>{t("premium.strictFilterDescription")}</small>
           </span>
         </label>
+
+        {isPremium ? (
+          <div className="bn-personalization-card__actions">
+            <button
+              type="button"
+              className="bn-button bn-button--primary"
+              onClick={() => handleConfirmPersonalization(draftPreferences)}
+              disabled={personalizationSaving || !hasDraftPreferences}
+            >
+              {personalizationSaving ? t("premium.applyingPersonalization") : t("premium.applyPersonalization")}
+            </button>
+            <span>
+              {preferencesChanged
+                ? t("premium.personalizationUnsaved")
+                : t("premium.personalizationApplied")}
+            </span>
+          </div>
+        ) : null}
       </section>
 
       <footer className="bn-account-footer">
