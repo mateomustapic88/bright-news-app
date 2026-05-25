@@ -28,7 +28,8 @@ const AccountTab = ({
   regions,
   userPreferences,
   handlePreferenceChange,
-  handleViewPlans,
+  handleStartPremiumPurchase,
+  premiumPurchaseLoading = false,
   handleGoogleSignIn,
   handleEmailAuth,
   handleSignOut,
@@ -146,8 +147,13 @@ const AccountTab = ({
         {isPremium ? (
           <p className="bn-premium-card__status">{t("premium.active")}</p>
         ) : (
-          <button type="button" className="bn-button bn-button--primary" onClick={handleViewPlans} disabled>
-            {t("premium.comingSoon")}
+          <button
+            type="button"
+            className="bn-button bn-button--primary"
+            onClick={handleStartPremiumPurchase}
+            disabled={premiumPurchaseLoading}
+          >
+            {premiumPurchaseLoading ? t("premium.processing") : t("premium.choosePlan")}
           </button>
         )}
       </section>

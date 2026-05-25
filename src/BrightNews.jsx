@@ -17,6 +17,7 @@ import {
   isNativeApp,
   parseMobileAuthCallback,
 } from "./lib/mobileAuth";
+import { purchasePremiumSubscription } from "./lib/googlePlayBilling";
 import {
   createSavedStory,
   createSourceRead,
@@ -223,6 +224,7 @@ const BrightNews = () => {
   const [profileLoading, setProfileLoading] = useState(false);
   const [sourceReadsUsed, setSourceReadsUsed] = useState(readLocalSourceReadCount);
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
+  const [premiumPurchaseLoading, setPremiumPurchaseLoading] = useState(false);
   const [userPreferences, setUserPreferences] = useState(readUserPreferences);
   const [rawArticles, setRawArticles] = useState([]);
   const [rawLoading, setRawLoading] = useState(false);
@@ -1189,13 +1191,67 @@ const BrightNews = () => {
     }
   };
 
-  const handleViewPlans = () => {
-    setUpgradeDialogOpen(false);
-    setTab("account");
-    trackEvent("premium_view_plans", {
-      signed_in: Boolean(session?.user),
-      is_premium: isPremium,
+  const handleStartPremiumPurchase = async () => {
+    if (!session?.user) {
+      setUpgradeDialogOpen(false);
+      setTab("account");
+      setAuthMessage(t("premium.signInToUpgrade"));
+      trackEvent("premium_sign_in_required", {
+        platform: isNativeApp() ? "native" : "web",
+      });
+      return;
+    }
+
+    if (!isNativeApp()) {
+      setShareFeedback({
+        variant: "info",
+        message: t("premium.androidOnly"),
+      });
+      return;
+    }
+
+    setPremiumPurchaseLoading(true);
+    setAuthError("");
+    setShareFeedback(null);
+    trackEvent("premium_purchase_start", {
+      signed_in: true,
+      platform: "native",
     });
+
+    try {
+      const result = await purchasePremiumSubscription();
+
+      if (result.pending) {
+        setShareFeedback({
+          variant: "info",
+          message: t("premium.purchasePending"),
+        });
+        return;
+      }
+
+      const nextProfile = result.profile || await loadProfile(session.user.id);
+      setProfile(nextProfile);
+      setUpgradeDialogOpen(false);
+      setTab("account");
+      setShareFeedback({
+        variant: "accent",
+        message: t("premium.purchaseSuccess"),
+      });
+      trackEvent("premium_purchase_success", {
+        signed_in: true,
+      });
+    } catch (purchaseError) {
+      setShareFeedback({
+        variant: "error",
+        message: purchaseError?.message || t("premium.purchaseError"),
+      });
+      trackEvent("premium_purchase_error", {
+        signed_in: true,
+        message: purchaseError?.message || "unknown",
+      });
+    } finally {
+      setPremiumPurchaseLoading(false);
+    }
   };
 
   const handlePreferenceChange = async updates => {
@@ -1450,7 +1506,8 @@ const BrightNews = () => {
       <PremiumUpgradeDialog
         open={upgradeDialogOpen}
         onClose={() => setUpgradeDialogOpen(false)}
-        onViewPlans={handleViewPlans}
+        onStartPremiumPurchase={handleStartPremiumPurchase}
+        purchaseLoading={premiumPurchaseLoading}
         readLimit={FREE_SOURCE_READ_LIMIT}
         t={t}
       />
@@ -1531,7 +1588,8 @@ const BrightNews = () => {
             regions={availableRegions}
             userPreferences={userPreferences}
             handlePreferenceChange={handlePreferenceChange}
-            handleViewPlans={handleViewPlans}
+            handleStartPremiumPurchase={handleStartPremiumPurchase}
+            premiumPurchaseLoading={premiumPurchaseLoading}
             handleSignOut={handleSignOut}
             handleGoogleSignIn={handleGoogleSignIn}
             handleEmailAuth={handleEmailAuth}
