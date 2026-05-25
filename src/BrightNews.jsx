@@ -1289,6 +1289,8 @@ const BrightNews = () => {
     if (!isNativeApp()) {
       setUpgradeDialogOpen(false);
       setTab("account");
+      setAuthMessage(t("premium.androidOnly"));
+      setAuthError("");
       setShareFeedback({
         variant: "info",
         message: t("premium.androidOnly"),
@@ -1301,6 +1303,7 @@ const BrightNews = () => {
 
     setPremiumPurchaseLoading(true);
     setAuthError("");
+    setAuthMessage("");
     setShareFeedback(null);
     trackEvent("premium_purchase_start", {
       signed_in: true,
@@ -1311,6 +1314,7 @@ const BrightNews = () => {
       const result = await purchasePremiumSubscription();
 
       if (result.pending) {
+        setAuthMessage(t("premium.purchasePending"));
         setShareFeedback({
           variant: "info",
           message: t("premium.purchasePending"),
@@ -1322,6 +1326,7 @@ const BrightNews = () => {
       setProfile(nextProfile);
       setUpgradeDialogOpen(false);
       setTab("account");
+      setAuthMessage(t("premium.purchaseSuccess"));
       setShareFeedback({
         variant: "accent",
         message: t("premium.purchaseSuccess"),
@@ -1330,6 +1335,7 @@ const BrightNews = () => {
         signed_in: true,
       });
     } catch (purchaseError) {
+      setAuthError(purchaseError?.message || t("premium.purchaseError"));
       setShareFeedback({
         variant: "error",
         message: purchaseError?.message || t("premium.purchaseError"),
