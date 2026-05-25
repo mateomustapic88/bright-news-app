@@ -25,6 +25,8 @@ import {
   deleteSavedStory,
   loadAvailableRegionCodes,
   loadProfile,
+  loadPersonalizedStories,
+  loadPersonalizedStoriesPage,
   loadRawArticles,
   loadSourceReadCountToday,
   loadUserPreferences,
@@ -156,6 +158,17 @@ const applyPremiumStoryPreferences = (items, {
   }
 
   return nextItems.length > 0 ? nextItems : items;
+};
+
+const getPersonalizedFeedCacheKey = preferences => {
+  const preferredRegions = preferences?.preferredRegions || [];
+  const preferredCategories = preferences?.preferredCategories || [];
+  return [
+    "personalized",
+    preferredRegions.join(",") || "all-regions",
+    preferredCategories.join(",") || "all-categories",
+    preferences?.strictPositiveFilter ? "strict" : "standard",
+  ].join("-");
 };
 
 const getReadableAuthError = error => {
@@ -688,6 +701,7 @@ const BrightNews = () => {
 
   const languageFilters = getLanguageFiltersForStories(stories);
   const languageFilteredStories = stories.filter(story => (
+    feedMode === "personalized" ||
     storyLanguageFilter === "all" || story.languageCode === storyLanguageFilter
   ));
   const visibleStories = applyPremiumStoryPreferences(languageFilteredStories, {
@@ -863,7 +877,10 @@ const BrightNews = () => {
   }, [tab, session?.user, profile?.is_admin, reviewFilter, fetchRawArticles]);
 
   const fetchNews = useCallback(async (regionCode, categoryId, force = false) => {
-    const cacheKey = `${regionCode}-${categoryId}`;
+    const usePersonalizedFeed = feedMode === "personalized" && personalizedFeedAvailable;
+    const cacheKey = usePersonalizedFeed
+      ? getPersonalizedFeedCacheKey(userPreferences)
+      : `${regionCode}-${categoryId}`;
     const isWebPagination = !isNativeApp() && desktopViewport;
 
     if (!force && cache.current[cacheKey]) {
@@ -887,13 +904,25 @@ const BrightNews = () => {
     activeFeedKeyRef.current = cacheKey;
 
     try {
-      const result = isWebPagination
-        ? await loadStoriesPage(regionCode, categoryId, { offset: 0, limit: WEB_INITIAL_STORY_LIMIT })
-        : {
-            items: await loadStories(regionCode, categoryId),
-            hasMore: false,
-            nextOffset: 0,
-          };
+      const result = usePersonalizedFeed
+        ? (
+            isWebPagination
+              ? await loadPersonalizedStoriesPage(userPreferences, { offset: 0, limit: WEB_INITIAL_STORY_LIMIT })
+              : {
+                  items: await loadPersonalizedStories(userPreferences),
+                  hasMore: false,
+                  nextOffset: 0,
+                }
+          )
+        : (
+            isWebPagination
+              ? await loadStoriesPage(regionCode, categoryId, { offset: 0, limit: WEB_INITIAL_STORY_LIMIT })
+              : {
+                  items: await loadStories(regionCode, categoryId),
+                  hasMore: false,
+                  nextOffset: 0,
+                }
+          );
       if (abortRef.current !== reqId) return;
       cache.current[cacheKey] = result;
       setStories(result.items);
@@ -906,13 +935,16 @@ const BrightNews = () => {
       setFirstLoad(false);
       setLoading(false);
     }
-  }, [desktopViewport]);
+  }, [desktopViewport, feedMode, personalizedFeedAvailable, userPreferences]);
 
   const loadMoreStories = useCallback(async () => {
     if (isNativeApp() || !desktopViewport) return;
     if (loading || loadingMore) return;
 
-    const cacheKey = `${region}-${category}`;
+    const usePersonalizedFeed = feedMode === "personalized" && personalizedFeedAvailable;
+    const cacheKey = usePersonalizedFeed
+      ? getPersonalizedFeedCacheKey(userPreferences)
+      : `${region}-${category}`;
     const currentFeed = cache.current[cacheKey];
 
     if (!currentFeed?.hasMore) return;
@@ -920,10 +952,13 @@ const BrightNews = () => {
     setLoadingMore(true);
 
     try {
-      const nextPage = await loadStoriesPage(region, category, {
+      const pageOptions = {
         offset: currentFeed.nextOffset || currentFeed.items.length,
         limit: WEB_INCREMENTAL_STORY_LIMIT,
-      });
+      };
+      const nextPage = usePersonalizedFeed
+        ? await loadPersonalizedStoriesPage(userPreferences, pageOptions)
+        : await loadStoriesPage(region, category, pageOptions);
 
       if (activeFeedKeyRef.current !== cacheKey) return;
 
@@ -945,7 +980,16 @@ const BrightNews = () => {
         setLoadingMore(false);
       }
     }
-  }, [category, desktopViewport, loading, loadingMore, region]);
+  }, [
+    category,
+    desktopViewport,
+    feedMode,
+    loading,
+    loadingMore,
+    personalizedFeedAvailable,
+    region,
+    userPreferences,
+  ]);
 
   const availableRegions = getRegionsForCodes(availableRegionCodes);
 
@@ -964,6 +1008,7 @@ const BrightNews = () => {
     setFeedMode("personalized");
     setRegion("world");
     setCategory("all");
+    setStoryLanguageFilter("all");
     trackEvent("personalized_feed_select", {
       preferred_regions: (userPreferences?.preferredRegions || []).length,
       preferred_categories: (userPreferences?.preferredCategories || []).length,
@@ -1425,6 +1470,9 @@ const BrightNews = () => {
     ...item,
     label: getTabLabel(item.id, uiLanguage),
   }));
+  const activeFeedCacheKey = feedMode === "personalized" && personalizedFeedAvailable
+    ? getPersonalizedFeedCacheKey(userPreferences)
+    : `${region}-${category}`;
 
   return (
     <div className={`bright-news${hideFeedChrome && tab === "home" ? " is-feed-chrome-hidden" : ""}`}>
@@ -1533,7 +1581,7 @@ const BrightNews = () => {
             error={error}
             shareFeedback={shareFeedback}
             stories={visibleStories}
-            hasMore={!isNativeApp() && desktopViewport && Boolean(cache.current[`${region}-${category}`]?.hasMore)}
+            hasMore={!isNativeApp() && desktopViewport && Boolean(cache.current[activeFeedCacheKey]?.hasMore)}
             onLoadMore={loadMoreStories}
             expanded={expanded}
             saved={saved}

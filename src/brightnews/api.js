@@ -35,6 +35,26 @@ const applyStoryFilters = (query, regionCode, categoryId) => {
   return nextQuery;
 };
 
+const applyPersonalizedStoryFilters = (query, preferences = {}) => {
+  let nextQuery = query;
+  const preferredRegions = Array.isArray(preferences?.preferredRegions)
+    ? preferences.preferredRegions.filter(Boolean)
+    : [];
+  const preferredCategories = Array.isArray(preferences?.preferredCategories)
+    ? preferences.preferredCategories.filter(Boolean)
+    : [];
+
+  if (preferredRegions.length > 0) {
+    nextQuery = nextQuery.in("region_code", preferredRegions);
+  }
+
+  if (preferredCategories.length > 0) {
+    nextQuery = nextQuery.in("category", preferredCategories);
+  }
+
+  return nextQuery;
+};
+
 export const loadStories = async (regionCode, categoryId, options = {}) => {
   if (!supabase) {
     throw new Error("Supabase configuration is missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
@@ -78,6 +98,51 @@ export const loadStoriesPage = async (regionCode, categoryId, options = {}) => {
   } = options;
 
   const items = await loadStories(regionCode, categoryId, { offset, limit });
+
+  return {
+    items,
+    hasMore: items.length === limit,
+    nextOffset: offset + items.length,
+  };
+};
+
+export const loadPersonalizedStories = async (preferences, options = {}) => {
+  if (!supabase) {
+    throw new Error("Supabase configuration is missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
+  }
+
+  const {
+    offset = 0,
+    limit,
+  } = options;
+
+  let query = supabase
+    .from("stories")
+    .select("*")
+    .order("is_pinned", { ascending: false })
+    .order("saved_count", { ascending: false })
+    .order("published_at", { ascending: false });
+
+  query = applyPersonalizedStoryFilters(query, preferences);
+
+  if (typeof limit === "number" && limit > 0) {
+    query = query.range(offset, offset + limit - 1);
+  }
+
+  const { data, error } = await query;
+
+  if (error) throw new Error(error.message);
+
+  return (data || []).map(mapStoryRow);
+};
+
+export const loadPersonalizedStoriesPage = async (preferences, options = {}) => {
+  const {
+    offset = 0,
+    limit = 10,
+  } = options;
+
+  const items = await loadPersonalizedStories(preferences, { offset, limit });
 
   return {
     items,
