@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import {
   CATEGORIES,
+  STORY_FILTERS,
   getContinentIdForRegionCode,
   getRegionContinentGroups,
   getCategoryThemeClass,
 } from "../constants";
-import { getCategoryLabel, getRegionLabel } from "../i18n";
+import { getCategoryLabel, getRegionLabel, getStoryFilterLabel } from "../i18n";
 import Chip from "../components/Chip";
 import EmptyState from "../components/EmptyState";
 import HeroCard from "../components/HeroCard";
@@ -14,8 +15,12 @@ import StatusMessage from "../components/StatusMessage";
 import StoryCard from "../components/StoryCard";
 
 const FEATURED_POOL_SIZE = 12;
-const getFeaturedStory = (stories, category) => {
+const getFeaturedStory = (stories, category, storyFilter) => {
   const featuredPool = stories.slice(0, FEATURED_POOL_SIZE);
+
+  if (storyFilter !== "featured") {
+    return featuredPool[0] || null;
+  }
 
   if (category && category !== "all") {
     return featuredPool[0] || null;
@@ -68,6 +73,8 @@ const HomeTab = ({
   setRegion,
   category,
   setCategory,
+  storyFilter = "newest",
+  setStoryFilter,
   feedMode = "standard",
   personalizedFeedAvailable = false,
   handleSelectPersonalizedFeed,
@@ -102,10 +109,11 @@ const HomeTab = ({
   const worldRegion = regions.find(item => item.code === "world");
   const selectedRegion = regions.find(item => item.code === region) || worldRegion || regions[0];
   const selectedCategory = CATEGORIES.find(item => item.id === category) || CATEGORIES[0];
+  const selectedStoryFilter = STORY_FILTERS.find(item => item.id === storyFilter) || STORY_FILTERS[0];
   const categoryButtonLabel = feedMode === "personalized"
     ? t("home.personalizedFeed")
     : getCategoryLabel(selectedCategory.id, uiLanguage);
-  const featuredStory = getFeaturedStory(stories, category);
+  const featuredStory = getFeaturedStory(stories, category, storyFilter);
 
   const remainingStories = stories.filter(story => story.id !== featuredStory?.id);
 
@@ -178,6 +186,23 @@ const HomeTab = ({
               </Chip>
             ))}
           </div>
+
+          <div className="bn-home-tab__filter-group">
+            <span className="bn-home-tab__filter-label">{t("home.storyFilter")}</span>
+            <div className="bn-chip-row bn-chip-row--surface bn-chip-row--feed-filters">
+              {STORY_FILTERS.map(item => (
+                <Chip
+                  key={item.id}
+                  active={storyFilter === item.id}
+                  onClick={() => setStoryFilter(item.id)}
+                  className="bn-chip--feed-filter"
+                >
+                  <span>{item.emoji}</span>
+                  <span>{getStoryFilterLabel(item.id, uiLanguage)}</span>
+                </Chip>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -203,9 +228,24 @@ const HomeTab = ({
             onClick={() => setMobileFilterPanel(current => (current === "category" ? null : "category"))}
             aria-expanded={mobileFilterPanel === "category"}
           >
+            <span className="bn-mobile-filter-button__icon">{feedMode === "personalized" ? "✨" : selectedCategory.emoji}</span>
             <span className="bn-mobile-filter-button__copy">
               <small>{t("home.category")}</small>
               <strong>{categoryButtonLabel}</strong>
+            </span>
+            <span className="bn-mobile-filter-button__chevron" aria-hidden="true">⌄</span>
+          </button>
+
+          <button
+            type="button"
+            className={`bn-mobile-filter-button bn-mobile-filter-button--story-filter${mobileFilterPanel === "storyFilter" ? " is-open" : ""}`}
+            onClick={() => setMobileFilterPanel(current => (current === "storyFilter" ? null : "storyFilter"))}
+            aria-expanded={mobileFilterPanel === "storyFilter"}
+          >
+            <span className="bn-mobile-filter-button__icon">{selectedStoryFilter.emoji}</span>
+            <span className="bn-mobile-filter-button__copy">
+              <small>{t("home.filter")}</small>
+              <strong>{getStoryFilterLabel(selectedStoryFilter.id, uiLanguage)}</strong>
             </span>
             <span className="bn-mobile-filter-button__chevron" aria-hidden="true">⌄</span>
           </button>
@@ -296,6 +336,25 @@ const HomeTab = ({
               >
                 <span>{item.emoji}</span>
                 <span>{getCategoryLabel(item.id, uiLanguage)}</span>
+              </Chip>
+            ))}
+          </div>
+        ) : null}
+
+        {mobileFilterPanel === "storyFilter" ? (
+          <div className="bn-mobile-filter-panel bn-mobile-filter-panel--story-filters" aria-label={t("home.storyFilter")}>
+            {STORY_FILTERS.map(item => (
+              <Chip
+                key={item.id}
+                active={storyFilter === item.id}
+                onClick={() => {
+                  setStoryFilter(item.id);
+                  setMobileFilterPanel(null);
+                }}
+                className="bn-chip--feed-filter"
+              >
+                <span>{item.emoji}</span>
+                <span>{getStoryFilterLabel(item.id, uiLanguage)}</span>
               </Chip>
             ))}
           </div>

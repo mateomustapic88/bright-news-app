@@ -51,13 +51,43 @@
   gap: 10px;
 }
 
+.bn-home-tab__filter-group {
+  display: grid;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.bn-home-tab__filter-label {
+  color: var(--bn-text-muted);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .bn-chip-row--surface {
   margin-bottom: 0;
+}
+
+.bn-chip-row--feed-filters {
+  gap: 8px;
 }
 
 .bn-chip--personalized {
   border-color: color-mix(in srgb, var(--bn-accent) 34%, var(--bn-divider));
   background: color-mix(in srgb, var(--bn-accent-bg) 78%, var(--bn-surface-raised));
+  color: var(--bn-accent-strong);
+}
+
+.bn-chip--feed-filter {
+  border-color: color-mix(in srgb, var(--bn-divider) 84%, var(--bn-accent));
+  background: var(--bn-surface-raised);
+  color: var(--bn-text-strong);
+}
+
+.bn-chip--feed-filter.is-active {
+  border-color: color-mix(in srgb, var(--bn-accent) 48%, var(--bn-divider));
+  background: color-mix(in srgb, var(--bn-accent-bg) 74%, var(--bn-surface-raised));
   color: var(--bn-accent-strong);
 }
 
@@ -168,7 +198,7 @@
 
   .bn-home-tab__mobile-filter-bar {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 14px;
   }
 
@@ -216,10 +246,6 @@
     background: transparent;
     box-shadow: none;
     font-size: 24px;
-  }
-
-  .bn-mobile-filter-button--category {
-    padding-left: 48px;
   }
 
   .bn-mobile-filter-button__copy {
@@ -278,7 +304,8 @@
   }
 
   .bn-mobile-filter-panel__options,
-  .bn-mobile-filter-panel--categories {
+  .bn-mobile-filter-panel--categories,
+  .bn-mobile-filter-panel--story-filters {
     display: grid;
     grid-template-columns: 1fr;
     gap: 6px;
@@ -362,32 +389,28 @@
   }
 
   .bn-mobile-filter-button {
-    gap: 9px;
+    gap: 7px;
     min-height: 62px;
-    padding: 9px 12px;
+    padding: 9px 10px;
   }
 
   .bn-mobile-filter-button__icon {
-    width: 27px;
-    height: 27px;
-    font-size: 21px;
-  }
-
-  .bn-mobile-filter-button--category {
-    padding-left: 24px;
+    width: 24px;
+    height: 24px;
+    font-size: 19px;
   }
 
   .bn-mobile-filter-button__copy {
     small {
-      font-size: 10px;
+      font-size: 9px;
     }
 
     strong {
-      font-size: 16px;
+      font-size: 14px;
     }
   }
 
   .bn-mobile-filter-button__chevron {
-    font-size: 16px;
+    font-size: 14px;
   }
 }

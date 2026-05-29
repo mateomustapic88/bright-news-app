@@ -78,6 +78,14 @@ export const REVIEW_FILTERS = [
   { id: "all", label: "All" },
 ];
 
+export const STORY_FILTERS = [
+  { id: "newest", label: "Newest", emoji: "🕒" },
+  { id: "top", label: "Top saved", emoji: "❤️" },
+  { id: "featured", label: "Featured", emoji: "⭐" },
+];
+
+export const DEFAULT_STORY_FILTER = "newest";
+
 export const SAVED_STORIES_KEY = "brightnews.savedStories";
 export const ONBOARDING_DISMISSED_KEY = "brightnews.onboardingDismissed";
 export const PREFERRED_REGION_KEY = "brightnews.preferredRegion";
@@ -90,6 +98,7 @@ export const USER_PREFERENCES_KEY = "brightnews.userPreferences";
 export const FREE_SOURCE_READ_LIMIT = 5;
 export const PREMIUM_PRODUCT_ID = "brightnews_premium_monthly";
 export const PREMIUM_PRICE_LABEL = "€4.99/month";
+export const PREMIUM_CHECKOUT_ENABLED = true;
 
 export const THEME_PREFERENCES = ["system", "light", "dark"];
 

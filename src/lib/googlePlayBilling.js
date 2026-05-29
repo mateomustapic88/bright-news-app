@@ -1,20 +1,24 @@
-import { Capacitor, registerPlugin } from "@capacitor/core";
+import { Capacitor } from "@capacitor/core";
 import { supabase } from "./supabase";
 import { PREMIUM_PRODUCT_ID } from "../brightnews/constants";
 import { isNativeApp } from "./mobileAuth";
 
-const GooglePlayBilling = registerPlugin("GooglePlayBilling");
+const callBillingPlugin = (methodName, options = {}) => {
+  const nativePromise = globalThis.Capacitor?.nativePromise || Capacitor?.nativePromise;
+
+  if (typeof nativePromise !== "function") {
+    throw new Error("Google Play Billing is not available in this app build.");
+  }
+
+  return nativePromise("GooglePlayBilling", methodName, options);
+};
 
 export const purchasePremiumSubscription = async () => {
   if (!isNativeApp()) {
     throw new Error("Premium purchases are available in the Android app.");
   }
 
-  if (!Capacitor.isPluginAvailable("GooglePlayBilling")) {
-    throw new Error("Google Play Billing is not available in this app build. Update BrightNews from Google Play and try again.");
-  }
-
-  const purchase = await GooglePlayBilling.purchaseSubscription({
+  const purchase = await callBillingPlugin("purchaseSubscription", {
     productId: PREMIUM_PRODUCT_ID,
   });
 
@@ -51,6 +55,6 @@ export const purchasePremiumSubscription = async () => {
 export const queryActivePremiumSubscriptions = async () => {
   if (!isNativeApp()) return [];
 
-  const result = await GooglePlayBilling.queryActiveSubscriptions();
+  const result = await callBillingPlugin("queryActiveSubscriptions");
   return Array.isArray(result?.purchases) ? result.purchases : [];
 };

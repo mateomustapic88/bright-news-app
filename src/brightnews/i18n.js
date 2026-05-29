@@ -109,6 +109,9 @@ export const getRegionLabel = (regionCode, languageId) =>
 export const getReviewFilterLabel = (filterId, languageId) =>
   createTranslator(languageId)(`reviewFilters.${filterId}`);
 
+export const getStoryFilterLabel = (filterId, languageId) =>
+  createTranslator(languageId)(`storyFilters.${filterId}`);
+
 export const getLanguageLabel = (languageCode, languageId) =>
   createTranslator(languageId)(`languages.${languageCode}`);
 

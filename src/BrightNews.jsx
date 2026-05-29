@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { App } from "@capacitor/app";
 import { Browser } from "@capacitor/browser";
+import packageInfo from "../package.json";
 import {
   enableAnalytics,
   setAnalyticsUserId,
@@ -17,7 +18,6 @@ import {
   isNativeApp,
   parseMobileAuthCallback,
 } from "./lib/mobileAuth";
-import { purchasePremiumSubscription } from "./lib/googlePlayBilling";
 import {
   createSavedStory,
   createSourceRead,
@@ -40,7 +40,9 @@ import {
 } from "./brightnews/api";
 import {
   getAvailableAppLanguages,
+  DEFAULT_STORY_FILTER,
   FREE_SOURCE_READ_LIMIT,
+  PREMIUM_CHECKOUT_ENABLED,
   inferPreferredRegionCode,
   inferPreferredAppLanguage,
   getLanguageFiltersForStories,
@@ -213,6 +215,7 @@ const BrightNews = () => {
   const [region, setRegion]       = useState(() => readPreferredRegion() || inferPreferredRegionCode());
   const [availableRegionCodes, setAvailableRegionCodes] = useState(["world"]);
   const [category, setCategory]   = useState("all");
+  const [storyFilter, setStoryFilter] = useState(DEFAULT_STORY_FILTER);
   const [feedMode, setFeedMode] = useState("standard");
   const [appLanguage, setAppLanguage] = useState(() => readAppLanguage() || inferPreferredAppLanguage());
   const [storyLanguageFilter, setStoryLanguageFilter] = useState(() => readAppLanguage() || inferPreferredAppLanguage());
@@ -239,6 +242,8 @@ const BrightNews = () => {
   const [sourceReadsUsed, setSourceReadsUsed] = useState(readLocalSourceReadCount);
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
   const [premiumPurchaseLoading, setPremiumPurchaseLoading] = useState(false);
+  const [premiumPurchaseFeedback, setPremiumPurchaseFeedback] = useState(null);
+  const [appInfo, setAppInfo] = useState(null);
   const [personalizationSaving, setPersonalizationSaving] = useState(false);
   const [userPreferences, setUserPreferences] = useState(readUserPreferences);
   const [rawArticles, setRawArticles] = useState([]);
@@ -268,6 +273,11 @@ const BrightNews = () => {
   const storyLanguageInitializedRef = useRef(false);
   const uiLanguage = getUiLanguage(appLanguage);
   const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const appVersionLabel = useMemo(() => {
+    const version = appInfo?.version || packageInfo.version;
+    const build = appInfo?.build;
+    return build ? `${version} (${build})` : version;
+  }, [appInfo]);
   const effectiveProfile = profile;
   const isPremium = isPremiumProfile(effectiveProfile);
   const sourceReadState = useMemo(() => ({
@@ -287,6 +297,22 @@ const BrightNews = () => {
         : story
     ))
   ), []);
+
+  useEffect(() => {
+    let active = true;
+
+    App.getInfo()
+      .then(info => {
+        if (active) setAppInfo(info);
+      })
+      .catch(() => {
+        if (active) setAppInfo(null);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     window.localStorage.setItem(SAVED_STORIES_KEY, JSON.stringify(saved));
@@ -881,8 +907,8 @@ const BrightNews = () => {
   const fetchNews = useCallback(async (regionCode, categoryId, force = false) => {
     const usePersonalizedFeed = feedMode === "personalized" && personalizedFeedAvailable;
     const cacheKey = usePersonalizedFeed
-      ? getPersonalizedFeedCacheKey(userPreferences)
-      : `${regionCode}-${categoryId}`;
+      ? `${getPersonalizedFeedCacheKey(userPreferences)}-${storyFilter}`
+      : `${regionCode}-${categoryId}-${storyFilter}`;
     const isWebPagination = !isNativeApp() && desktopViewport;
 
     if (!force && cache.current[cacheKey]) {
@@ -909,18 +935,18 @@ const BrightNews = () => {
       const result = usePersonalizedFeed
         ? (
             isWebPagination
-              ? await loadPersonalizedStoriesPage(userPreferences, { offset: 0, limit: WEB_INITIAL_STORY_LIMIT })
+              ? await loadPersonalizedStoriesPage(userPreferences, { offset: 0, limit: WEB_INITIAL_STORY_LIMIT, storyFilter })
               : {
-                  items: await loadPersonalizedStories(userPreferences),
+                  items: await loadPersonalizedStories(userPreferences, { storyFilter }),
                   hasMore: false,
                   nextOffset: 0,
                 }
           )
         : (
             isWebPagination
-              ? await loadStoriesPage(regionCode, categoryId, { offset: 0, limit: WEB_INITIAL_STORY_LIMIT })
+              ? await loadStoriesPage(regionCode, categoryId, { offset: 0, limit: WEB_INITIAL_STORY_LIMIT, storyFilter })
               : {
-                  items: await loadStories(regionCode, categoryId),
+                  items: await loadStories(regionCode, categoryId, { storyFilter }),
                   hasMore: false,
                   nextOffset: 0,
                 }
@@ -937,10 +963,10 @@ const BrightNews = () => {
       setFirstLoad(false);
       setLoading(false);
     }
-  }, [desktopViewport, feedMode, personalizedFeedAvailable, userPreferences]);
+  }, [desktopViewport, feedMode, personalizedFeedAvailable, storyFilter, userPreferences]);
 
   const primePersonalizedFeed = useCallback(async preferences => {
-    const cacheKey = getPersonalizedFeedCacheKey(preferences);
+    const cacheKey = `${getPersonalizedFeedCacheKey(preferences)}-${storyFilter}`;
     const isWebPagination = !isNativeApp() && desktopViewport;
     const reqId = Date.now();
     abortRef.current = reqId;
@@ -953,9 +979,9 @@ const BrightNews = () => {
 
     try {
       const result = isWebPagination
-        ? await loadPersonalizedStoriesPage(preferences, { offset: 0, limit: WEB_INITIAL_STORY_LIMIT })
+        ? await loadPersonalizedStoriesPage(preferences, { offset: 0, limit: WEB_INITIAL_STORY_LIMIT, storyFilter })
         : {
-            items: await loadPersonalizedStories(preferences),
+            items: await loadPersonalizedStories(preferences, { storyFilter }),
             hasMore: false,
             nextOffset: 0,
           };
@@ -974,7 +1000,7 @@ const BrightNews = () => {
       setFirstLoad(false);
       setLoading(false);
     }
-  }, [desktopViewport]);
+  }, [desktopViewport, storyFilter]);
 
   const loadMoreStories = useCallback(async () => {
     if (isNativeApp() || !desktopViewport) return;
@@ -982,8 +1008,8 @@ const BrightNews = () => {
 
     const usePersonalizedFeed = feedMode === "personalized" && personalizedFeedAvailable;
     const cacheKey = usePersonalizedFeed
-      ? getPersonalizedFeedCacheKey(userPreferences)
-      : `${region}-${category}`;
+      ? `${getPersonalizedFeedCacheKey(userPreferences)}-${storyFilter}`
+      : `${region}-${category}-${storyFilter}`;
     const currentFeed = cache.current[cacheKey];
 
     if (!currentFeed?.hasMore) return;
@@ -996,8 +1022,8 @@ const BrightNews = () => {
         limit: WEB_INCREMENTAL_STORY_LIMIT,
       };
       const nextPage = usePersonalizedFeed
-        ? await loadPersonalizedStoriesPage(userPreferences, pageOptions)
-        : await loadStoriesPage(region, category, pageOptions);
+        ? await loadPersonalizedStoriesPage(userPreferences, { ...pageOptions, storyFilter })
+        : await loadStoriesPage(region, category, { ...pageOptions, storyFilter });
 
       if (activeFeedKeyRef.current !== cacheKey) return;
 
@@ -1027,6 +1053,7 @@ const BrightNews = () => {
     loadingMore,
     personalizedFeedAvailable,
     region,
+    storyFilter,
     userPreferences,
   ]);
 
@@ -1041,6 +1068,16 @@ const BrightNews = () => {
     setFeedMode("standard");
     setCategory(nextCategory);
   }, []);
+
+  const handleSetStoryFilter = useCallback(nextStoryFilter => {
+    setStoryFilter(nextStoryFilter);
+    trackEvent("story_filter_change", {
+      filter: nextStoryFilter,
+      region,
+      category,
+      feed_mode: feedMode,
+    });
+  }, [category, feedMode, region]);
 
   const handleSelectPersonalizedFeed = useCallback(() => {
     if (!personalizedFeedAvailable) return;
@@ -1058,7 +1095,7 @@ const BrightNews = () => {
   useEffect(() => {
     const timer = setTimeout(() => fetchNews(region, category), 400);
     return () => clearTimeout(timer);
-  }, [region, category, fetchNews]);
+  }, [region, category, storyFilter, fetchNews]);
 
   const handleGoogleSignIn = async () => {
     if (!supabase) {
@@ -1276,10 +1313,34 @@ const BrightNews = () => {
   };
 
   const handleStartPremiumPurchase = async () => {
+    if (!PREMIUM_CHECKOUT_ENABLED) {
+      setUpgradeDialogOpen(false);
+      setTab("account");
+      setAuthMessage(t("premium.checkoutPaused"));
+      setAuthError("");
+      setPremiumPurchaseFeedback({
+        variant: "info",
+        message: t("premium.checkoutPaused"),
+      });
+      setShareFeedback({
+        variant: "info",
+        message: t("premium.checkoutPaused"),
+      });
+      trackEvent("premium_checkout_paused", {
+        signed_in: Boolean(session?.user),
+        platform: isNativeApp() ? "native" : "web",
+      });
+      return;
+    }
+
     if (!session?.user) {
       setUpgradeDialogOpen(false);
       setTab("account");
       setAuthMessage(t("premium.signInToUpgrade"));
+      setPremiumPurchaseFeedback({
+        variant: "info",
+        message: t("premium.signInToUpgrade"),
+      });
       trackEvent("premium_sign_in_required", {
         platform: isNativeApp() ? "native" : "web",
       });
@@ -1291,6 +1352,10 @@ const BrightNews = () => {
       setTab("account");
       setAuthMessage(t("premium.androidOnly"));
       setAuthError("");
+      setPremiumPurchaseFeedback({
+        variant: "info",
+        message: t("premium.androidOnly"),
+      });
       setShareFeedback({
         variant: "info",
         message: t("premium.androidOnly"),
@@ -1304,6 +1369,10 @@ const BrightNews = () => {
     setPremiumPurchaseLoading(true);
     setAuthError("");
     setAuthMessage(t("premium.openingGooglePlay"));
+    setPremiumPurchaseFeedback({
+      variant: "info",
+      message: t("premium.openingGooglePlay"),
+    });
     setShareFeedback(null);
     trackEvent("premium_purchase_start", {
       signed_in: true,
@@ -1311,10 +1380,15 @@ const BrightNews = () => {
     });
 
     try {
+      const { purchasePremiumSubscription } = await import("./lib/googlePlayBilling");
       const result = await purchasePremiumSubscription();
 
       if (result.pending) {
         setAuthMessage(t("premium.purchasePending"));
+        setPremiumPurchaseFeedback({
+          variant: "info",
+          message: t("premium.purchasePending"),
+        });
         setShareFeedback({
           variant: "info",
           message: t("premium.purchasePending"),
@@ -1327,6 +1401,10 @@ const BrightNews = () => {
       setUpgradeDialogOpen(false);
       setTab("account");
       setAuthMessage(t("premium.purchaseSuccess"));
+      setPremiumPurchaseFeedback({
+        variant: "accent",
+        message: t("premium.purchaseSuccess"),
+      });
       setShareFeedback({
         variant: "accent",
         message: t("premium.purchaseSuccess"),
@@ -1339,6 +1417,10 @@ const BrightNews = () => {
       setTab("account");
       setAuthMessage("");
       setAuthError(purchaseError?.message || t("premium.purchaseError"));
+      setPremiumPurchaseFeedback({
+        variant: "error",
+        message: purchaseError?.message || t("premium.purchaseError"),
+      });
       setShareFeedback({
         variant: "error",
         message: purchaseError?.message || t("premium.purchaseError"),
@@ -1545,8 +1627,8 @@ const BrightNews = () => {
     label: getTabLabel(item.id, uiLanguage),
   }));
   const activeFeedCacheKey = feedMode === "personalized" && personalizedFeedAvailable
-    ? getPersonalizedFeedCacheKey(userPreferences)
-    : `${region}-${category}`;
+    ? `${getPersonalizedFeedCacheKey(userPreferences)}-${storyFilter}`
+    : `${region}-${category}-${storyFilter}`;
 
   return (
     <div className={`bright-news${hideFeedChrome && tab === "home" ? " is-feed-chrome-hidden" : ""}`}>
@@ -1595,7 +1677,7 @@ const BrightNews = () => {
           if (refreshing) return;
 
           setRefreshing(true);
-          trackEvent("feed_refresh", { region, category, language: storyLanguageFilter });
+          trackEvent("feed_refresh", { region, category, filter: storyFilter, language: storyLanguageFilter });
           try {
             await refreshAvailableRegions();
             await fetchNews(region, category, true);
@@ -1631,6 +1713,7 @@ const BrightNews = () => {
         onStartPremiumPurchase={handleStartPremiumPurchase}
         purchaseLoading={premiumPurchaseLoading}
         purchaseStatus={premiumPurchaseLoading ? t("premium.openingGooglePlay") : ""}
+        checkoutEnabled={PREMIUM_CHECKOUT_ENABLED}
         readLimit={FREE_SOURCE_READ_LIMIT}
         t={t}
       />
@@ -1646,6 +1729,8 @@ const BrightNews = () => {
             setRegion={handleSetRegion}
             category={category}
             setCategory={handleSetCategory}
+            storyFilter={storyFilter}
+            setStoryFilter={handleSetStoryFilter}
             feedMode={feedMode}
             setFeedMode={setFeedMode}
             personalizedFeedAvailable={personalizedFeedAvailable}
@@ -1715,6 +1800,9 @@ const BrightNews = () => {
             personalizationSaving={personalizationSaving}
             handleStartPremiumPurchase={handleStartPremiumPurchase}
             premiumPurchaseLoading={premiumPurchaseLoading}
+            premiumPurchaseFeedback={premiumPurchaseFeedback}
+            premiumCheckoutEnabled={PREMIUM_CHECKOUT_ENABLED}
+            appVersionLabel={appVersionLabel}
             handleSignOut={handleSignOut}
             handleGoogleSignIn={handleGoogleSignIn}
             handleEmailAuth={handleEmailAuth}

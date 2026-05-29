@@ -62,6 +62,11 @@
     "rejected": "Rejected",
     "all": "All"
   },
+  "storyFilters": {
+    "newest": "Newest",
+    "top": "Top saved",
+    "featured": "Featured"
+  },
   "topbar": {
     "account": "Account",
     "signIn": "Sign In",
@@ -85,8 +90,10 @@
   "home": {
     "exploreFeed": "Explore the feed",
     "category": "Category",
+    "filter": "Filter",
+    "storyFilter": "Story filter",
     "personalizedFeed": "Personalized",
-    "exploreDescription": "Choose a topic, then scroll a single story flow.",
+    "exploreDescription": "Choose a topic and filter, then scroll a single story flow.",
     "topStory": "Top Story",
     "moreGoodNews": "More Good News",
     "highlights": "Today's highlights",
@@ -122,6 +129,7 @@
     "support": "Support",
     "privacyPolicy": "Privacy policy",
     "accountDeletion": "Delete account",
+    "appVersion": "App version: {version}",
     "resourcesHint": "The feedback email opens with a prefilled template so people can quickly describe bugs, confusing flows, or story quality issues."
   },
   "auth": {
@@ -252,6 +260,7 @@
     "processing": "Processing...",
     "comingSoon": "Coming soon",
     "active": "Premium is active",
+    "checkoutPaused": "Premium checkout is temporarily unavailable while we finish the Google Play setup.",
     "signInToUpgrade": "Sign in first to upgrade to Premium.",
     "androidOnly": "Premium purchases are available in the Android app installed from Google Play.",
     "openingGooglePlay": "Opening Google Play checkout...",

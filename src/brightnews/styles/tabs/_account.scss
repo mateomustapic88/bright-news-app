@@ -232,6 +232,30 @@
   font-weight: 900;
 }
 
+.bn-premium-card__feedback {
+  margin: -4px 0 0;
+  padding: 10px 12px;
+  border: 1px solid var(--bn-divider);
+  border-radius: 14px;
+  background: var(--bn-surface-raised);
+  color: var(--bn-text-muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.bn-premium-card__feedback--accent {
+  border-color: color-mix(in srgb, var(--bn-success) 28%, var(--bn-divider));
+  background: var(--bn-success-bg);
+  color: var(--bn-success);
+}
+
+.bn-premium-card__feedback--error {
+  border-color: color-mix(in srgb, var(--bn-danger) 34%, var(--bn-divider));
+  background: color-mix(in srgb, var(--bn-danger) 12%, var(--bn-surface-raised));
+  color: var(--bn-danger);
+}
+
 .bn-personalization-card {
   display: grid;
   gap: 16px;
@@ -364,4 +388,14 @@
       text-decoration: underline;
     }
   }
+}
+
+.bn-account-footer__version {
+  margin: 0;
+  color: var(--bn-text-subtle);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-transform: uppercase;
 }

@@ -7,6 +7,7 @@ const PremiumUpgradeDialog = ({
   onStartPremiumPurchase,
   purchaseLoading = false,
   purchaseStatus = "",
+  checkoutEnabled = true,
   readLimit,
   t,
 }) => {
@@ -55,20 +56,22 @@ const PremiumUpgradeDialog = ({
       </div>
 
       <div className="bn-premium-dialog__actions">
-        <button
-          type="button"
-          className="bn-button bn-button--primary"
-          onClick={onStartPremiumPurchase}
-          disabled={purchaseLoading}
-        >
-          {purchaseLoading ? t("premium.processing") : t("premium.choosePlan")}
-        </button>
+        {checkoutEnabled ? (
+          <button
+            type="button"
+            className="bn-button bn-button--primary"
+            onClick={onStartPremiumPurchase}
+            disabled={purchaseLoading}
+          >
+            {purchaseLoading ? t("premium.processing") : t("premium.choosePlan")}
+          </button>
+        ) : null}
         <button type="button" className="bn-button bn-button--secondary" onClick={onClose}>
           {t("premium.notNow")}
         </button>
       </div>
       <p className="bn-premium-dialog__note">
-        {purchaseStatus || t("premium.billingNote")}
+        {checkoutEnabled ? purchaseStatus || t("premium.billingNote") : t("premium.checkoutPaused")}
       </p>
     </DialogOverlay>
   );

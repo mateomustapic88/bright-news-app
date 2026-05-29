@@ -17,6 +17,7 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
+import com.getcapacitor.Logger;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
 import java.util.Collections;
@@ -30,11 +31,21 @@ public class GooglePlayBillingPlugin extends Plugin implements PurchasesUpdatedL
 
     @Override
     public void load() {
-        billingClient = BillingClient.newBuilder(getContext())
-            .setListener(this)
-            .enablePendingPurchases(PendingPurchasesParams.newBuilder().build())
-            .enableAutoServiceReconnection()
-            .build();
+        try {
+            Logger.debug("GooglePlayBilling", "Initializing GooglePlayBilling plugin");
+            PendingPurchasesParams pendingPurchasesParams = PendingPurchasesParams.newBuilder()
+                .enableOneTimeProducts()
+                .build();
+
+            billingClient = BillingClient.newBuilder(getContext())
+                .setListener(this)
+                .enablePendingPurchases(pendingPurchasesParams)
+                .enableAutoServiceReconnection()
+                .build();
+        } catch (Exception ex) {
+            Logger.error("GooglePlayBilling", "Failed to initialize BillingClient", ex);
+            throw ex;
+        }
     }
 
     @PluginMethod

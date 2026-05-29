@@ -32,6 +32,9 @@ const AccountTab = ({
   personalizationSaving = false,
   handleStartPremiumPurchase,
   premiumPurchaseLoading = false,
+  premiumPurchaseFeedback = null,
+  premiumCheckoutEnabled = true,
+  appVersionLabel = "",
   handleGoogleSignIn,
   handleEmailAuth,
   handleSignOut,
@@ -156,15 +159,26 @@ const AccountTab = ({
 
         {isPremium ? (
           <p className="bn-premium-card__status">{t("premium.active")}</p>
+        ) : !premiumCheckoutEnabled ? (
+          <p className="bn-premium-card__feedback bn-premium-card__feedback--info">
+            {t("premium.checkoutPaused")}
+          </p>
         ) : (
-          <button
-            type="button"
-            className="bn-button bn-button--primary"
-            onClick={handleStartPremiumPurchase}
-            disabled={premiumPurchaseLoading}
-          >
-            {premiumPurchaseLoading ? t("premium.processing") : t("premium.choosePlan")}
-          </button>
+          <>
+            <button
+              type="button"
+              className="bn-button bn-button--primary"
+              onClick={handleStartPremiumPurchase}
+              disabled={premiumPurchaseLoading}
+            >
+              {premiumPurchaseLoading ? t("premium.processing") : t("premium.choosePlan")}
+            </button>
+            {premiumPurchaseFeedback ? (
+              <p className={`bn-premium-card__feedback bn-premium-card__feedback--${premiumPurchaseFeedback.variant || "info"}`}>
+                {premiumPurchaseFeedback.message}
+              </p>
+            ) : null}
+          </>
         )}
       </section>
 
@@ -274,6 +288,11 @@ const AccountTab = ({
         <p className="bn-account-footer__hint">
           {t("account.supportEmail")} <a href={SUPPORT_MAILTO}>{SUPPORT_EMAIL}</a>
         </p>
+        {appVersionLabel ? (
+          <p className="bn-account-footer__version">
+            {t("account.appVersion", { version: appVersionLabel })}
+          </p>
+        ) : null}
       </footer>
     </section>
   );

@@ -55,6 +55,23 @@ const applyPersonalizedStoryFilters = (query, preferences = {}) => {
   return nextQuery;
 };
 
+const applyStoryOrdering = (query, storyFilter = "newest") => {
+  if (storyFilter === "top") {
+    return query
+      .order("saved_count", { ascending: false })
+      .order("published_at", { ascending: false });
+  }
+
+  if (storyFilter === "featured") {
+    return query
+      .order("is_pinned", { ascending: false })
+      .order("saved_count", { ascending: false })
+      .order("published_at", { ascending: false });
+  }
+
+  return query.order("published_at", { ascending: false });
+};
+
 export const loadStories = async (regionCode, categoryId, options = {}) => {
   if (!supabase) {
     throw new Error("Supabase configuration is missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
@@ -63,22 +80,15 @@ export const loadStories = async (regionCode, categoryId, options = {}) => {
   const {
     offset = 0,
     limit,
+    storyFilter = "newest",
   } = options;
-
-  const rankBySaves = categoryId;
 
   let query = supabase
     .from("stories")
-    .select("*")
-    .order("is_pinned", { ascending: false });
-
-  if (rankBySaves) {
-    query = query.order("saved_count", { ascending: false });
-  }
-
-  query = query.order("published_at", { ascending: false });
+    .select("*");
 
   query = applyStoryFilters(query, regionCode, categoryId);
+  query = applyStoryOrdering(query, storyFilter);
 
   if (typeof limit === "number" && limit > 0) {
     query = query.range(offset, offset + limit - 1);
@@ -97,7 +107,7 @@ export const loadStoriesPage = async (regionCode, categoryId, options = {}) => {
     limit = 10,
   } = options;
 
-  const items = await loadStories(regionCode, categoryId, { offset, limit });
+  const items = await loadStories(regionCode, categoryId, { offset, limit, storyFilter: options.storyFilter });
 
   return {
     items,
@@ -114,16 +124,15 @@ export const loadPersonalizedStories = async (preferences, options = {}) => {
   const {
     offset = 0,
     limit,
+    storyFilter = "newest",
   } = options;
 
   let query = supabase
     .from("stories")
-    .select("*")
-    .order("is_pinned", { ascending: false })
-    .order("saved_count", { ascending: false })
-    .order("published_at", { ascending: false });
+    .select("*");
 
   query = applyPersonalizedStoryFilters(query, preferences);
+  query = applyStoryOrdering(query, storyFilter);
 
   if (typeof limit === "number" && limit > 0) {
     query = query.range(offset, offset + limit - 1);
@@ -142,7 +151,7 @@ export const loadPersonalizedStoriesPage = async (preferences, options = {}) => 
     limit = 10,
   } = options;
 
-  const items = await loadPersonalizedStories(preferences, { offset, limit });
+  const items = await loadPersonalizedStories(preferences, { offset, limit, storyFilter: options.storyFilter });
 
   return {
     items,
