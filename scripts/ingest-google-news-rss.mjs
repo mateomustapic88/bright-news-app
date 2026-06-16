@@ -2,9 +2,11 @@ import { createClient } from "@supabase/supabase-js";
 import { pathToFileURL } from "node:url";
 import {
   buildRawArticleRow,
+  CATEGORY_CONFIG,
   DEFAULT_INGEST_REGION_CODES,
   dedupeBySourceUrl,
   getCategoryEmoji,
+  getLocalizedCategoryQuery,
   parseRssItems,
   REGION_CONFIG,
   resolveCategory,
@@ -50,14 +52,25 @@ if (!supabaseUrl) {
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 const requestDelayMs = Number(getEnv("INGEST_GOOGLE_NEWS_RSS_REQUEST_DELAY_MS") || 1200);
 const maxItemsPerFeed = Number(getEnv("INGEST_GOOGLE_NEWS_RSS_MAX_ITEMS") || 25);
+const maxItemsPerCategoryFeed = Number(getEnv("INGEST_GOOGLE_NEWS_RSS_CATEGORY_MAX_ITEMS") || 10);
 const maxRetriesPerRequest = Number(getEnv("INGEST_GOOGLE_NEWS_RSS_MAX_RETRIES") || 2);
 const retryDelayMs = Number(getEnv("INGEST_GOOGLE_NEWS_RSS_RETRY_DELAY_MS") || 4000);
+const includeTopFeed = getEnv("INGEST_GOOGLE_NEWS_RSS_INCLUDE_TOP_FEED") !== "false";
+const includeCategoryFeeds = getEnv("INGEST_GOOGLE_NEWS_RSS_CATEGORY_FEEDS") !== "false";
+const defaultCategoryFeedNames = "Environment,Science,Health,Innovation";
+const categoryFeedNames = new Set(
+  (getEnv("INGEST_GOOGLE_NEWS_RSS_CATEGORY_NAMES") || defaultCategoryFeedNames)
+    .split(",")
+    .map(value => value.trim())
+    .filter(Boolean),
+);
+const categoryFeedLimit = Math.max(0, Number(getEnv("INGEST_GOOGLE_NEWS_RSS_CATEGORY_LIMIT") || categoryFeedNames.size));
 const enabledRegionCodes = (getEnv("INGEST_REGION_CODES") || DEFAULT_INGEST_REGION_CODES)
   .split(",")
   .map(value => value.trim())
   .filter(Boolean);
 
-const buildFeedUrl = ({ region }) => {
+const buildFeedUrl = ({ region, query }) => {
   const locale = GOOGLE_NEWS_REGION_CONFIG[region.code] || GOOGLE_NEWS_REGION_CONFIG.world;
   const params = new URLSearchParams({
     hl: locale.hl,
@@ -65,7 +78,45 @@ const buildFeedUrl = ({ region }) => {
     ceid: locale.ceid,
   });
 
+  if (query) {
+    params.set("q", query);
+    return `${GOOGLE_NEWS_BASE_URL}/search?${params.toString()}`;
+  }
+
   return `${GOOGLE_NEWS_BASE_URL}?${params.toString()}`;
+};
+
+const getRegionFeeds = region => {
+  const feeds = [];
+
+  if (includeTopFeed) {
+    feeds.push({
+      url: buildFeedUrl({ region }),
+      category: null,
+      label: `${region.code}:top`,
+      maxItems: maxItemsPerFeed,
+    });
+  }
+
+  if (includeCategoryFeeds) {
+    const enabledCategories = CATEGORY_CONFIG
+      .filter(category => categoryFeedNames.has(category.category))
+      .slice(0, categoryFeedLimit);
+
+    for (const category of enabledCategories) {
+      feeds.push({
+        url: buildFeedUrl({
+          region,
+          query: getLocalizedCategoryQuery(category, region.lang),
+        }),
+        category: category.category,
+        label: `${region.code}:${category.category}`,
+        maxItems: maxItemsPerCategoryFeed,
+      });
+    }
+  }
+
+  return feeds;
 };
 
 const splitHeadlineAndSource = (rawTitle, explicitSourceName = "") => {
@@ -98,10 +149,10 @@ const splitHeadlineAndSource = (rawTitle, explicitSourceName = "") => {
   };
 };
 
-const fetchFeed = async ({ region }) => {
+const fetchFeed = async feed => {
   for (let attempt = 0; attempt <= maxRetriesPerRequest; attempt += 1) {
     try {
-      const response = await fetch(buildFeedUrl({ region }));
+      const response = await fetch(feed.url);
       const xml = await response.text();
 
       if (!response.ok) {
@@ -187,70 +238,74 @@ export const run = async () => {
   }
 
   for (const region of enabledRegions) {
-    try {
-      const xml = await fetchFeed({ region });
-      const items = parseRssItems(xml).slice(0, maxItemsPerFeed);
+    for (const feed of getRegionFeeds(region)) {
+      try {
+        const xml = await fetchFeed(feed);
+        const items = parseRssItems(xml).slice(0, feed.maxItems || maxItemsPerFeed);
 
-      for (const item of items) {
-        const { title, sourceName } = splitHeadlineAndSource(item.title, deriveSourceName(item));
+        for (const item of items) {
+          const { title, sourceName } = splitHeadlineAndSource(item.title, deriveSourceName(item));
 
-        if (region.lang !== "en" && isLikelyEnglishHeadline(title)) {
-          continue;
-        }
+          if (region.lang !== "en" && isLikelyEnglishHeadline(title)) {
+            continue;
+          }
 
-        const category = resolveCategory({
-          title,
-          description: item.description,
-          content: item.content_encoded,
-          tags: item.categories,
-        });
-
-        const sourceUrl = item.source_url || item.link;
-        const resolvedRegionCode = region.code === "world"
-          ? resolveRegionCode({
+          const category = feed.category || resolveCategory({
             title,
             description: item.description,
             content: item.content_encoded,
-            tags: [...item.categories, category, sourceName],
-            sourceUrl,
-          })
-          : region.code;
+            tags: item.categories,
+          });
 
-        const row = await buildRawArticleRow({
-          vendor: "google_news_rss",
-          sourceName,
-          article: {
-            url: item.link,
-            title,
-            description: item.description,
-            content: item.content_encoded,
-            publishedAt: item.pubDate,
-          },
-          regionCode: resolvedRegionCode,
-          countryCode: REGION_CONFIG.find(candidate => candidate.code === resolvedRegionCode)?.country || null,
-          category,
-          emoji: getCategoryEmoji(category),
-          tags: [...item.categories, category, "google_news_rss", sourceName],
-          rawPayload: {
-            ...item,
-            google_news_feed: buildFeedUrl({ region }),
-          },
-        });
+          const sourceUrl = item.source_url || item.link;
+          const resolvedRegionCode = region.code === "world"
+            ? resolveRegionCode({
+              title,
+              description: item.description,
+              content: item.content_encoded,
+              tags: [...item.categories, category, sourceName],
+              sourceUrl,
+            })
+            : region.code;
 
-        if (row) {
-          fetchedArticles.push(row);
+          const row = await buildRawArticleRow({
+            vendor: "google_news_rss",
+            sourceName,
+            article: {
+              url: item.link,
+              title,
+              description: item.description,
+              content: item.content_encoded,
+              publishedAt: item.pubDate,
+            },
+            regionCode: resolvedRegionCode,
+            countryCode: REGION_CONFIG.find(candidate => candidate.code === resolvedRegionCode)?.country || null,
+            category,
+            emoji: getCategoryEmoji(category),
+            tags: [...item.categories, category, "google_news_rss", sourceName],
+            rawPayload: {
+              ...item,
+              google_news_feed: feed.url,
+              google_news_feed_label: feed.label,
+            },
+          });
+
+          if (row) {
+            fetchedArticles.push(row);
+          }
         }
+
+        succeededRegions.push(feed.label);
+      } catch (error) {
+        regionErrors.push({
+          region: region.code,
+          feed: feed.label,
+          error: error?.message || "Unknown Google News RSS region error",
+        });
       }
 
-      succeededRegions.push(region.code);
-    } catch (error) {
-      regionErrors.push({
-        region: region.code,
-        error: error?.message || "Unknown Google News RSS region error",
-      });
+      await sleep(requestDelayMs);
     }
-
-    await sleep(requestDelayMs);
   }
 
   const dedupedRows = dedupeBySourceUrl(fetchedArticles);
