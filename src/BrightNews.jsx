@@ -73,6 +73,7 @@ import {
   writeUserPreferences,
 } from "./brightnews/storage";
 import BottomNav from "./brightnews/components/BottomNav";
+import AppStoreDock from "./brightnews/components/AppStoreDock";
 import Header from "./brightnews/components/Header";
 import LoadingBar from "./brightnews/components/LoadingBar";
 import OnboardingModal from "./brightnews/components/OnboardingModal";
@@ -1629,9 +1630,10 @@ const BrightNews = () => {
   const activeFeedCacheKey = feedMode === "personalized" && personalizedFeedAvailable
     ? `${getPersonalizedFeedCacheKey(userPreferences)}-${storyFilter}`
     : `${region}-${category}-${storyFilter}`;
+  const showAppStoreDock = !isNativeApp();
 
   return (
-    <div className={`bright-news${hideFeedChrome && tab === "home" ? " is-feed-chrome-hidden" : ""}`}>
+    <div className={`bright-news${hideFeedChrome && tab === "home" ? " is-feed-chrome-hidden" : ""}${showAppStoreDock ? " has-app-store-dock" : ""}`}>
       {loading ? <LoadingBar /> : null}
 
       {themeFeedback ? (
@@ -1835,6 +1837,15 @@ const BrightNews = () => {
         onUpgradeClick={handleSourceMeterClick}
         t={t}
       />
+
+      {showAppStoreDock ? (
+        <AppStoreDock
+          onGooglePlayClick={() => trackEvent("google_play_download_click", {
+            placement: "persistent_store_dock",
+          })}
+          t={t}
+        />
+      ) : null}
 
       <BottomNav tabs={localizedTabs} tab={tab} setTab={setTab} />
 

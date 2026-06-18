@@ -1191,6 +1191,100 @@
   background: var(--bn-accent-strong);
 }
 
+.bn-app-store-dock {
+  position: fixed;
+  right: max(18px, calc((100vw - var(--bn-shell-width)) / 2 + 18px));
+  bottom: max(env(safe-area-inset-bottom), 18px);
+  z-index: 105;
+  display: flex;
+  align-items: stretch;
+  gap: 7px;
+  padding: 6px;
+  border: 1px solid var(--bn-divider);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bn-surface-raised-strong) 94%, transparent);
+  box-shadow: var(--bn-shadow-card-hover);
+  backdrop-filter: blur(18px);
+}
+
+.bn-app-store-dock__google-play,
+.bn-app-store-dock__ios {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 7px 11px;
+  border-radius: 7px;
+  text-decoration: none;
+}
+
+.bn-app-store-dock__google-play {
+  background: #171717;
+  color: #fff;
+  transition: background var(--bn-transition), transform var(--bn-transition);
+
+  &:hover {
+    background: #000;
+    transform: translateY(-1px);
+  }
+}
+
+.bn-app-store-dock__ios {
+  border: 1px solid var(--bn-divider);
+  background: var(--bn-surface-raised);
+  color: var(--bn-text-muted);
+  cursor: not-allowed;
+}
+
+.bn-app-store-dock__play-icon,
+.bn-app-store-dock__ios-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+}
+
+.bn-app-store-dock__play-icon {
+  color: #7ddc75;
+  font-size: 18px;
+}
+
+.bn-app-store-dock__ios-mark {
+  border: 1px solid var(--bn-divider);
+  border-radius: 6px;
+  background: var(--bn-surface-raised-strong);
+  color: var(--bn-text-strong);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.bn-app-store-dock__copy {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+
+  small {
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+    opacity: 0.76;
+  }
+
+  strong {
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0;
+    line-height: 1.15;
+    white-space: nowrap;
+  }
+}
+
+.bright-news.has-app-store-dock .bn-source-meter {
+  bottom: 92px;
+}
+
 .bn-source-meter {
   @include button-reset;
 
@@ -1589,6 +1683,50 @@
     width: auto;
     border-radius: 16px;
     padding: 9px 11px;
+  }
+
+  .bright-news.has-app-store-dock .bn-screen {
+    padding-bottom: 156px;
+  }
+
+  .bn-app-store-dock {
+    right: 12px;
+    bottom: calc(max(env(safe-area-inset-bottom), 0px) + 68px);
+    left: 12px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    gap: 6px;
+    padding: 5px;
+  }
+
+  .bn-app-store-dock__google-play,
+  .bn-app-store-dock__ios {
+    gap: 7px;
+    min-width: 0;
+    min-height: 42px;
+    padding: 6px 8px;
+  }
+
+  .bn-app-store-dock__play-icon,
+  .bn-app-store-dock__ios-mark {
+    width: 24px;
+    height: 24px;
+  }
+
+  .bn-app-store-dock__copy {
+    small {
+      font-size: 8px;
+    }
+
+    strong {
+      overflow: hidden;
+      font-size: 11px;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .bright-news.has-app-store-dock .bn-source-meter {
+    bottom: 128px;
   }
 }
 

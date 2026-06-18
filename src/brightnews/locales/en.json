@@ -87,6 +87,12 @@
     "refreshingStories": "Refreshing stories...",
     "edition": "Edition"
   },
+  "appStore": {
+    "downloadApp": "Download the BrightNews app",
+    "getItOn": "Get it on",
+    "iosApp": "iPhone app",
+    "comingSoon": "Coming soon"
+  },
   "home": {
     "exploreFeed": "Explore the feed",
     "category": "Category",
