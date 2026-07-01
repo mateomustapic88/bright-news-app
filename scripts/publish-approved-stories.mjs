@@ -60,14 +60,19 @@ const withRetries = async (label, runQuery) => {
   }
 };
 
-const loadLiveStories = async () => {
+const loadExistingStoriesBySourceUrl = async sourceUrls => {
+  const uniqueSourceUrls = [...new Set(sourceUrls.map(normalizeExternalUrl).filter(Boolean))];
+
+  if (uniqueSourceUrls.length === 0) {
+    return [];
+  }
+
   const { data, error } = await withRetries(
-    "Failed to load live stories",
+    "Failed to load existing stories by source URL",
     () => supabase
       .from("stories")
-      .select("id, source_url, region_code, country_code, is_pinned, published_at")
-      .order("is_pinned", { ascending: false })
-      .order("published_at", { ascending: false }),
+      .select("id, source_url")
+      .in("source_url", uniqueSourceUrls),
   );
 
   if (error) throw new Error(error.message);
@@ -139,12 +144,16 @@ export const run = async () => {
       normalizedApprovedRows: normalizedApprovedRows.length,
     });
 
+    const republishCandidates = await loadRepublishCandidates();
+    const candidateSourceUrls = [
+      ...normalizedApprovedRows.map(row => row.source_url),
+      ...republishCandidates.map(row => row.source_url),
+    ];
+
     stage = "load_existing_stories";
-    const liveStories = await loadLiveStories();
-    const existingStories = liveStories;
+    const existingStories = await loadExistingStoriesBySourceUrl(candidateSourceUrls);
     const existingBySourceUrl = new Map(existingStories.map(story => [story.source_url, story.id]));
     const rowsToInsert = normalizedApprovedRows.filter(row => !existingBySourceUrl.has(row.source_url));
-    const republishCandidates = await loadRepublishCandidates();
     const selectedRepublishRows = [];
     const selectedSourceUrls = new Set(rowsToInsert.map(row => row.source_url));
 
@@ -160,7 +169,7 @@ export const run = async () => {
 
     const candidateRowsToInsert = [...rowsToInsert, ...selectedRepublishRows];
     logPublishStage("existing_stories_loaded", {
-      liveStories: liveStories.length,
+      candidateSourceUrls: new Set(candidateSourceUrls.map(normalizeExternalUrl).filter(Boolean)).size,
       existingStories: existingBySourceUrl.size,
       rowsToInsert: rowsToInsert.length,
       republishRowsToInsert: selectedRepublishRows.length,
@@ -218,7 +227,6 @@ export const run = async () => {
       republished: selectedRepublishRows.length,
       inserted: insertedStories.length,
       published: markedPublished,
-      liveStories: liveStories.length + insertedStories.length,
     };
 
     logPublishStage("completed", result);
