@@ -19,6 +19,23 @@ if (!supabaseUrl) {
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 const maxRetries = Number(getEnv("PUBLISH_APPROVED_MAX_RETRIES") || 3);
 const retryDelayMs = Number(getEnv("PUBLISH_APPROVED_RETRY_DELAY_MS") || 1500);
+const publishApprovedLimit = Number(getEnv("PUBLISH_APPROVED_LIMIT") || 25);
+const republishCandidateLimit = Number(getEnv("PUBLISH_REPUBLISH_LIMIT") || 0);
+const rawArticleStoryColumns = [
+  "id",
+  "source_url",
+  "title",
+  "description",
+  "content",
+  "category",
+  "source_name",
+  "region_code",
+  "country_code",
+  "emoji",
+  "published_at",
+  "image_url",
+  "review_notes",
+].join(", ");
 
 const toSentence = value => (value || "").replace(/\s+/g, " ").trim();
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -80,16 +97,23 @@ const loadExistingStoriesBySourceUrl = async sourceUrls => {
 };
 
 const loadRepublishCandidates = async () => {
+  if (republishCandidateLimit <= 0) {
+    logPublishStage("republish_candidates_skipped", {
+      reason: "PUBLISH_REPUBLISH_LIMIT is 0",
+    });
+    return [];
+  }
+
   const { data, error } = await withRetries(
     "Failed to load republish candidates",
     () => supabase
       .from("raw_articles")
-      .select("*")
+      .select(rawArticleStoryColumns)
       .eq("review_status", "published")
       .is("published_story_id", null)
       .ilike("review_notes", "%Moved out of live feed due to published story cap.%")
       .order("published_at", { ascending: false })
-      .limit(500),
+      .limit(republishCandidateLimit),
   );
 
   if (error) throw new Error(error.message);
@@ -127,11 +151,11 @@ export const run = async () => {
       "Failed to load approved raw articles",
       () => supabase
         .from("raw_articles")
-        .select("*")
+        .select(rawArticleStoryColumns)
         .eq("review_status", "approved")
         .is("published_story_id", null)
         .order("published_at", { ascending: false })
-        .limit(100),
+        .limit(publishApprovedLimit),
     );
 
     if (approvedError) throw new Error(approvedError.message);
@@ -142,8 +166,10 @@ export const run = async () => {
     logPublishStage("approved_rows_loaded", {
       approvedRows: approvedRows?.length || 0,
       normalizedApprovedRows: normalizedApprovedRows.length,
+      publishApprovedLimit,
     });
 
+    stage = "load_republish_candidates";
     const republishCandidates = await loadRepublishCandidates();
     const candidateSourceUrls = [
       ...normalizedApprovedRows.map(row => row.source_url),
