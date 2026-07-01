@@ -166,20 +166,11 @@ export const inferReviewDecision = ({
   }
 
   if (!hasAiReviewer &&
-      sourceQualityScore >= thresholds.autoApproveMinSourceQualityScore &&
-      sourceAdjustedScore >= effectiveAutoApproveScore) {
+      (sourceAdjustedScore >= effectiveAutoApproveScore || canAutoApproveStrongLocal)) {
     return {
-      reviewStatus: "approved",
+      reviewStatus: "pending",
       rejectedReason: "",
-      reviewNotes: `Auto-approved by heuristic score because AI review is unavailable (positive ${candidateScore.toFixed(2)}, source ${sourceQualityScore.toFixed(2)}, blended ${sourceAdjustedScore.toFixed(2)}).`,
-    };
-  }
-
-  if (!hasAiReviewer && canAutoApproveStrongLocal) {
-    return {
-      reviewStatus: "approved",
-      rejectedReason: "",
-      reviewNotes: `Auto-approved from strong local positive signal because AI review is unavailable (positive ${candidateScore.toFixed(2)}, source ${sourceQualityScore.toFixed(2)}, blended ${sourceAdjustedScore.toFixed(2)}).`,
+      reviewNotes: `AI review unavailable; kept pending instead of heuristic auto-approval (positive ${candidateScore.toFixed(2)}, source ${sourceQualityScore.toFixed(2)}, blended ${sourceAdjustedScore.toFixed(2)}).`,
     };
   }
 
