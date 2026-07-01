@@ -4,7 +4,6 @@ import { run as runGdeltIngest } from "./ingest-gdelt.mjs";
 import { run as runGuardianIngest } from "./ingest-guardian.mjs";
 import { run as runGoogleNewsRssIngest } from "./ingest-google-news-rss.mjs";
 import { run as runNewsDataIngest } from "./ingest-newsdata.mjs";
-import { run as runNewsCatcherIngest } from "./ingest-newscatcher.mjs";
 import { run as runRssIngest } from "./ingest-rss.mjs";
 import { run as runOpenAiReview } from "./review-pending-with-openai.mjs";
 import { run as runPublishApproved } from "./publish-approved-stories.mjs";
@@ -15,7 +14,6 @@ export const run = async () => {
   const guardian = { skipped: false };
   const googleNewsRss = { skipped: false };
   const newsdata = { skipped: false };
-  const newscatcher = { skipped: false };
   const rss = { skipped: false };
   const openai = { skipped: false };
   const published = { skipped: false };
@@ -56,13 +54,6 @@ export const run = async () => {
   }
 
   try {
-    Object.assign(newscatcher, await runNewsCatcherIngest());
-  } catch (error) {
-    newscatcher.skipped = true;
-    newscatcher.error = error.message;
-  }
-
-  try {
     Object.assign(rss, await runRssIngest());
   } catch (error) {
     rss.skipped = true;
@@ -83,7 +74,7 @@ export const run = async () => {
     published.error = error.message;
   }
 
-  const result = { gnews, gdelt, guardian, googleNewsRss, newsdata, newscatcher, rss, openai, published };
+  const result = { gnews, gdelt, guardian, googleNewsRss, newsdata, rss, openai, published };
   console.log(JSON.stringify(result, null, 2));
   return result;
 };

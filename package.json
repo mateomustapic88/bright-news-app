@@ -22,7 +22,6 @@
     "ingest:newsdata": "node --env-file=.env scripts/ingest-newsdata.mjs",
     "backfill:hr-news": "node --env-file=.env scripts/backfill-hr-news.mjs",
     "backfill:story-images": "node --env-file=.env scripts/backfill-story-images.mjs",
-    "ingest:newscatcher": "node --env-file=.env scripts/ingest-newscatcher.mjs",
     "ingest:rss": "node --env-file=.env scripts/ingest-rss.mjs",
     "review:pending": "node --env-file=.env scripts/review-pending-with-openai.mjs",
     "publish:approved": "node --env-file=.env scripts/publish-approved-stories.mjs",
