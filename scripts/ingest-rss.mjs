@@ -61,6 +61,47 @@ const FEED_CONFIG = [
     feedUrl: "https://www.goodgoodgood.co/feed",
   },
   {
+    vendor: "yes_magazine",
+    sourceName: "YES! Magazine",
+    feedUrl: "https://www.yesmagazine.org/feed",
+    regionCode: "world",
+    category: "Community",
+  },
+  {
+    vendor: "nasa_news",
+    sourceName: "NASA News",
+    feedUrl: "https://www.nasa.gov/news-release/feed/",
+    regionCode: "world",
+    category: "Science",
+  },
+  {
+    vendor: "esa_news",
+    sourceName: "ESA News",
+    feedUrl: "https://www.esa.int/rssfeed/Our_Activities",
+    regionCode: "world",
+    category: "Science",
+  },
+  {
+    vendor: "mongabay",
+    sourceName: "Mongabay",
+    feedUrl: "https://news.mongabay.com/feed/",
+    regionCode: "world",
+    category: "Environment",
+  },
+  {
+    vendor: "un_news",
+    sourceName: "UN News",
+    feedUrl: "https://news.un.org/feed/subscribe/en/news/all/rss.xml",
+    regionCode: "world",
+  },
+  {
+    vendor: "who_news",
+    sourceName: "WHO News",
+    feedUrl: "https://www.who.int/rss-feeds/news-english.xml",
+    regionCode: "world",
+    category: "Health",
+  },
+  {
     vendor: "npr_science",
     sourceName: "NPR Science",
     feedUrl: "https://feeds.npr.org/1007/rss.xml",
@@ -122,6 +163,12 @@ const FEED_CONFIG = [
     feedUrl: "https://news.mit.edu/rss/feed",
     regionCode: "us",
     category: "Innovation",
+  },
+  {
+    vendor: "conversation_us",
+    sourceName: "The Conversation US",
+    feedUrl: "https://theconversation.com/us/articles.atom",
+    regionCode: "us",
   },
   {
     vendor: "index_znanost",
@@ -209,6 +256,18 @@ const FEED_CONFIG = [
     feedUrl: "https://www.24sata.hr/feeds/tech.xml",
     regionCode: "hr",
     category: "Innovation",
+  },
+  {
+    vendor: "telegram_hr",
+    sourceName: "Telegram",
+    feedUrl: "https://www.telegram.hr/feed/",
+    regionCode: "hr",
+  },
+  {
+    vendor: "vecernji_hr",
+    sourceName: "Večernji list",
+    feedUrl: "https://www.vecernji.hr/rss",
+    regionCode: "hr",
   },
   {
     vendor: "miss7_zdrava",
@@ -311,6 +370,12 @@ const FEED_CONFIG = [
     regionCode: "si",
   },
   {
+    vendor: "rtv_slo",
+    sourceName: "RTV Slovenija",
+    feedUrl: "https://www.rtvslo.si/feeds/01.xml",
+    regionCode: "si",
+  },
+  {
     vendor: "n1_srbija",
     sourceName: "N1 Srbija",
     feedUrl: "https://n1info.rs/feed/",
@@ -351,6 +416,12 @@ const FEED_CONFIG = [
     category: "Community",
   },
   {
+    vendor: "danas_rs",
+    sourceName: "Danas",
+    feedUrl: "https://www.danas.rs/feed/",
+    regionCode: "rs",
+  },
+  {
     vendor: "klix_ba",
     sourceName: "Klix",
     feedUrl: "https://www.klix.ba/rss",
@@ -389,6 +460,18 @@ const FEED_CONFIG = [
     feedUrl: "https://www.nezavisne.com/rss/kultura",
     regionCode: "ba",
     category: "Community",
+  },
+  {
+    vendor: "avaz_ba",
+    sourceName: "Dnevni avaz",
+    feedUrl: "https://avaz.ba/rss",
+    regionCode: "ba",
+  },
+  {
+    vendor: "buka_ba",
+    sourceName: "Buka",
+    feedUrl: "https://6yka.com/feed/",
+    regionCode: "ba",
   },
   {
     vendor: "bbc_science_environment",
@@ -432,6 +515,12 @@ const FEED_CONFIG = [
     category: "Innovation",
   },
   {
+    vendor: "conversation_uk",
+    sourceName: "The Conversation UK",
+    feedUrl: "https://theconversation.com/uk/articles.atom",
+    regionCode: "uk",
+  },
+  {
     vendor: "abc_health",
     sourceName: "ABC Health & Wellbeing",
     feedUrl: "https://www.abc.net.au/health/indexes/exclude-recipes/rss.xml",
@@ -455,6 +544,12 @@ const FEED_CONFIG = [
     vendor: "sbs_news_au",
     sourceName: "SBS News",
     feedUrl: "https://www.sbs.com.au/news/feed",
+    regionCode: "au",
+  },
+  {
+    vendor: "conversation_au",
+    sourceName: "The Conversation Australia",
+    feedUrl: "https://theconversation.com/au/articles.atom",
     regionCode: "au",
   },
   {
