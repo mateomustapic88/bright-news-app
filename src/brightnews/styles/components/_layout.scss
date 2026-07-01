@@ -1202,7 +1202,7 @@
   padding: 6px;
   border: 1px solid var(--bn-divider);
   border-radius: 10px;
-  background: color-mix(in srgb, var(--bn-surface-raised-strong) 94%, transparent);
+  background: var(--bn-surface-raised-strong);
   box-shadow: var(--bn-shadow-card-hover);
   backdrop-filter: blur(18px);
 }
