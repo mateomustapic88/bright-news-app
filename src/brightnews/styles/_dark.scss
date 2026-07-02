@@ -99,6 +99,18 @@
     box-shadow: 0 18px 42px rgba(0, 0, 0, 0.52);
   }
 
+  .bn-app-store-dock {
+    background: #101b2d;
+    border-color: var(--bn-border-strong);
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.52);
+  }
+
+  .bn-app-store-dock__ios,
+  .bn-app-store-dock__ios-mark {
+    background: #17243a;
+    border-color: var(--bn-border-strong);
+  }
+
   .bn-source-meter__track {
     background: color-mix(in srgb, var(--bn-surface-tint) 78%, var(--bn-bg));
   }
@@ -162,11 +174,13 @@
   .bn-onboarding__surface {
     background:
       radial-gradient(circle at top right, color-mix(in srgb, var(--bn-accent) 18%, transparent), transparent 36%),
-      var(--bn-surface-raised);
+      #101b2d;
+    border: 1px solid var(--bn-border-strong);
+    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.62);
   }
 
   .bn-onboarding__card {
-    background: color-mix(in srgb, var(--bn-accent) 8%, var(--bn-surface-raised));
+    background: color-mix(in srgb, var(--bn-accent) 8%, #17243a);
   }
 
   .bn-onboarding__card-icon {
