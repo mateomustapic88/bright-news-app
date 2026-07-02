@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://brightnews-three.vercel.app/sitemap.xml
+Sitemap: https://brightnews.app/sitemap.xml

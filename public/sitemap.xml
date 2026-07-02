@@ -1,87 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://brightnews-three.vercel.app/</loc>
+    <loc>https://brightnews.app/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/positive-news-today</loc>
+    <loc>https://brightnews.app/positive-news-today</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/good-news-this-week</loc>
+    <loc>https://brightnews.app/good-news-this-week</loc>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/uplifting-stories</loc>
+    <loc>https://brightnews.app/uplifting-stories</loc>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/positive-news/usa</loc>
+    <loc>https://brightnews.app/positive-news/usa</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/positive-news/uk</loc>
+    <loc>https://brightnews.app/positive-news/uk</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/positive-news/croatia</loc>
+    <loc>https://brightnews.app/positive-news/croatia</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/positive-news/slovenia</loc>
+    <loc>https://brightnews.app/positive-news/slovenia</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/positive-news/serbia</loc>
+    <loc>https://brightnews.app/positive-news/serbia</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/positive-news/bosnia-and-herzegovina</loc>
+    <loc>https://brightnews.app/positive-news/bosnia-and-herzegovina</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/positive-news/germany</loc>
+    <loc>https://brightnews.app/positive-news/germany</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/positive-news/france</loc>
+    <loc>https://brightnews.app/positive-news/france</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/positive-news/canada</loc>
+    <loc>https://brightnews.app/positive-news/canada</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/positive-news/japan</loc>
+    <loc>https://brightnews.app/positive-news/japan</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/positive-news/australia</loc>
+    <loc>https://brightnews.app/positive-news/australia</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/positive-news/brazil</loc>
+    <loc>https://brightnews.app/positive-news/brazil</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/positive-news/india</loc>
+    <loc>https://brightnews.app/positive-news/india</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
