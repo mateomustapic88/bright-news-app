@@ -1,4 +1,4 @@
-export const SITE_URL = import.meta.env.VITE_SITE_URL || "https://bright-news-app.vercel.app";
+export const SITE_URL = import.meta.env.VITE_SITE_URL || "https://brightnews-three.vercel.app";
 export const GOOGLE_PLAY_URL = "https://play.google.com/store/apps/details?id=com.mateomustapic.brightnews";
 
 export const SEO_ROUTES = [
