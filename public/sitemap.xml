@@ -26,6 +26,36 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://brightnews.app/positive-news/usa/today</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews.app/good-news/usa/this-week</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews.app/uplifting-stories/usa</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews.app/positive-news/usa/health</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews.app/positive-news/usa/science</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews.app/positive-news/usa/environment</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://brightnews.app/positive-news/uk</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>

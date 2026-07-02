@@ -133,6 +133,7 @@ const SeoRoundupPage = ({ route }) => {
       try {
         const result = await loadSeoStories({
           regionCode: route.regionCode,
+          categoryId: route.categoryId || "all",
           storyFilter: route.storyFilter,
           limit: 12,
         });
