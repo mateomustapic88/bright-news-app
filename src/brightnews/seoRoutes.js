@@ -1,5 +1,21 @@
-export const SITE_URL = import.meta.env.VITE_SITE_URL || "https://brightnews-three.vercel.app";
+export const SITE_URL = import.meta.env?.VITE_SITE_URL || "https://brightnews-three.vercel.app";
 export const GOOGLE_PLAY_URL = "https://play.google.com/store/apps/details?id=com.mateomustapic.brightnews";
+
+const countryRoute = ({
+  slug,
+  country,
+  regionCode,
+  adjective,
+}) => ({
+  path: `/positive-news/${slug}`,
+  title: `Positive News ${country} | BrightNews`,
+  heading: `Positive News ${country}`,
+  eyebrow: `${country} edition`,
+  description: `Positive and constructive news from ${country}, including health, science, nature, innovation and community stories.`,
+  keywords: `positive news ${country}, good news ${country}, uplifting ${adjective} news`,
+  regionCode,
+  storyFilter: "newest",
+});
 
 export const SEO_ROUTES = [
   {
@@ -32,36 +48,19 @@ export const SEO_ROUTES = [
     regionCode: "world",
     storyFilter: "top",
   },
-  {
-    path: "/positive-news/australia",
-    title: "Positive News Australia | BrightNews",
-    heading: "Positive News Australia",
-    eyebrow: "Australia edition",
-    description: "Positive and constructive news from Australia, including health, science, nature and community stories.",
-    keywords: "positive news Australia, good news Australia, uplifting Australian news",
-    regionCode: "au",
-    storyFilter: "newest",
-  },
-  {
-    path: "/positive-news/japan",
-    title: "Positive News Japan | BrightNews",
-    heading: "Positive News Japan",
-    eyebrow: "Japan edition",
-    description: "Positive and constructive news from Japan, including science, health, innovation and community stories.",
-    keywords: "positive news Japan, good news Japan, uplifting Japanese news",
-    regionCode: "jp",
-    storyFilter: "newest",
-  },
-  {
-    path: "/positive-news/croatia",
-    title: "Positive News Croatia | BrightNews",
-    heading: "Positive News Croatia",
-    eyebrow: "Croatia edition",
-    description: "Positive and constructive news from Croatia, with stories about progress, health, science and local communities.",
-    keywords: "positive news Croatia, good news Croatia, uplifting Croatian news",
-    regionCode: "hr",
-    storyFilter: "newest",
-  },
+  countryRoute({ slug: "usa", country: "USA", regionCode: "us", adjective: "American" }),
+  countryRoute({ slug: "uk", country: "UK", regionCode: "uk", adjective: "British" }),
+  countryRoute({ slug: "croatia", country: "Croatia", regionCode: "hr", adjective: "Croatian" }),
+  countryRoute({ slug: "slovenia", country: "Slovenia", regionCode: "si", adjective: "Slovenian" }),
+  countryRoute({ slug: "serbia", country: "Serbia", regionCode: "rs", adjective: "Serbian" }),
+  countryRoute({ slug: "bosnia-and-herzegovina", country: "Bosnia and Herzegovina", regionCode: "ba", adjective: "Bosnian" }),
+  countryRoute({ slug: "germany", country: "Germany", regionCode: "de", adjective: "German" }),
+  countryRoute({ slug: "france", country: "France", regionCode: "fr", adjective: "French" }),
+  countryRoute({ slug: "canada", country: "Canada", regionCode: "ca", adjective: "Canadian" }),
+  countryRoute({ slug: "japan", country: "Japan", regionCode: "jp", adjective: "Japanese" }),
+  countryRoute({ slug: "australia", country: "Australia", regionCode: "au", adjective: "Australian" }),
+  countryRoute({ slug: "brazil", country: "Brazil", regionCode: "br", adjective: "Brazilian" }),
+  countryRoute({ slug: "india", country: "India", regionCode: "in", adjective: "Indian" }),
 ];
 
 export const getSeoRoute = pathname => {

@@ -21,7 +21,47 @@
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/positive-news/australia</loc>
+    <loc>https://brightnews-three.vercel.app/positive-news/usa</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews-three.vercel.app/positive-news/uk</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews-three.vercel.app/positive-news/croatia</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews-three.vercel.app/positive-news/slovenia</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews-three.vercel.app/positive-news/serbia</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews-three.vercel.app/positive-news/bosnia-and-herzegovina</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews-three.vercel.app/positive-news/germany</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews-three.vercel.app/positive-news/france</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews-three.vercel.app/positive-news/canada</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
@@ -31,7 +71,17 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://brightnews-three.vercel.app/positive-news/croatia</loc>
+    <loc>https://brightnews-three.vercel.app/positive-news/australia</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews-three.vercel.app/positive-news/brazil</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews-three.vercel.app/positive-news/india</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>

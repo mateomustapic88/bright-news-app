@@ -14,6 +14,7 @@
     "cap:open:ios": "npx cap open ios",
     "cap:open:android": "npx cap open android",
     "lint": "eslint .",
+    "seo:sitemap": "node scripts/generate-seo-sitemap.mjs",
     "preview": "vite preview",
     "ingest:gnews": "node --env-file=.env scripts/ingest-gnews.mjs",
     "ingest:gdelt": "node --env-file=.env scripts/ingest-gdelt.mjs",
