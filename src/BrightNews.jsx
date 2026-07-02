@@ -87,7 +87,6 @@ import AccountTab from "./brightnews/tabs/AccountTab";
 import HomeTab from "./brightnews/tabs/HomeTab";
 import ReviewTab from "./brightnews/tabs/ReviewTab";
 import SavedTab from "./brightnews/tabs/SavedTab";
-import "./brightnews/styles/BrightNews.scss";
 
 const WEB_INITIAL_STORY_LIMIT = 50;
 const WEB_INCREMENTAL_STORY_LIMIT = 10;

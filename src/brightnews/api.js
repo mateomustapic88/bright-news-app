@@ -116,6 +116,31 @@ export const loadStoriesPage = async (regionCode, categoryId, options = {}) => {
   };
 };
 
+export const loadSeoStories = async ({
+  regionCode = "world",
+  categoryId = "all",
+  storyFilter = "newest",
+  limit = 12,
+} = {}) => {
+  if (!supabase) {
+    throw new Error("Supabase configuration is missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
+  }
+
+  let query = supabase
+    .from("stories")
+    .select("id, headline, summary, category, location, emoji, impact, read_time, source_url, image_url, published_at, region_code, saved_count, is_pinned")
+    .limit(limit);
+
+  query = applyStoryFilters(query, regionCode, categoryId);
+  query = applyStoryOrdering(query, storyFilter);
+
+  const { data, error } = await query;
+
+  if (error) throw new Error(error.message);
+
+  return (data || []).map(mapStoryRow);
+};
+
 export const loadPersonalizedStories = async (preferences, options = {}) => {
   if (!supabase) {
     throw new Error("Supabase configuration is missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
