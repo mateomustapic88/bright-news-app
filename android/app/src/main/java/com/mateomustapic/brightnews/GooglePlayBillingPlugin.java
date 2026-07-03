@@ -151,10 +151,12 @@ public class GooglePlayBillingPlugin extends Plugin implements PurchasesUpdatedL
             return;
         }
 
+        ProductDetails.SubscriptionOfferDetails selectedOffer = selectBestSubscriptionOffer(offers);
+
         BillingFlowParams.ProductDetailsParams productDetailsParams =
             BillingFlowParams.ProductDetailsParams.newBuilder()
                 .setProductDetails(productDetails)
-                .setOfferToken(offers.get(0).getOfferToken())
+                .setOfferToken(selectedOffer.getOfferToken())
                 .build();
 
         BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
@@ -165,6 +167,32 @@ public class GooglePlayBillingPlugin extends Plugin implements PurchasesUpdatedL
         if (launchResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
             rejectPurchaseCall(launchResult.getDebugMessage());
         }
+    }
+
+    private ProductDetails.SubscriptionOfferDetails selectBestSubscriptionOffer(List<ProductDetails.SubscriptionOfferDetails> offers) {
+        for (ProductDetails.SubscriptionOfferDetails offer : offers) {
+            if (hasFreeTrialPricingPhase(offer)) {
+                Logger.debug("GooglePlayBilling", "Using free trial subscription offer.");
+                return offer;
+            }
+        }
+
+        Logger.debug("GooglePlayBilling", "Using default subscription offer.");
+        return offers.get(0);
+    }
+
+    private boolean hasFreeTrialPricingPhase(ProductDetails.SubscriptionOfferDetails offer) {
+        if (offer.getPricingPhases() == null || offer.getPricingPhases().getPricingPhaseList() == null) {
+            return false;
+        }
+
+        for (ProductDetails.PricingPhase pricingPhase : offer.getPricingPhases().getPricingPhaseList()) {
+            if (pricingPhase.getPriceAmountMicros() == 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
