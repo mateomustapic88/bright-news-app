@@ -3,8 +3,6 @@ export const APP_ID = "com.mateomustapic.brightnews";
 export const MOBILE_AUTH_SCHEME = APP_ID;
 export const SUPPORT_EMAIL = "brightnews.global@gmail.com";
 export const SUPPORT_MAILTO = `mailto:${SUPPORT_EMAIL}`;
-export const WEB_APP_URL = "https://brightnews.app";
-const LEGACY_WEB_HOSTS = new Set(["brightnews-three.vercel.app"]);
 const withBasePath = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
 
 export const LEGAL_LINKS = {
@@ -37,14 +35,5 @@ export const buildFeedbackMailto = () => {
 
 export const getConfiguredWebAuthRedirectUrl = () => {
   const configuredUrl = import.meta.env.VITE_WEB_AUTH_REDIRECT_URL?.trim();
-  if (!configuredUrl) return null;
-
-  try {
-    const url = new URL(configuredUrl);
-    if (LEGACY_WEB_HOSTS.has(url.hostname)) return WEB_APP_URL;
-  } catch {
-    return null;
-  }
-
-  return configuredUrl;
+  return configuredUrl || null;
 };

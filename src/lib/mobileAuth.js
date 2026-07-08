@@ -1,5 +1,5 @@
 import { Capacitor } from "@capacitor/core";
-import { getConfiguredWebAuthRedirectUrl, MOBILE_AUTH_SCHEME, WEB_APP_URL } from "./appConfig";
+import { getConfiguredWebAuthRedirectUrl, MOBILE_AUTH_SCHEME } from "./appConfig";
 
 export const MOBILE_AUTH_REDIRECT_URL = `${MOBILE_AUTH_SCHEME}://auth/callback`;
 
@@ -8,17 +8,7 @@ export const isNativeApp = () => Capacitor.isNativePlatform();
 export const getAuthRedirectUrl = () => {
   if (isNativeApp()) return MOBILE_AUTH_REDIRECT_URL;
   if (typeof window === "undefined") return getConfiguredWebAuthRedirectUrl() || undefined;
-  const configuredUrl = getConfiguredWebAuthRedirectUrl();
-  if (configuredUrl) return configuredUrl;
-
-  try {
-    const origin = window.location.origin;
-    const url = new URL(origin);
-    if (url.hostname === "brightnews-three.vercel.app") return WEB_APP_URL;
-    return origin;
-  } catch {
-    return WEB_APP_URL;
-  }
+  return getConfiguredWebAuthRedirectUrl() || window.location.origin;
 };
 
 export const isMobileAuthCallback = url => (
