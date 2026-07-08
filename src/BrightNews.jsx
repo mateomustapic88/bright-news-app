@@ -108,7 +108,8 @@ const getAuthProvider = session => (
 const hasPreferenceValues = preferences => (
   (preferences?.preferredRegions || []).length > 0 ||
   (preferences?.preferredCategories || []).length > 0 ||
-  Boolean(preferences?.strictPositiveFilter)
+  Boolean(preferences?.strictPositiveFilter) ||
+  Boolean(preferences?.hideSavedStories)
 );
 
 const strictPositiveBlocklist = [
@@ -130,6 +131,7 @@ const strictPositivePattern = new RegExp(`\\b(${strictPositiveBlocklist.join("|"
 const applyPremiumStoryPreferences = (items, {
   isPremium,
   preferences,
+  savedStoryIds = [],
   selectedRegion,
   selectedCategory,
 }) => {
@@ -138,6 +140,7 @@ const applyPremiumStoryPreferences = (items, {
   const preferredRegions = preferences?.preferredRegions || [];
   const preferredCategories = preferences?.preferredCategories || [];
   const strictPositiveFilter = Boolean(preferences?.strictPositiveFilter);
+  const hideSavedStories = Boolean(preferences?.hideSavedStories);
 
   let nextItems = items;
 
@@ -160,6 +163,15 @@ const applyPremiumStoryPreferences = (items, {
     }
   }
 
+  if (hideSavedStories && savedStoryIds.length > 0) {
+    const savedStorySet = new Set(savedStoryIds);
+    nextItems = nextItems.filter(story => !savedStorySet.has(story.id));
+  }
+
+  if (hideSavedStories) {
+    return nextItems;
+  }
+
   return nextItems.length > 0 ? nextItems : items;
 };
 
@@ -171,6 +183,7 @@ const getPersonalizedFeedCacheKey = preferences => {
     preferredRegions.join(",") || "all-regions",
     preferredCategories.join(",") || "all-categories",
     preferences?.strictPositiveFilter ? "strict" : "standard",
+    preferences?.hideSavedStories ? "fresh" : "all-saved",
   ].join("-");
 };
 
@@ -735,6 +748,7 @@ const BrightNews = () => {
   const visibleStories = applyPremiumStoryPreferences(languageFilteredStories, {
     isPremium: feedMode === "personalized" && personalizedFeedAvailable,
     preferences: userPreferences,
+    savedStoryIds: saved,
     selectedRegion: "world",
     selectedCategory: "all",
   });
@@ -827,7 +841,12 @@ const BrightNews = () => {
 
       try {
         const remotePreferences = await loadUserPreferences(session.user.id);
-        const nextPreferences = remotePreferences || localPreferences;
+        const nextPreferences = remotePreferences
+          ? {
+              ...remotePreferences,
+              hideSavedStories: localPreferences.hideSavedStories,
+            }
+          : localPreferences;
 
         if (active) {
           setUserPreferences(nextPreferences);
@@ -1468,6 +1487,7 @@ const BrightNews = () => {
         preferred_regions: (nextPreferences?.preferredRegions || []).length,
         preferred_categories: (nextPreferences?.preferredCategories || []).length,
         strict_positive_filter: Boolean(nextPreferences?.strictPositiveFilter),
+        hide_saved_stories: Boolean(nextPreferences?.hideSavedStories),
       });
     } catch {
       setShareFeedback({

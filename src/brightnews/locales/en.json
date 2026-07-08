@@ -260,6 +260,7 @@
     "benefitUnlimitedSources": "Unlimited Read source links",
     "benefitPersonalization": "Personalize countries and categories",
     "benefitStrictFilter": "Stricter positive-news filtering",
+    "benefitFreshFeed": "Fresh feed that hides stories you already saved",
     "benefitSupport": "Support independent BrightNews development",
     "viewPlans": "View plans",
     "choosePlan": "Choose plan",
@@ -287,7 +288,9 @@
     "personalizationUnsaved": "Changes are not applied yet.",
     "personalizationReady": "Personalized feed is ready on Home.",
     "strictFilterTitle": "Extra-strict positive filter",
-    "strictFilterDescription": "Prefer safer, more clearly uplifting stories when filtering improves."
+    "strictFilterDescription": "Prefer safer, more clearly uplifting stories when filtering improves.",
+    "freshFeedTitle": "Fresh feed",
+    "freshFeedDescription": "Hide stories you already saved from your personalized feed."
   },
   "feedback": {
     "signInSuccess": "Signed in successfully.",

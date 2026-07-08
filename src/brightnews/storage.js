@@ -174,7 +174,14 @@ export const incrementLocalSourceReadCount = () => {
 };
 
 export const readUserPreferences = () => {
-  if (typeof window === "undefined") return { preferredRegions: [], preferredCategories: [], strictPositiveFilter: false };
+  if (typeof window === "undefined") {
+    return {
+      preferredRegions: [],
+      preferredCategories: [],
+      strictPositiveFilter: false,
+      hideSavedStories: false,
+    };
+  }
 
   try {
     const stored = window.localStorage.getItem(USER_PREFERENCES_KEY);
@@ -183,9 +190,15 @@ export const readUserPreferences = () => {
       preferredRegions: Array.isArray(parsed.preferredRegions) ? parsed.preferredRegions : [],
       preferredCategories: Array.isArray(parsed.preferredCategories) ? parsed.preferredCategories : [],
       strictPositiveFilter: Boolean(parsed.strictPositiveFilter),
+      hideSavedStories: Boolean(parsed.hideSavedStories),
     };
   } catch {
-    return { preferredRegions: [], preferredCategories: [], strictPositiveFilter: false };
+    return {
+      preferredRegions: [],
+      preferredCategories: [],
+      strictPositiveFilter: false,
+      hideSavedStories: false,
+    };
   }
 };
 

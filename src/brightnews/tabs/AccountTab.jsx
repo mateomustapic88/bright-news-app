@@ -57,7 +57,12 @@ const AccountTab = ({
   const preferredRegions = draftPreferences?.preferredRegions || [];
   const preferredCategories = draftPreferences?.preferredCategories || [];
   const strictPositiveFilter = Boolean(draftPreferences?.strictPositiveFilter);
-  const hasDraftPreferences = preferredRegions.length > 0 || preferredCategories.length > 0 || strictPositiveFilter;
+  const hideSavedStories = Boolean(draftPreferences?.hideSavedStories);
+  const hasDraftPreferences =
+    preferredRegions.length > 0 ||
+    preferredCategories.length > 0 ||
+    strictPositiveFilter ||
+    hideSavedStories;
   const preferencesChanged =
     JSON.stringify(draftPreferences || {}) !== JSON.stringify(userPreferences || {});
 
@@ -155,6 +160,7 @@ const AccountTab = ({
           <span>✓ {t("premium.benefitUnlimitedSources")}</span>
           <span>✓ {t("premium.benefitPersonalization")}</span>
           <span>✓ {t("premium.benefitStrictFilter")}</span>
+          <span>✓ {t("premium.benefitFreshFeed")}</span>
         </div>
 
         {isPremium ? (
@@ -240,6 +246,22 @@ const AccountTab = ({
           <span>
             <strong>{t("premium.strictFilterTitle")}</strong>
             <small>{t("premium.strictFilterDescription")}</small>
+          </span>
+        </label>
+
+        <label className="bn-personalization-card__toggle">
+          <input
+            type="checkbox"
+            checked={hideSavedStories}
+            onChange={event => setDraftPreferences(currentPreferences => ({
+              ...currentPreferences,
+              hideSavedStories: event.target.checked,
+            }))}
+            disabled={!isPremium}
+          />
+          <span>
+            <strong>{t("premium.freshFeedTitle")}</strong>
+            <small>{t("premium.freshFeedDescription")}</small>
           </span>
         </label>
 
