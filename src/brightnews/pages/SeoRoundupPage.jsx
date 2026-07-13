@@ -3,6 +3,7 @@ import { loadSeoStories } from "../api";
 import { CATEGORIES, REGIONS, getCategoryMeta, getCategoryThemeClass } from "../constants";
 import { formatStoryPublishedAt, getCategoryLabel } from "../i18n";
 import { GOOGLE_PLAY_URL, SEO_ROUTES, SITE_URL } from "../seoRoutes";
+import BrandMark from "../components/BrandMark";
 import StoryMedia from "../components/StoryMedia";
 
 const upsertMeta = (selector, attributes) => {
@@ -164,11 +165,11 @@ const SeoRoundupPage = ({ route }) => {
   }, [route]);
 
   return (
-    <main className="bn-seo-page">
+    <main className="bright-news bn-seo-page">
       <header className="bn-seo-hero">
         <nav className="bn-seo-nav" aria-label="BrightNews">
           <a href="/" className="bn-seo-brand">
-            <span aria-hidden="true">☀️</span>
+            <span className="bn-seo-brand__mark"><BrandMark /></span>
             <strong>BrightNews</strong>
           </a>
           <a className="bn-seo-nav__app" href={GOOGLE_PLAY_URL} target="_blank" rel="noreferrer noopener">

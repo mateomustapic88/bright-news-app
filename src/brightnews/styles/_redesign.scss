@@ -143,9 +143,21 @@
   flex: 0 0 auto;
 }
 
-.bn-account-button__avatar,
 .bn-account-button__icon {
+  display: inline-flex;
+  flex: 0 0 26px;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+}
+
+.bn-account-button__avatar,
+.bn-account-button__avatar--fallback {
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
+  object-fit: cover;
 }
 
 .bn-language-menu__panel {
@@ -1304,6 +1316,17 @@
     width: 38px;
     min-height: 38px;
     padding: 0;
+  }
+
+  .bn-account-button__icon,
+  .bn-account-button__avatar,
+  .bn-account-button__avatar--fallback {
+    width: 28px;
+    height: 28px;
+  }
+
+  .bn-account-button__icon {
+    flex-basis: 28px;
   }
 
   .bn-screen {
