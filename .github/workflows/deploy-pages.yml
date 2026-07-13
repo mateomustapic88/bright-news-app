@@ -44,7 +44,6 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
-          VITE_WEB_AUTH_REDIRECT_URL: ${{ vars.VITE_WEB_AUTH_REDIRECT_URL }}
         run: npm run build -- --base="/${{ github.event.repository.name }}/"
 
       - name: Configure Pages

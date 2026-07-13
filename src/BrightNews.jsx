@@ -363,11 +363,7 @@ const BrightNews = () => {
   useEffect(() => {
     if (typeof document === "undefined") return;
     const root = document.documentElement;
-    if (themePreference === "system") {
-      root.removeAttribute("data-theme");
-    } else {
-      root.setAttribute("data-theme", themePreference);
-    }
+    root.setAttribute("data-theme", themePreference);
     writeThemePreference(themePreference);
   }, [themePreference]);
 
@@ -1830,6 +1826,11 @@ const BrightNews = () => {
             handleFeedbackClick={handleFeedbackClick}
             t={t}
             uiLanguage={uiLanguage}
+            themePreference={themePreference}
+            setThemePreference={setThemePreference}
+            appLanguage={appLanguage}
+            appLanguages={appLanguages}
+            setAppLanguage={setAppLanguage}
           />
         )}
 
@@ -1851,11 +1852,13 @@ const BrightNews = () => {
         )}
       </div>
 
-      <SourceReadMeter
-        sourceReadState={sourceReadState}
-        onUpgradeClick={handleSourceMeterClick}
-        t={t}
-      />
+      {tab === "home" && !isPremium && (sourceReadState?.used || 0) > 0 ? (
+        <SourceReadMeter
+          sourceReadState={sourceReadState}
+          onUpgradeClick={handleSourceMeterClick}
+          t={t}
+        />
+      ) : null}
 
       {showAppStoreDock ? (
         <AppStoreDock

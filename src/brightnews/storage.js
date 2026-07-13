@@ -120,13 +120,13 @@ export const writeStoryLanguageFilter = languageCode => {
 };
 
 export const readThemePreference = () => {
-  if (typeof window === "undefined") return "system";
+  if (typeof window === "undefined") return "light";
 
   try {
     const value = window.localStorage.getItem(THEME_PREFERENCE_KEY);
-    return THEME_PREFERENCES.includes(value) ? value : "system";
+    return THEME_PREFERENCES.includes(value) ? value : "light";
   } catch {
-    return "system";
+    return "light";
   }
 };
 
@@ -134,7 +134,7 @@ export const writeThemePreference = value => {
   if (typeof window === "undefined") return;
 
   try {
-    if (!THEME_PREFERENCES.includes(value) || value === "system") {
+    if (!THEME_PREFERENCES.includes(value)) {
       window.localStorage.removeItem(THEME_PREFERENCE_KEY);
       return;
     }

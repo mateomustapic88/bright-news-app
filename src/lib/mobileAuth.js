@@ -1,5 +1,5 @@
 import { Capacitor } from "@capacitor/core";
-import { getConfiguredWebAuthRedirectUrl, MOBILE_AUTH_SCHEME } from "./appConfig";
+import { MOBILE_AUTH_SCHEME } from "./appConfig";
 
 export const MOBILE_AUTH_REDIRECT_URL = `${MOBILE_AUTH_SCHEME}://auth/callback`;
 
@@ -7,8 +7,8 @@ export const isNativeApp = () => Capacitor.isNativePlatform();
 
 export const getAuthRedirectUrl = () => {
   if (isNativeApp()) return MOBILE_AUTH_REDIRECT_URL;
-  if (typeof window === "undefined") return getConfiguredWebAuthRedirectUrl() || undefined;
-  return getConfiguredWebAuthRedirectUrl() || window.location.origin;
+  if (typeof window === "undefined") return undefined;
+  return window.location.origin;
 };
 
 export const isMobileAuthCallback = url => (

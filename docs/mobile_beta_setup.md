@@ -30,17 +30,11 @@ In `Authentication -> URL Configuration`, allow:
 - `http://localhost:5173`
 - `com.mateomustapic.brightnews://auth/callback`
 
-For hosted web later, also add the production site URL and set:
+For hosted web, also add the production site URL:
 
-```env
-VITE_WEB_AUTH_REDIRECT_URL=https://your-domain.com
-```
+- `https://brightnews.app`
 
-If you deploy the web app on Vercel first, this can be your Vercel URL, for example:
-
-```env
-VITE_WEB_AUTH_REDIRECT_URL=https://brightnews.vercel.app
-```
+Web authentication automatically returns to the origin where sign-in started.
 
 ### Google OAuth
 

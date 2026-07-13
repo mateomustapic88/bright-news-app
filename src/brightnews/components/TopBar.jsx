@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { getLanguageLabel, getLanguageShortLabel } from "../i18n";
 import BrandMark from "./BrandMark";
+import AppIcon from "./AppIcon";
 import ThemeSwitch from "./ThemeSwitch";
 
 const getInitials = value =>
@@ -111,7 +112,7 @@ const TopBar = ({
                   {getInitials(label)}
                 </span>
               )
-            ) : "🔐"}
+            ) : <AppIcon name="user" size={18} />}
           </span>
           <span>{session?.user ? t("topbar.account") : t("topbar.signIn")}</span>
         </button>

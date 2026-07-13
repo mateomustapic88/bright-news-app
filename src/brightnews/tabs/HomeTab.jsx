@@ -7,6 +7,7 @@ import {
   getCategoryThemeClass,
 } from "../constants";
 import { getCategoryLabel, getRegionLabel, getStoryFilterLabel } from "../i18n";
+import AppIcon from "../components/AppIcon";
 import Chip from "../components/Chip";
 import EmptyState from "../components/EmptyState";
 import HeroCard from "../components/HeroCard";
@@ -108,11 +109,6 @@ const HomeTab = ({
   const visibleMobileContinentId = activeMobileContinentId || selectedRegionContinentId;
   const worldRegion = regions.find(item => item.code === "world");
   const selectedRegion = regions.find(item => item.code === region) || worldRegion || regions[0];
-  const selectedCategory = CATEGORIES.find(item => item.id === category) || CATEGORIES[0];
-  const selectedStoryFilter = STORY_FILTERS.find(item => item.id === storyFilter) || STORY_FILTERS[0];
-  const categoryButtonLabel = feedMode === "personalized"
-    ? t("home.personalizedFeed")
-    : getCategoryLabel(selectedCategory.id, uiLanguage);
   const featuredStory = getFeaturedStory(stories, category, storyFilter);
 
   const remainingStories = stories.filter(story => story.id !== featuredStory?.id);
@@ -157,97 +153,55 @@ const HomeTab = ({
   return (
     <section className="bn-tab bn-home-tab">
       <div className="bn-home-tab__filters-surface bn-home-tab__filters-surface--desktop">
-        <div className="bn-home-tab__filters-copy">
-          <span className="bn-home-tab__filters-kicker">{t("home.exploreFeed")}</span>
-          <p>{t("home.exploreDescription")}</p>
-        </div>
+        <nav className="bn-category-tabs" aria-label={t("home.category")}>
+          {personalizedFeedAvailable ? (
+            <Chip
+              active={feedMode === "personalized"}
+              onClick={handleSelectPersonalizedFeed}
+              className="bn-category-tab bn-chip--personalized bn-theme--all"
+            >
+              <AppIcon name="sparkles" size={15} />
+              <span>{t("home.personalizedFeed")}</span>
+            </Chip>
+          ) : null}
+          {CATEGORIES.map(item => (
+            <Chip
+              key={item.id}
+              active={feedMode !== "personalized" && category === item.id}
+              onClick={() => setCategory(item.id)}
+              className={`bn-category-tab ${getCategoryThemeClass(item.id)}`}
+            >
+              <span>{getCategoryLabel(item.id, uiLanguage)}</span>
+            </Chip>
+          ))}
+        </nav>
 
-        <div className="bn-home-tab__filters">
-          <div className="bn-chip-row bn-chip-row--surface">
-            {personalizedFeedAvailable ? (
-              <Chip
-                active={feedMode === "personalized"}
-                onClick={handleSelectPersonalizedFeed}
-                className="bn-chip--category bn-chip--personalized bn-theme--all"
-              >
-                <span>✨</span>
-                <span>{t("home.personalizedFeed")}</span>
-              </Chip>
-            ) : null}
-            {CATEGORIES.map(item => (
-              <Chip
-                key={item.id}
-                active={category === item.id}
-                onClick={() => setCategory(item.id)}
-                className={`bn-chip--category ${getCategoryThemeClass(item.id)}`}
-              >
-                <span>{item.emoji}</span>
-                <span>{getCategoryLabel(item.id, uiLanguage)}</span>
-              </Chip>
-            ))}
-          </div>
-
-          <div className="bn-home-tab__filter-group">
-            <span className="bn-home-tab__filter-label">{t("home.storyFilter")}</span>
-            <div className="bn-chip-row bn-chip-row--surface bn-chip-row--feed-filters">
-              {STORY_FILTERS.map(item => (
-                <Chip
-                  key={item.id}
-                  active={storyFilter === item.id}
-                  onClick={() => setStoryFilter(item.id)}
-                  className="bn-chip--feed-filter"
-                >
-                  <span>{item.emoji}</span>
-                  <span>{getStoryFilterLabel(item.id, uiLanguage)}</span>
-                </Chip>
-              ))}
-            </div>
-          </div>
+        <div className="bn-story-filter-segments" aria-label={t("home.storyFilter")}>
+          {STORY_FILTERS.map(item => (
+            <Chip
+              key={item.id}
+              active={storyFilter === item.id}
+              onClick={() => setStoryFilter(item.id)}
+              className="bn-story-filter-segment"
+            >
+              <AppIcon name={item.id === "newest" ? "clock" : item.id === "top" ? "top" : "star"} size={15} />
+              <span>{getStoryFilterLabel(item.id, uiLanguage)}</span>
+            </Chip>
+          ))}
         </div>
       </div>
 
       <div className="bn-home-tab__filters-mobile">
-        <div className="bn-home-tab__mobile-filter-bar">
+        <div className="bn-mobile-edition-row">
           <button
             type="button"
             className={`bn-mobile-filter-button${mobileFilterPanel === "region" ? " is-open" : ""}`}
             onClick={() => setMobileFilterPanel(current => (current === "region" ? null : "region"))}
             aria-expanded={mobileFilterPanel === "region"}
           >
-            <span className="bn-mobile-filter-button__icon">{selectedRegion?.flag || "🌍"}</span>
-            <span className="bn-mobile-filter-button__copy">
-              <small>{t("header.edition")}</small>
-              <strong>{selectedRegion ? getRegionLabel(selectedRegion.code, uiLanguage) : getRegionLabel("world", uiLanguage)}</strong>
-            </span>
-            <span className="bn-mobile-filter-button__chevron" aria-hidden="true">⌄</span>
-          </button>
-
-          <button
-            type="button"
-            className={`bn-mobile-filter-button bn-mobile-filter-button--category ${getCategoryThemeClass(selectedCategory.id)}${mobileFilterPanel === "category" ? " is-open" : ""}`}
-            onClick={() => setMobileFilterPanel(current => (current === "category" ? null : "category"))}
-            aria-expanded={mobileFilterPanel === "category"}
-          >
-            <span className="bn-mobile-filter-button__icon">{feedMode === "personalized" ? "✨" : selectedCategory.emoji}</span>
-            <span className="bn-mobile-filter-button__copy">
-              <small>{t("home.category")}</small>
-              <strong>{categoryButtonLabel}</strong>
-            </span>
-            <span className="bn-mobile-filter-button__chevron" aria-hidden="true">⌄</span>
-          </button>
-
-          <button
-            type="button"
-            className={`bn-mobile-filter-button bn-mobile-filter-button--story-filter${mobileFilterPanel === "storyFilter" ? " is-open" : ""}`}
-            onClick={() => setMobileFilterPanel(current => (current === "storyFilter" ? null : "storyFilter"))}
-            aria-expanded={mobileFilterPanel === "storyFilter"}
-          >
-            <span className="bn-mobile-filter-button__icon">{selectedStoryFilter.emoji}</span>
-            <span className="bn-mobile-filter-button__copy">
-              <small>{t("home.filter")}</small>
-              <strong>{getStoryFilterLabel(selectedStoryFilter.id, uiLanguage)}</strong>
-            </span>
-            <span className="bn-mobile-filter-button__chevron" aria-hidden="true">⌄</span>
+            <AppIcon name="globe" size={19} />
+            <strong>{selectedRegion ? getRegionLabel(selectedRegion.code, uiLanguage) : getRegionLabel("world", uiLanguage)}</strong>
+            <AppIcon name="chevronDown" size={17} className="bn-mobile-filter-button__chevron" />
           </button>
         </div>
 
@@ -281,7 +235,7 @@ const HomeTab = ({
                   >
                     <span className="bn-region-button__flag">{item.emoji}</span>
                     <span>{item.label}</span>
-                    <span className="bn-region-button__chevron" aria-hidden="true">⌄</span>
+                    <AppIcon name="chevronDown" size={16} className="bn-region-button__chevron" />
                   </button>
 
                   {visibleMobileContinentId === item.id ? (
@@ -309,56 +263,42 @@ const HomeTab = ({
           </div>
         ) : null}
 
-        {mobileFilterPanel === "category" ? (
-          <div className="bn-mobile-filter-panel bn-mobile-filter-panel--categories" aria-label={t("home.category")}>
-            {personalizedFeedAvailable ? (
-              <Chip
-                active={feedMode === "personalized"}
-                onClick={() => {
-                  handleSelectPersonalizedFeed?.();
-                  setMobileFilterPanel(null);
-                }}
-                className="bn-chip--category bn-chip--personalized bn-theme--all"
-              >
-                <span>✨</span>
-                <span>{t("home.personalizedFeed")}</span>
-              </Chip>
-            ) : null}
-            {CATEGORIES.map(item => (
-              <Chip
-                key={item.id}
-                active={category === item.id}
-                onClick={() => {
-                  setCategory(item.id);
-                  setMobileFilterPanel(null);
-                }}
-                className={`bn-chip--category ${getCategoryThemeClass(item.id)}`}
-              >
-                <span>{item.emoji}</span>
-                <span>{getCategoryLabel(item.id, uiLanguage)}</span>
-              </Chip>
-            ))}
-          </div>
-        ) : null}
+        <nav className="bn-category-tabs" aria-label={t("home.category")}>
+          {personalizedFeedAvailable ? (
+            <Chip
+              active={feedMode === "personalized"}
+              onClick={handleSelectPersonalizedFeed}
+              className="bn-category-tab bn-chip--personalized bn-theme--all"
+            >
+              <AppIcon name="sparkles" size={15} />
+              <span>{t("home.personalizedFeed")}</span>
+            </Chip>
+          ) : null}
+          {CATEGORIES.map(item => (
+            <Chip
+              key={item.id}
+              active={feedMode !== "personalized" && category === item.id}
+              onClick={() => setCategory(item.id)}
+              className={`bn-category-tab ${getCategoryThemeClass(item.id)}`}
+            >
+              <span>{getCategoryLabel(item.id, uiLanguage)}</span>
+            </Chip>
+          ))}
+        </nav>
 
-        {mobileFilterPanel === "storyFilter" ? (
-          <div className="bn-mobile-filter-panel bn-mobile-filter-panel--story-filters" aria-label={t("home.storyFilter")}>
-            {STORY_FILTERS.map(item => (
-              <Chip
-                key={item.id}
-                active={storyFilter === item.id}
-                onClick={() => {
-                  setStoryFilter(item.id);
-                  setMobileFilterPanel(null);
-                }}
-                className="bn-chip--feed-filter"
-              >
-                <span>{item.emoji}</span>
-                <span>{getStoryFilterLabel(item.id, uiLanguage)}</span>
-              </Chip>
-            ))}
-          </div>
-        ) : null}
+        <div className="bn-story-filter-segments" aria-label={t("home.storyFilter")}>
+          {STORY_FILTERS.map(item => (
+            <Chip
+              key={item.id}
+              active={storyFilter === item.id}
+              onClick={() => setStoryFilter(item.id)}
+              className="bn-story-filter-segment"
+            >
+              <AppIcon name={item.id === "newest" ? "clock" : item.id === "top" ? "top" : "star"} size={15} />
+              <span>{getStoryFilterLabel(item.id, uiLanguage)}</span>
+            </Chip>
+          ))}
+        </div>
       </div>
 
       {loading && firstLoad && (
@@ -380,7 +320,7 @@ const HomeTab = ({
 
       {featuredStory && (
         <>
-          <div className="bn-home-tab__intro bn-home-tab__intro--desktop">
+          <div className="bn-home-tab__intro">
             <div>
               <span className="bn-home-tab__kicker">{t("home.highlights")}</span>
               <h2>{t("home.title")}</h2>
@@ -388,25 +328,51 @@ const HomeTab = ({
             </div>
           </div>
 
-          <div className="bn-home-tab__story-grid bn-home-tab__story-grid--desktop">
-            <div className="bn-home-tab__lead">
-              <HeroCard
-                story={featuredStory}
-                expanded={expanded}
-                firstLoad={firstLoad}
-                saved={saved}
-                setExpanded={setExpanded}
-                toggleSave={toggleSave}
-                handleShareStory={handleShareStory}
-                handleReportStory={handleReportStory}
-                handleReadSource={handleReadSource}
-                sourceReadState={sourceReadState}
-                t={t}
-                uiLanguage={uiLanguage}
-              />
+          <div className="bn-home-tab__desktop-feed">
+            <div className="bn-home-tab__feature-row">
+              <div className="bn-home-tab__lead">
+                <HeroCard
+                  story={featuredStory}
+                  expanded={expanded}
+                  firstLoad={firstLoad}
+                  saved={saved}
+                  setExpanded={setExpanded}
+                  toggleSave={toggleSave}
+                  handleShareStory={handleShareStory}
+                  handleReportStory={handleReportStory}
+                  handleReadSource={handleReadSource}
+                  sourceReadState={sourceReadState}
+                  t={t}
+                  uiLanguage={uiLanguage}
+                />
+              </div>
+
+              {remainingStories[0] ? (
+                <div
+                  className={`bn-home-tab__story-cell bn-home-tab__supporting-story${
+                    expanded === remainingStories[0].id ? " is-expanded" : ""
+                  }`}
+                >
+                  <StoryCard
+                    story={remainingStories[0]}
+                    expanded={expanded}
+                    firstLoad={firstLoad}
+                    saved={saved}
+                    setExpanded={setExpanded}
+                    toggleSave={toggleSave}
+                    handleShareStory={handleShareStory}
+                    handleReportStory={handleReportStory}
+                    handleReadSource={handleReadSource}
+                    sourceReadState={sourceReadState}
+                    t={t}
+                    uiLanguage={uiLanguage}
+                  />
+                </div>
+              ) : null}
             </div>
 
-            {remainingStories.map(story => (
+            <div className="bn-home-tab__story-grid bn-home-tab__story-grid--desktop">
+              {remainingStories.slice(1).map(story => (
               <div
                 key={story.id}
                 className={`bn-home-tab__story-cell${expanded === story.id ? " is-expanded" : ""}`}
@@ -426,9 +392,10 @@ const HomeTab = ({
                   uiLanguage={uiLanguage}
                 />
               </div>
-            ))}
+              ))}
 
-            {desktopFeedEnabled && hasMore ? <div ref={loadMoreRef} className="bn-home-tab__load-trigger" aria-hidden="true" /> : null}
+              {desktopFeedEnabled && hasMore ? <div ref={loadMoreRef} className="bn-home-tab__load-trigger" aria-hidden="true" /> : null}
+            </div>
           </div>
 
           <div className="bn-home-tab__mobile-flow">

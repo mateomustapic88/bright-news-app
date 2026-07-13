@@ -17,34 +17,21 @@ Add these in the Vercel project settings:
 
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
-- `VITE_WEB_AUTH_REDIRECT_URL`
-
-Set `VITE_WEB_AUTH_REDIRECT_URL` to your final Vercel production URL, for example:
-
-```env
-VITE_WEB_AUTH_REDIRECT_URL=https://brightnews.vercel.app
-```
-
-If you later attach a custom domain, update the value to that final domain instead.
 
 ## Supabase auth configuration
 
 In Supabase `Authentication -> URL Configuration`, add the hosted web app URL:
 
-- `https://brightnews.vercel.app`
-
-If you later switch to a custom domain, add that domain too.
+- `https://brightnews.app`
 
 ## Public web URLs to use
 
-Once the app is live on Vercel, use these URLs instead of any previous GitHub Pages links:
+Use these production URLs:
 
-- App homepage: `https://brightnews.vercel.app/`
-- Privacy policy: `https://brightnews.vercel.app/privacy-policy.html`
-- Support: `https://brightnews.vercel.app/support.html`
-- Account deletion: `https://brightnews.vercel.app/account-deletion.html`
-
-Replace the hostname with your real Vercel project URL if you choose a different project name.
+- App homepage: `https://brightnews.app/`
+- Privacy policy: `https://brightnews.app/privacy-policy.html`
+- Support: `https://brightnews.app/support.html`
+- Account deletion: `https://brightnews.app/account-deletion.html`
 
 ## Recommended follow-up updates
 
@@ -58,4 +45,4 @@ After deployment, update:
 ## Notes
 
 - The app already uses relative legal-page links, so those pages will work automatically once deployed.
-- The app already falls back to `window.location.origin` for web auth redirects, but setting `VITE_WEB_AUTH_REDIRECT_URL` is still the safer production setup.
+- Web authentication returns to the origin where the user started signing in, such as `https://brightnews.app`.

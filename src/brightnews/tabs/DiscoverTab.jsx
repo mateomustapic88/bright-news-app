@@ -1,5 +1,6 @@
 import { getRegionContinentGroups } from "../constants";
 import { getRegionLabel } from "../i18n";
+import AppIcon from "../components/AppIcon";
 
 const DiscoverTab = ({ region, regions, setRegion, setTab, t, uiLanguage }) => {
   const continentGroups = getRegionContinentGroups(regions);
@@ -7,7 +8,10 @@ const DiscoverTab = ({ region, regions, setRegion, setTab, t, uiLanguage }) => {
 
   return (
     <section className="bn-tab bn-discover-tab">
-      <h2>{t("discover.title")}</h2>
+      <div className="bn-tab-heading">
+        <AppIcon name="compass" size={24} />
+        <h2>{t("discover.title").replace(/^[^\p{L}\p{N}]+/u, "")}</h2>
+      </div>
       <p>{t("discover.description")}</p>
 
       <div className="bn-discover-continents">

@@ -64,8 +64,8 @@
   },
   "storyFilters": {
     "newest": "Newest",
-    "top": "Top saved",
-    "featured": "Featured"
+    "top": "Popular",
+    "featured": "Top stories"
   },
   "topbar": {
     "account": "Account",
@@ -103,8 +103,8 @@
     "topStory": "Top Story",
     "moreGoodNews": "More Good News",
     "highlights": "Today's highlights",
-    "title": "One calm stream of good news.",
-    "description": "Start with the strongest story, then keep exploring the rest of the feed below.",
+    "title": "Positive news from around the world",
+    "description": "Stories of progress, solutions, and people making a difference.",
     "loading": "Loading today's good news...",
     "noStoriesTitle": "No stories found",
     "noStoriesDescription": "There are no positive stories for this region and category yet. Try another filter or check back soon.",
@@ -280,6 +280,9 @@
     "personalizationTitle": "Shape your calmer feed",
     "personalizationDescription": "Choose the countries and topics you care about most. Premium preferences sync to your account.",
     "premiumOnly": "Premium",
+    "personalizationLockedTitle": "Personalization is locked",
+    "personalizationLockedDescription": "Upgrade to Premium to choose countries and topics, enable stricter filtering, and hide saved stories.",
+    "unlockPersonalization": "Unlock with Premium",
     "preferredCountries": "Preferred countries",
     "preferredCategories": "Preferred categories",
     "applyPersonalization": "Apply personalized feed",

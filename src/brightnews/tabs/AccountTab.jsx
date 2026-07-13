@@ -1,7 +1,8 @@
 import { useState } from "react";
 import AuthPanel from "../components/AuthPanel";
 import { CATEGORIES, FREE_SOURCE_READ_LIMIT, PREMIUM_PRICE_LABEL, isPremiumProfile } from "../constants";
-import { getCategoryLabel, getRegionLabel } from "../i18n";
+import { getCategoryLabel, getLanguageLabel, getRegionLabel } from "../i18n";
+import AppIcon from "../components/AppIcon";
 import {
   buildFeedbackMailto,
   LEGAL_LINKS,
@@ -41,6 +42,11 @@ const AccountTab = ({
   handleFeedbackClick,
   t,
   uiLanguage,
+  themePreference = "light",
+  setThemePreference,
+  appLanguage,
+  appLanguages = [],
+  setAppLanguage,
 }) => {
   const feedbackMailto = buildFeedbackMailto();
   const displayName =
@@ -79,6 +85,11 @@ const AccountTab = ({
 
   return (
     <section className="bn-tab bn-account-tab">
+      <header className="bn-account-page-header">
+        <p>{t("account.resourcesTitle")}</p>
+        <h2>{t(session?.user ? "account.signedInTitle" : "account.signedOutTitle").replace(/^[^\p{L}\p{N}]+/u, "")}</h2>
+      </header>
+
       {session?.user ? (
         <section className="bn-account-card bn-account-card--identity">
           <div className="bn-account-identity">
@@ -98,6 +109,7 @@ const AccountTab = ({
             </div>
           </div>
           <button type="button" onClick={handleSignOut} className="bn-button bn-button--secondary">
+            <AppIcon name="logout" size={17} />
             {t("auth.signOut")}
           </button>
         </section>
@@ -124,7 +136,7 @@ const AccountTab = ({
       <section className={`bn-account-card bn-premium-card${isPremium ? " is-premium" : ""}`}>
         <div className="bn-premium-card__header">
           <div>
-            <p className="bn-premium-card__eyebrow">{t("premium.eyebrow")}</p>
+            <p className="bn-premium-card__eyebrow"><AppIcon name="crown" size={16} /> {t("premium.eyebrow")}</p>
             <h2>{isPremium ? t("premium.accountTitlePremium") : t("premium.accountTitleFree")}</h2>
           </div>
           <span className="bn-premium-card__price">{PREMIUM_PRICE_LABEL}</span>
@@ -157,10 +169,10 @@ const AccountTab = ({
         </div>
 
         <div className="bn-premium-card__features">
-          <span>✓ {t("premium.benefitUnlimitedSources")}</span>
-          <span>✓ {t("premium.benefitPersonalization")}</span>
-          <span>✓ {t("premium.benefitStrictFilter")}</span>
-          <span>✓ {t("premium.benefitFreshFeed")}</span>
+          <span><AppIcon name="shield" size={16} /> {t("premium.benefitUnlimitedSources")}</span>
+          <span><AppIcon name="settings" size={16} /> {t("premium.benefitPersonalization")}</span>
+          <span><AppIcon name="filter" size={16} /> {t("premium.benefitStrictFilter")}</span>
+          <span><AppIcon name="sparkles" size={16} /> {t("premium.benefitFreshFeed")}</span>
         </div>
 
         {isPremium ? (
@@ -188,100 +200,156 @@ const AccountTab = ({
         )}
       </section>
 
+      <section className="bn-account-settings" aria-labelledby="bn-account-settings-title">
+        <div className="bn-account-settings__header">
+          <p>{t("premium.personalizationEyebrow")}</p>
+          <h2 id="bn-account-settings-title">{t("topbar.language")} &amp; {t("topbar.themeSystem")}</h2>
+        </div>
+
+        <label className="bn-account-setting-row">
+          <span className="bn-account-setting-row__icon"><AppIcon name="moon" size={20} /></span>
+          <span className="bn-account-setting-row__copy">
+            <strong>{t("topbar.themeLight").replace(/\s+theme$/i, "")}</strong>
+            <small>{t(`topbar.theme${themePreference === "dark" ? "Dark" : themePreference === "light" ? "Light" : "System"}`)}</small>
+          </span>
+          <select value={themePreference} onChange={event => setThemePreference?.(event.target.value)}>
+            <option value="system">{t("topbar.themeSystem")}</option>
+            <option value="light">{t("topbar.themeLight")}</option>
+            <option value="dark">{t("topbar.themeDark")}</option>
+          </select>
+        </label>
+
+        {appLanguages.length > 1 ? (
+          <label className="bn-account-setting-row">
+            <span className="bn-account-setting-row__icon"><AppIcon name="language" size={20} /></span>
+            <span className="bn-account-setting-row__copy">
+              <strong>{t("topbar.language")}</strong>
+              <small>{getLanguageLabel(appLanguage, uiLanguage)}</small>
+            </span>
+            <select value={appLanguage} onChange={event => setAppLanguage?.(event.target.value)}>
+              {appLanguages.map(item => (
+                <option key={item.id} value={item.id}>{getLanguageLabel(item.id, uiLanguage)}</option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+      </section>
+
       <section className={`bn-account-card bn-personalization-card${!isPremium ? " is-locked" : ""}`}>
         <div className="bn-personalization-card__header">
           <div>
             <p className="bn-premium-card__eyebrow">{t("premium.personalizationEyebrow")}</p>
             <h2>{t("premium.personalizationTitle")}</h2>
           </div>
-          {!isPremium ? <span className="bn-personalization-card__lock">{t("premium.premiumOnly")}</span> : null}
+          {!isPremium ? (
+            <span className="bn-personalization-card__lock">
+              <AppIcon name="lock" size={14} />
+              {t("premium.premiumOnly")}
+            </span>
+          ) : null}
         </div>
 
         <p className="bn-premium-card__description">{t("premium.personalizationDescription")}</p>
 
-        <div className="bn-personalization-card__group">
-          <span>{t("premium.preferredCountries")}</span>
-          <div className="bn-personalization-card__chips">
-            {regions.filter(item => item.code !== "world").map(item => (
-              <button
-                key={item.code}
-                type="button"
-                className={preferredRegions.includes(item.code) ? "is-active" : ""}
-                onClick={() => togglePreference("preferredRegions", item.code)}
-                disabled={!isPremium}
-              >
-                {item.flag} {getRegionLabel(item.code, uiLanguage)}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="bn-personalization-card__group">
-          <span>{t("premium.preferredCategories")}</span>
-          <div className="bn-personalization-card__chips">
-            {CATEGORIES.filter(item => item.id !== "all").map(item => (
-              <button
-                key={item.id}
-                type="button"
-                className={preferredCategories.includes(item.id) ? "is-active" : ""}
-                onClick={() => togglePreference("preferredCategories", item.id)}
-                disabled={!isPremium}
-              >
-                {item.emoji} {getCategoryLabel(item.id, uiLanguage)}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <label className="bn-personalization-card__toggle">
-          <input
-            type="checkbox"
-            checked={strictPositiveFilter}
-            onChange={event => setDraftPreferences(currentPreferences => ({
-              ...currentPreferences,
-              strictPositiveFilter: event.target.checked,
-            }))}
-            disabled={!isPremium}
-          />
-          <span>
-            <strong>{t("premium.strictFilterTitle")}</strong>
-            <small>{t("premium.strictFilterDescription")}</small>
-          </span>
-        </label>
-
-        <label className="bn-personalization-card__toggle">
-          <input
-            type="checkbox"
-            checked={hideSavedStories}
-            onChange={event => setDraftPreferences(currentPreferences => ({
-              ...currentPreferences,
-              hideSavedStories: event.target.checked,
-            }))}
-            disabled={!isPremium}
-          />
-          <span>
-            <strong>{t("premium.freshFeedTitle")}</strong>
-            <small>{t("premium.freshFeedDescription")}</small>
-          </span>
-        </label>
-
-        {isPremium ? (
-          <div className="bn-personalization-card__actions">
+        {!isPremium ? (
+          <div className="bn-personalization-card__locked-notice" role="note">
+            <span className="bn-personalization-card__locked-icon"><AppIcon name="lock" size={20} /></span>
+            <span>
+              <strong>{t("premium.personalizationLockedTitle")}</strong>
+              <small>{t("premium.personalizationLockedDescription")}</small>
+            </span>
             <button
               type="button"
               className="bn-button bn-button--primary"
-              onClick={() => handleConfirmPersonalization(draftPreferences)}
-              disabled={personalizationSaving || !hasDraftPreferences}
+              onClick={handleStartPremiumPurchase}
+              disabled={premiumPurchaseLoading || !premiumCheckoutEnabled}
             >
-              {personalizationSaving ? t("premium.applyingPersonalization") : t("premium.applyPersonalization")}
+              {premiumPurchaseLoading ? t("premium.processing") : t("premium.unlockPersonalization")}
             </button>
-            <span>
-              {preferencesChanged
-                ? t("premium.personalizationUnsaved")
-                : t("premium.personalizationApplied")}
-            </span>
           </div>
         ) : null}
+
+        <fieldset className="bn-personalization-card__controls" disabled={!isPremium}>
+          <div className="bn-personalization-card__group">
+            <span>{t("premium.preferredCountries")}</span>
+            <div className="bn-personalization-card__chips">
+              {regions.filter(item => item.code !== "world").map(item => (
+                <button
+                  key={item.code}
+                  type="button"
+                  className={preferredRegions.includes(item.code) ? "is-active" : ""}
+                  onClick={() => togglePreference("preferredRegions", item.code)}
+                >
+                  {item.flag} {getRegionLabel(item.code, uiLanguage)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="bn-personalization-card__group">
+            <span>{t("premium.preferredCategories")}</span>
+            <div className="bn-personalization-card__chips">
+              {CATEGORIES.filter(item => item.id !== "all").map(item => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={preferredCategories.includes(item.id) ? "is-active" : ""}
+                  onClick={() => togglePreference("preferredCategories", item.id)}
+                >
+                  {item.emoji} {getCategoryLabel(item.id, uiLanguage)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <label className="bn-personalization-card__toggle">
+            <input
+              type="checkbox"
+              checked={strictPositiveFilter}
+              onChange={event => setDraftPreferences(currentPreferences => ({
+                ...currentPreferences,
+                strictPositiveFilter: event.target.checked,
+              }))}
+            />
+            <span>
+              <strong>{t("premium.strictFilterTitle")}</strong>
+              <small>{t("premium.strictFilterDescription")}</small>
+            </span>
+          </label>
+
+          <label className="bn-personalization-card__toggle">
+            <input
+              type="checkbox"
+              checked={hideSavedStories}
+              onChange={event => setDraftPreferences(currentPreferences => ({
+                ...currentPreferences,
+                hideSavedStories: event.target.checked,
+              }))}
+            />
+            <span>
+              <strong>{t("premium.freshFeedTitle")}</strong>
+              <small>{t("premium.freshFeedDescription")}</small>
+            </span>
+          </label>
+
+          {isPremium ? (
+            <div className="bn-personalization-card__actions">
+              <button
+                type="button"
+                className="bn-button bn-button--primary"
+                onClick={() => handleConfirmPersonalization(draftPreferences)}
+                disabled={personalizationSaving || !hasDraftPreferences}
+              >
+                {personalizationSaving ? t("premium.applyingPersonalization") : t("premium.applyPersonalization")}
+              </button>
+              <span>
+                {preferencesChanged
+                  ? t("premium.personalizationUnsaved")
+                  : t("premium.personalizationApplied")}
+              </span>
+            </div>
+          ) : null}
+        </fieldset>
       </section>
 
       <footer className="bn-account-footer">

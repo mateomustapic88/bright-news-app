@@ -32,8 +32,3 @@ export const buildFeedbackMailto = () => {
 
   return `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 };
-
-export const getConfiguredWebAuthRedirectUrl = () => {
-  const configuredUrl = import.meta.env.VITE_WEB_AUTH_REDIRECT_URL?.trim();
-  return configuredUrl || null;
-};

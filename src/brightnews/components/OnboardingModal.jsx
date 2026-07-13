@@ -1,19 +1,20 @@
 import DialogOverlay from "./DialogOverlay";
+import AppIcon from "./AppIcon";
 
 const OnboardingModal = ({ session, handleDismiss, handleGoogleSignIn, t }) => {
   const onboardingPoints = [
     {
-      emoji: "🌍",
+      icon: "globe",
       title: t("onboarding.point1Title"),
       description: t("onboarding.point1Description"),
     },
     {
-      emoji: "🔗",
+      icon: "shield",
       title: t("onboarding.point2Title"),
       description: t("onboarding.point2Description"),
     },
     {
-      emoji: "❤️",
+      icon: "bookmark",
       title: t("onboarding.point3Title"),
       description: t("onboarding.point3Description"),
     },
@@ -30,7 +31,7 @@ const OnboardingModal = ({ session, handleDismiss, handleGoogleSignIn, t }) => {
         <div className="bn-onboarding__grid">
           {onboardingPoints.map(item => (
             <article key={item.title} className="bn-onboarding__card">
-              <span className="bn-onboarding__icon" aria-hidden="true">{item.emoji}</span>
+              <span className="bn-onboarding__icon"><AppIcon name={item.icon} size={21} /></span>
               <h3>{item.title}</h3>
               <p>{item.description}</p>
             </article>
