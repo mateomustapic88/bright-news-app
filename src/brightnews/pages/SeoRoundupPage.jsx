@@ -58,6 +58,14 @@ const groupStoriesByCategory = stories => CATEGORIES
   .filter(group => group.stories.length > 0);
 
 const getRouteRegion = route => REGIONS.find(region => region.code === route.regionCode) || REGIONS[0];
+const getRouteIntro = route => {
+  if (Array.isArray(route.intro) && route.intro.length > 0) return route.intro;
+
+  return [
+    route.description,
+    "Browse source-linked positive news, good news and uplifting stories without losing the original reporting behind each story.",
+  ];
+};
 
 const SeoStoryCard = ({ story }) => {
   const category = getCategoryMeta(story.category);
@@ -96,6 +104,7 @@ const SeoRoundupPage = ({ route }) => {
   const region = getRouteRegion(route);
   const canonicalUrl = `${SITE_URL}${route.path}`;
   const categoryGroups = useMemo(() => groupStoriesByCategory(stories), [stories]);
+  const introParagraphs = getRouteIntro(route);
 
   useEffect(() => {
     document.title = route.title;
@@ -114,10 +123,11 @@ const SeoRoundupPage = ({ route }) => {
       "@type": "CollectionPage",
       name: route.heading,
       description: route.description,
+      keywords: route.keywords,
       url: canonicalUrl,
       isPartOf: {
         "@type": "WebSite",
-        name: "BrightNews",
+        name: "Positive News by BrightNews",
         url: SITE_URL,
       },
     });
@@ -170,6 +180,11 @@ const SeoRoundupPage = ({ route }) => {
           <p className="bn-seo-eyebrow">{route.eyebrow}</p>
           <h1>{route.heading}</h1>
           <p>{route.description}</p>
+          <div className="bn-seo-hero__intro">
+            {introParagraphs.map(paragraph => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
           <div className="bn-seo-hero__meta" aria-label="Roundup details">
             <span>{region.flag} {region.label}</span>
             <span>Constructive stories</span>
@@ -181,7 +196,7 @@ const SeoRoundupPage = ({ route }) => {
       <section className="bn-seo-section" aria-labelledby="latest-positive-news">
         <div className="bn-seo-section__header">
           <p className="bn-seo-eyebrow">Latest roundup</p>
-          <h2 id="latest-positive-news">Positive stories worth reading</h2>
+          <h2 id="latest-positive-news">Latest positive news and uplifting stories</h2>
         </div>
 
         {loading ? <p className="bn-seo-status">Loading the latest BrightNews stories...</p> : null}
@@ -220,7 +235,7 @@ const SeoRoundupPage = ({ route }) => {
       <section className="bn-seo-section bn-seo-section--links" aria-labelledby="more-positive-news">
         <div className="bn-seo-section__header">
           <p className="bn-seo-eyebrow">Explore</p>
-          <h2 id="more-positive-news">More BrightNews roundups</h2>
+          <h2 id="more-positive-news">More positive news roundups</h2>
         </div>
         <div className="bn-seo-link-grid">
           {SEO_ROUTES.filter(item => item.path !== route.path).map(item => (

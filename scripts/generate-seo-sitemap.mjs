@@ -2,8 +2,15 @@ import { writeFileSync } from "node:fs";
 import { SEO_ROUTES, SITE_URL } from "../src/brightnews/seoRoutes.js";
 
 const routePriority = route => {
+  if (route.path === "/positive-news") return "0.95";
   if (route.path === "/positive-news-today") return "0.9";
-  if (route.path === "/good-news-this-week" || route.path === "/uplifting-stories") return "0.85";
+  if (
+    route.path === "/worldwide-positive-news" ||
+    route.path === "/good-news-in-the-world" ||
+    route.path === "/positive-current-events" ||
+    route.path === "/good-news-only"
+  ) return "0.9";
+  if (route.path === "/good-news-this-week" || route.path === "/uplifting-stories" || route.path === "/positive-stories") return "0.85";
   return "0.8";
 };
 
