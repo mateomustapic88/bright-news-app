@@ -4,6 +4,8 @@ import StoryMedia from "./StoryMedia";
 import StorySaveButton from "./StorySaveButton";
 import StoryShareButton from "./StoryShareButton";
 import StorySourceLink from "./StorySourceLink";
+import StoryActionIcon from "./StoryActionIcon";
+import AppIcon from "./AppIcon";
 
 const SavedStoryCard = ({
   story,
@@ -31,7 +33,8 @@ const SavedStoryCard = ({
       <div className="bn-saved-card__content">
         <div className="bn-saved-card__topline">
           <span className="bn-category-pill">
-            {category.emoji} {getCategoryLabel(story.category, uiLanguage)}
+            <AppIcon name={category.icon} size={13} />
+            {getCategoryLabel(story.category, uiLanguage)}
           </span>
           <div className="bn-story-card__actions">
             <StoryShareButton story={story} handleShareStory={handleShareStory} />
@@ -45,7 +48,10 @@ const SavedStoryCard = ({
         </div>
         <h3 className="bn-card-title">{story.headline}</h3>
         <div className="bn-saved-card__meta">
-          <span className="bn-card-location">📍 {story.location}</span>
+          <span className="bn-card-location bn-card-location--icon">
+            <StoryActionIcon name="location" className="bn-card-meta__icon" />
+            {story.location}
+          </span>
           {publishedLabel ? <span className="bn-card-location">{publishedLabel}</span> : null}
         </div>
         <StorySourceLink

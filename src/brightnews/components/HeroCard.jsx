@@ -7,6 +7,8 @@ import StorySaveButton from "./StorySaveButton";
 import StorySavedCount from "./StorySavedCount";
 import StoryShareButton from "./StoryShareButton";
 import StorySourceLink from "./StorySourceLink";
+import StoryActionIcon from "./StoryActionIcon";
+import AppIcon from "./AppIcon";
 
 const HeroCard = ({
   story,
@@ -62,13 +64,17 @@ const HeroCard = ({
           />
         </div>
         <div className="bn-hero-card__category-tag">
-          {category.emoji} {getCategoryLabel(story.category, uiLanguage)}
+          <AppIcon name={category.icon} size={13} />
+          {getCategoryLabel(story.category, uiLanguage)}
         </div>
       </div>
 
       <div className="bn-hero-card__body">
         <div className="bn-card-meta">
-          <span>📍 {story.location}</span>
+          <span className="bn-card-meta__item">
+            <StoryActionIcon name="location" className="bn-card-meta__icon" />
+            {story.location}
+          </span>
           {publishedLabel ? <span>{publishedLabel}</span> : null}
           <span>{story.readTime}</span>
           <StorySavedCount count={story.savedCount} t={t} uiLanguage={uiLanguage} />

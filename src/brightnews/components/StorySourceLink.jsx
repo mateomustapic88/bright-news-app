@@ -1,4 +1,5 @@
 import { normalizeExternalUrl } from "../../lib/urls";
+import StoryActionIcon from "./StoryActionIcon";
 
 const StorySourceLink = ({
   story,
@@ -32,7 +33,7 @@ const StorySourceLink = ({
       onClick={handleClick}
       className={`bn-source-link${compact ? " is-compact" : ""}`}
     >
-      <span>🔗</span>
+      <StoryActionIcon name="source" className="bn-source-link__icon" />
       <span>{label}</span>
       {helper ? <span className="bn-source-link__helper">{helper}</span> : null}
     </a>

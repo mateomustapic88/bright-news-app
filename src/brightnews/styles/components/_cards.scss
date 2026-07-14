@@ -88,6 +88,9 @@
 
 .bn-hero-card__category-tag {
   position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   top: 18px;
   right: 18px;
   z-index: 2;
@@ -98,6 +101,7 @@
   color: var(--bn-category-color);
   font-size: 12px;
   font-weight: 800;
+  line-height: 1;
 }
 
 .bn-hero-card__body {
@@ -224,6 +228,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 4px;
   min-height: 24px;
   padding: 4px 9px;
   border: 1px solid color-mix(in srgb, var(--bn-category-color) 22%, transparent);
@@ -234,6 +239,11 @@
   font-weight: 850;
   line-height: 1.25;
   white-space: nowrap;
+}
+
+.bn-saved-count-pill__icon {
+  width: 13px;
+  height: 13px;
 }
 
 .bn-saved-card {

@@ -64,8 +64,14 @@
   font-size: 13px;
   font-weight: 900;
 
-  span {
-    font-size: 18px;
+  .bn-discover-continent__icon {
+    width: 24px;
+    height: 24px;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
   }
 }
 
@@ -94,8 +100,43 @@
 }
 
 .bn-discover-region__flag {
+  display: flex;
+  justify-content: center;
   margin-bottom: 10px;
   font-size: 38px;
+}
+
+.bn-region-icon,
+.bn-region-icon__fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+}
+
+.bn-region-icon svg,
+.bn-region-icon__flag {
+  display: block;
+  width: 44px;
+  height: 44px;
+}
+
+.bn-region-icon__flag {
+  width: 44px;
+  height: 30px;
+  border-radius: 5px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px var(--bn-divider), 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.bn-region-icon--symbol {
+  color: currentColor;
+}
+
+.bn-region-icon__fallback {
+  font-size: 34px;
+  line-height: 1;
 }
 
 .bn-discover-region__label {

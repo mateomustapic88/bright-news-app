@@ -266,6 +266,7 @@
 .bn-chip.bn-category-tab {
   position: relative;
   flex: 0 0 auto;
+  gap: 6px;
   min-height: 38px;
   padding: 0;
   border: 0;
@@ -275,6 +276,10 @@
   color: var(--bn-text-muted);
   font-size: 12px;
   font-weight: 600;
+}
+
+.bn-chip.bn-category-tab svg {
+  flex: 0 0 auto;
 }
 
 .bn-chip.bn-category-tab::after {
@@ -459,6 +464,9 @@
 
 .bn-hero-card__category-tag,
 .bn-category-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -466,6 +474,13 @@
   color: var(--bn-category-color);
   font-size: 10px;
   font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.bn-hero-card__category-tag svg,
+.bn-category-pill svg {
+  flex: 0 0 auto;
 }
 
 .bn-hero-card__category-tag {
@@ -500,6 +515,11 @@
   color: var(--bn-text-subtle);
   font-size: 10px;
   font-weight: 500;
+  line-height: 1.2;
+}
+
+.bn-card-meta {
+  align-items: center;
 }
 
 .bn-card-summary {
@@ -1321,9 +1341,14 @@
   }
 
   .bn-account-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 38px;
+    height: 38px;
     min-height: 38px;
     padding: 0;
+    overflow: hidden;
   }
 
   .bn-account-button__icon,
@@ -1335,6 +1360,7 @@
 
   .bn-account-button__icon {
     flex-basis: 28px;
+    margin: 0;
   }
 
   .bn-screen {

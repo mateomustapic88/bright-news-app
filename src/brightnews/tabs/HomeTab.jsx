@@ -14,6 +14,7 @@ import HeroCard from "../components/HeroCard";
 import SectionLabel from "../components/SectionLabel";
 import StatusMessage from "../components/StatusMessage";
 import StoryCard from "../components/StoryCard";
+import RegionIcon from "../components/RegionIcon";
 
 const FEATURED_POOL_SIZE = 12;
 const getFeaturedStory = (stories, category, storyFilter) => {
@@ -171,6 +172,7 @@ const HomeTab = ({
               onClick={() => setCategory(item.id)}
               className={`bn-category-tab ${getCategoryThemeClass(item.id)}`}
             >
+              <AppIcon name={item.icon} size={15} />
               <span>{getCategoryLabel(item.id, uiLanguage)}</span>
             </Chip>
           ))}
@@ -199,7 +201,7 @@ const HomeTab = ({
             onClick={() => setMobileFilterPanel(current => (current === "region" ? null : "region"))}
             aria-expanded={mobileFilterPanel === "region"}
           >
-            <AppIcon name="globe" size={19} />
+            <RegionIcon code={selectedRegion?.code || "world"} fallback={selectedRegion?.flag || worldRegion?.flag} />
             <strong>{selectedRegion ? getRegionLabel(selectedRegion.code, uiLanguage) : getRegionLabel("world", uiLanguage)}</strong>
             <AppIcon name="chevronDown" size={17} className="bn-mobile-filter-button__chevron" />
           </button>
@@ -218,7 +220,9 @@ const HomeTab = ({
                   }}
                   className={`bn-region-button${region === "world" ? " is-active" : ""}`}
                 >
-                  <span className="bn-region-button__flag">{worldRegion.flag}</span>
+                  <span className="bn-region-button__flag">
+                    <RegionIcon code="world" fallback={worldRegion.flag} />
+                  </span>
                   <span>{getRegionLabel("world", uiLanguage)}</span>
                 </button>
               ) : null}
@@ -233,7 +237,9 @@ const HomeTab = ({
                     className={`bn-region-button bn-region-button--continent${visibleMobileContinentId === item.id ? " is-active" : ""}`}
                     aria-expanded={visibleMobileContinentId === item.id}
                   >
-                    <span className="bn-region-button__flag">{item.emoji}</span>
+                    <span className="bn-region-button__flag">
+                      <RegionIcon code={item.id} fallback={item.emoji} />
+                    </span>
                     <span>{item.label}</span>
                     <AppIcon name="chevronDown" size={16} className="bn-region-button__chevron" />
                   </button>
@@ -251,7 +257,9 @@ const HomeTab = ({
                           }}
                           className={`bn-region-button bn-region-button--country${region === regionItem.code ? " is-active" : ""}`}
                         >
-                          <span className="bn-region-button__flag">{regionItem.flag}</span>
+                          <span className="bn-region-button__flag">
+                            <RegionIcon code={regionItem.code} fallback={regionItem.flag} />
+                          </span>
                           <span>{getRegionLabel(regionItem.code, uiLanguage)}</span>
                         </button>
                       ))}
@@ -281,6 +289,7 @@ const HomeTab = ({
               onClick={() => setCategory(item.id)}
               className={`bn-category-tab ${getCategoryThemeClass(item.id)}`}
             >
+              <AppIcon name={item.icon} size={15} />
               <span>{getCategoryLabel(item.id, uiLanguage)}</span>
             </Chip>
           ))}

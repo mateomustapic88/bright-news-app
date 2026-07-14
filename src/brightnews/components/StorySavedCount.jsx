@@ -1,4 +1,5 @@
 import { formatCompactNumber } from "../i18n";
+import StoryActionIcon from "./StoryActionIcon";
 
 const StorySavedCount = ({ count, t, uiLanguage }) => {
   const savedCount = Number(count || 0);
@@ -12,7 +13,8 @@ const StorySavedCount = ({ count, t, uiLanguage }) => {
 
   return (
     <span className="bn-saved-count-pill" title={label}>
-      ❤️ {label}
+      <StoryActionIcon name="heart" active className="bn-saved-count-pill__icon" />
+      {label}
     </span>
   );
 };

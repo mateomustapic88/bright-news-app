@@ -1043,10 +1043,19 @@
     color: var(--bn-link-strong);
   }
 
+  .bn-region-icon--symbol {
+    color: var(--bn-text-strong);
+  }
+
   &.is-active {
-    border-color: transparent;
-    background: var(--bn-text-strong);
-    color: var(--bn-bg);
+    border-color: #f5b800;
+    background: var(--bn-accent-bg);
+    color: var(--bn-text-strong);
+    box-shadow: none;
+
+    .bn-region-icon--symbol {
+      color: currentColor;
+    }
   }
 }
 
@@ -1094,9 +1103,10 @@
   }
 
   &.is-active {
-    background: var(--bn-text-strong);
-    color: var(--bn-bg);
-    border-color: transparent;
+    background: var(--bn-accent-bg);
+    color: var(--bn-text-strong);
+    border-color: #f5b800;
+    box-shadow: none;
   }
 }
 
@@ -1133,7 +1143,39 @@
 }
 
 .bn-region-button__flag {
+  display: inline-flex;
+  flex: 0 0 18px;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
   font-size: 14px;
+}
+
+.bn-region-button__flag .bn-region-icon,
+.bn-globe-selector__flag {
+  width: 22px;
+  height: 18px;
+}
+
+.bn-region-button__flag .bn-region-icon svg,
+.bn-globe-selector__flag svg {
+  width: 18px;
+  height: 18px;
+}
+
+.bn-region-button__flag .bn-region-icon__flag,
+.bn-globe-selector__flag .bn-region-icon__flag {
+  width: 22px;
+  height: 15px;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px var(--bn-divider);
+}
+
+.bn-globe-selector__flag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .bn-region-button--continent {

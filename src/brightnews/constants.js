@@ -54,14 +54,14 @@ export const REGION_LANGUAGE_BY_CODE = {
 };
 
 export const CATEGORIES = [
-  { id: "all", label: "All", emoji: "✨", theme: "all" },
-  { id: "Environment", label: "Planet", emoji: "🌿", theme: "environment" },
-  { id: "Science", label: "Science", emoji: "🔬", theme: "science" },
-  { id: "Community", label: "People", emoji: "🤝", theme: "community" },
-  { id: "Health", label: "Health", emoji: "💚", theme: "health" },
-  { id: "Animals", label: "Animals", emoji: "🐾", theme: "animals" },
-  { id: "Sports", label: "Sports", emoji: "🏅", theme: "sports" },
-  { id: "Innovation", label: "Tech", emoji: "💡", theme: "innovation" },
+  { id: "all", label: "All", emoji: "✨", icon: "sparkles", theme: "all" },
+  { id: "Environment", label: "Planet", emoji: "🌿", icon: "leaf", theme: "environment" },
+  { id: "Science", label: "Science", emoji: "🔬", icon: "microscope", theme: "science" },
+  { id: "Community", label: "People", emoji: "🤝", icon: "handshake", theme: "community" },
+  { id: "Health", label: "Health", emoji: "💚", icon: "health", theme: "health" },
+  { id: "Animals", label: "Animals", emoji: "🐾", icon: "paw", theme: "animals" },
+  { id: "Sports", label: "Sports", emoji: "🏅", icon: "trophy", theme: "sports" },
+  { id: "Innovation", label: "Tech", emoji: "💡", icon: "lightbulb", theme: "innovation" },
 ];
 
 export const TABS = [

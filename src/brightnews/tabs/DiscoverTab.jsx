@@ -1,6 +1,7 @@
 import { getRegionContinentGroups } from "../constants";
 import { getRegionLabel } from "../i18n";
 import AppIcon from "../components/AppIcon";
+import RegionIcon from "../components/RegionIcon";
 
 const DiscoverTab = ({ region, regions, setRegion, setTab, t, uiLanguage }) => {
   const continentGroups = getRegionContinentGroups(regions);
@@ -26,7 +27,9 @@ const DiscoverTab = ({ region, regions, setRegion, setTab, t, uiLanguage }) => {
                 }}
                 className={`bn-discover-region${region === "world" ? " is-active" : ""}`}
               >
-                <div className="bn-discover-region__flag">{worldRegion.flag}</div>
+                <div className="bn-discover-region__flag">
+                  <RegionIcon code={worldRegion.code} fallback={worldRegion.flag} />
+                </div>
                 <div className="bn-discover-region__label">{getRegionLabel("world", uiLanguage)}</div>
               </button>
             </div>
@@ -36,7 +39,7 @@ const DiscoverTab = ({ region, regions, setRegion, setTab, t, uiLanguage }) => {
         {continentGroups.map(continent => (
           <section key={continent.id} className="bn-discover-continent">
             <div className="bn-discover-continent__header">
-              <span>{continent.emoji}</span>
+              <RegionIcon code={continent.id} fallback={continent.emoji} className="bn-discover-continent__icon" />
               <strong>{continent.label}</strong>
             </div>
 
@@ -51,7 +54,9 @@ const DiscoverTab = ({ region, regions, setRegion, setTab, t, uiLanguage }) => {
                   }}
                   className={`bn-discover-region${region === item.code ? " is-active" : ""}`}
                 >
-                  <div className="bn-discover-region__flag">{item.flag}</div>
+                  <div className="bn-discover-region__flag">
+                    <RegionIcon code={item.code} fallback={item.flag} />
+                  </div>
                   <div className="bn-discover-region__label">{getRegionLabel(item.code, uiLanguage)}</div>
                 </button>
               ))}
