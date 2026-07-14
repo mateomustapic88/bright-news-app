@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="3840" height="2400" viewBox="0 0 3840 2400">
+  <defs>
+    <style>
+      @font-face { font-family: Montserrat; src: url('../../node_modules/@fontsource/montserrat/files/montserrat-latin-400-normal.woff2'); font-weight: 400; }
+      @font-face { font-family: Montserrat; src: url('../../node_modules/@fontsource/montserrat/files/montserrat-latin-500-normal.woff2'); font-weight: 500; }
+      @font-face { font-family: Montserrat; src: url('../../node_modules/@fontsource/montserrat/files/montserrat-latin-600-normal.woff2'); font-weight: 600; }
+      @font-face { font-family: Montserrat; src: url('../../node_modules/@fontsource/montserrat/files/montserrat-latin-700-normal.woff2'); font-weight: 700; }
+      @font-face { font-family: Montserrat; src: url('../../node_modules/@fontsource/montserrat/files/montserrat-latin-800-normal.woff2'); font-weight: 800; }
+      text { font-family: Montserrat, Arial, sans-serif; letter-spacing: 0; }
+    </style>
+    <clipPath id="promo-main-screen"><rect x="26" y="26" width="778" height="1383" rx="66" /></clipPath>
+    <clipPath id="promo-side-screen"><rect x="22" y="22" width="616" height="1095" rx="54" /></clipPath>
+    <filter id="promo-shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="42" stdDeviation="42" flood-color="#24282d" flood-opacity="0.22" />
+    </filter>
+  </defs>
+
+  <rect width="3840" height="2400" fill="#f5f6f7" />
+  <rect x="2130" width="1710" height="2400" fill="#ffd34f" />
+  <rect x="0" y="0" width="24" height="2400" fill="#f6b900" />
+
+  <image x="180" y="160" width="190" height="190" href="../assets/brightnews-app-icon-512.png" xlink:href="../assets/brightnews-app-icon-512.png" />
+  <text x="430" y="302" fill="#16191d" font-size="126" font-weight="800">BrightNews</text>
+
+  <text x="180" y="670" fill="#16191d" font-size="176" font-weight="800">Positive news</text>
+  <text x="180" y="860" fill="#16191d" font-size="176" font-weight="800">for a <tspan fill="#c38c00">brighter day.</tspan></text>
+  <rect x="180" y="944" width="170" height="14" fill="#f6b900" />
+
+  <text x="180" y="1080" fill="#5f666e" font-size="58" font-weight="500">Uplifting stories from around the world,</text>
+  <text x="180" y="1164" fill="#5f666e" font-size="58" font-weight="500">filtered for a calmer reading experience.</text>
+
+  <g transform="translate(180 1375)">
+    <circle cx="44" cy="44" r="44" fill="#fff3c4" stroke="#f6b900" stroke-width="4" />
+    <path d="M20 44h48M44 20c14 12 14 36 0 48M44 20c-14 12-14 36 0 48M25 29c11 7 27 7 38 0M25 59c11-7 27-7 38 0" fill="none" stroke="#8d6900" stroke-width="5" stroke-linecap="round" />
+    <text x="122" y="61" fill="#16191d" font-size="52" font-weight="700">Worldwide positive-news coverage</text>
+  </g>
+
+  <g transform="translate(180 1575)">
+    <circle cx="44" cy="44" r="44" fill="#fff3c4" stroke="#f6b900" stroke-width="4" />
+    <path d="M22 52l14-16 12 10 20-24M56 22h12v12" fill="none" stroke="#8d6900" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="122" y="61" fill="#16191d" font-size="52" font-weight="700">Newest, popular and top stories</text>
+  </g>
+
+  <g transform="translate(180 1775)">
+    <circle cx="44" cy="44" r="44" fill="#fff3c4" stroke="#f6b900" stroke-width="4" />
+    <path d="M44 66S19 52 19 34c0-17 21-21 25-7 4-14 25-10 25 7 0 18-25 32-25 32Z" fill="none" stroke="#8d6900" stroke-width="5" stroke-linejoin="round" />
+    <text x="122" y="61" fill="#16191d" font-size="52" font-weight="700">Save stories and shape your feed</text>
+  </g>
+
+  <text x="180" y="2190" fill="#16191d" font-size="58" font-weight="700">brightnews.app</text>
+  <text x="180" y="2268" fill="#737980" font-size="42" font-weight="500">Android available now · iPhone app coming soon</text>
+
+  <g transform="translate(1960 650) rotate(-7 330 570)" filter="url(#promo-shadow)">
+    <rect width="660" height="1139" rx="72" fill="#ffffff" stroke="#16191d" stroke-width="14" />
+    <image x="22" y="22" width="616" height="1095" preserveAspectRatio="xMidYMin slice"
+      href="../screenshots/phone/03_discover_countries.png"
+      xlink:href="../screenshots/phone/03_discover_countries.png"
+      clip-path="url(#promo-side-screen)" />
+  </g>
+
+  <g transform="translate(2480 360)" filter="url(#promo-shadow)">
+    <rect width="830" height="1435" rx="86" fill="#ffffff" stroke="#16191d" stroke-width="16" />
+    <image x="26" y="26" width="778" height="1383" preserveAspectRatio="xMidYMin slice"
+      href="../screenshots/phone/01_home_positive_news.png"
+      xlink:href="../screenshots/phone/01_home_positive_news.png"
+      clip-path="url(#promo-main-screen)" />
+  </g>
+
+  <g transform="translate(3150 650) rotate(7 330 570)" filter="url(#promo-shadow)">
+    <rect width="660" height="1139" rx="72" fill="#ffffff" stroke="#16191d" stroke-width="14" />
+    <image x="22" y="22" width="616" height="1095" preserveAspectRatio="xMidYMin slice"
+      href="../screenshots/phone/04_saved_stories.png"
+      xlink:href="../screenshots/phone/04_saved_stories.png"
+      clip-path="url(#promo-side-screen)" />
+  </g>
+</svg>
