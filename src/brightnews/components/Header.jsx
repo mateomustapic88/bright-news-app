@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { getContinentIdForRegionCode, getRegionContinentGroups } from "../constants";
 import { formatUiDate, getRegionLabel } from "../i18n";
 import BrandMark from "./BrandMark";
+import RegionIcon from "./RegionIcon";
 
 const Header = ({
   region,
@@ -20,9 +21,7 @@ const Header = ({
   const [isRegionPickerOpen, setIsRegionPickerOpen] = useState(false);
   const [activeContinentId, setActiveContinentId] = useState(null);
   const continentGroups = useMemo(() => getRegionContinentGroups(regions), [regions]);
-  const visibleContinentId = region === "world"
-    ? activeContinentId
-    : getContinentIdForRegionCode(region);
+  const visibleContinentId = activeContinentId ?? (region === "world" ? null : getContinentIdForRegionCode(region));
   const activeContinent = continentGroups.find(item => item.id === visibleContinentId) || null;
   const worldRegion = regions.find(item => item.code === "world");
   const currentRegion = regions.find(item => item.code === region) || regions[0];
@@ -93,7 +92,11 @@ const Header = ({
               aria-haspopup="dialog"
             >
               <span className="bn-globe-selector__icon" aria-hidden="true">
-                <span className="bn-globe-selector__glyph">{currentRegion?.flag || "🌍"}</span>
+                {region === "world" ? (
+                  <RegionIcon code="world" fallback={worldRegion?.flag} className="bn-globe-selector__flag" />
+                ) : (
+                  <RegionIcon code={currentRegion?.code} fallback={currentRegion?.flag} className="bn-globe-selector__flag" />
+                )}
               </span>
               <span className="bn-globe-selector__copy">
                 <strong>{currentRegionLabel}</strong>
@@ -120,7 +123,7 @@ const Header = ({
                       }}
                       className={`bn-globe-selector__continent${region === "world" && !activeContinent ? " is-active" : ""}`}
                     >
-                      <span>{worldRegion.flag}</span>
+                      <RegionIcon code="world" fallback={worldRegion.flag} className="bn-globe-selector__flag" />
                       <span>{getRegionLabel("world", uiLanguage)}</span>
                     </button>
                   ) : null}
@@ -134,7 +137,7 @@ const Header = ({
                       onClick={() => setActiveContinentId(continent.id)}
                       className={`bn-globe-selector__continent${activeContinent?.id === continent.id ? " is-active" : ""}`}
                     >
-                      <span>{continent.emoji}</span>
+                      <RegionIcon code={continent.id} fallback={continent.emoji} className="bn-globe-selector__flag" />
                       <span>{continent.label}</span>
                     </button>
                   ))}
@@ -151,7 +154,7 @@ const Header = ({
                       }}
                       className={`bn-globe-selector__option${region === item.code ? " is-active" : ""}`}
                     >
-                      <span>{item.flag}</span>
+                      <RegionIcon code={item.code} fallback={item.flag} className="bn-globe-selector__flag" />
                       <span>{getRegionLabel(item.code, uiLanguage)}</span>
                     </button>
                   )) : (
@@ -169,7 +172,9 @@ const Header = ({
                 onClick={() => setRegion(item.code)}
                 className={`bn-region-button${region === item.code ? " is-active" : ""}`}
               >
-                <span className="bn-region-button__flag">{item.flag}</span>
+                <span className="bn-region-button__flag">
+                  <RegionIcon code={item.code} fallback={item.flag} />
+                </span>
                 <span>{getRegionLabel(item.code, uiLanguage)}</span>
               </button>
             ))}
