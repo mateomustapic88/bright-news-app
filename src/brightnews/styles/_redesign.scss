@@ -1270,6 +1270,14 @@
   .bn-top-bar {
     min-height: 58px;
     padding: 0 16px;
+    transform: translateY(0);
+    transition: transform 0.18s ease;
+    will-change: transform;
+  }
+
+  .bright-news.is-feed-chrome-hidden .bn-top-bar {
+    pointer-events: none;
+    transform: translateY(calc(-100% - env(safe-area-inset-top)));
   }
 
   .bn-top-bar__brand {
@@ -1337,6 +1345,10 @@
     top: 58px;
     margin: -18px -16px 0;
     padding: 6px 16px 10px;
+  }
+
+  .bright-news.is-feed-chrome-hidden .bn-home-tab__filters-mobile {
+    top: 0;
   }
 
   .bn-category-tabs {

@@ -407,7 +407,21 @@ const BrightNews = () => {
     const scroller = screenRef.current;
     if (!scroller) return undefined;
 
-    lastScreenScrollTopRef.current = scroller.scrollTop;
+    const scrollerStyles = window.getComputedStyle(scroller);
+    const usesInternalScroller = /(auto|scroll|overlay)/.test(scrollerStyles.overflowY)
+      && scroller.scrollHeight > scroller.clientHeight + 1;
+    const scrollTarget = usesInternalScroller ? scroller : window;
+    const getScrollTop = () => Math.max(
+      0,
+      usesInternalScroller
+        ? scroller.scrollTop
+        : window.scrollY || document.documentElement.scrollTop || 0,
+    );
+    let scrollDirection = null;
+    let directionStartScrollTop = getScrollTop();
+    let filterInteractionTimer;
+
+    lastScreenScrollTopRef.current = directionStartScrollTop;
 
     const handleFilterChromeStart = event => {
       if (!event.target?.closest?.(".bn-region-context, .bn-home-tab__filters-mobile")) return;
@@ -416,23 +430,34 @@ const BrightNews = () => {
     };
 
     const handleFilterChromeEnd = () => {
-      window.setTimeout(() => {
+      window.clearTimeout(filterInteractionTimer);
+      filterInteractionTimer = window.setTimeout(() => {
         filterChromeInteractionRef.current = false;
-        lastScreenScrollTopRef.current = scroller.scrollTop;
+        lastScreenScrollTopRef.current = getScrollTop();
+        directionStartScrollTop = lastScreenScrollTopRef.current;
+        scrollDirection = null;
       }, 120);
     };
 
     const handleScroll = () => {
-      const nextScrollTop = scroller.scrollTop;
+      const nextScrollTop = getScrollTop();
       const scrollDelta = nextScrollTop - lastScreenScrollTopRef.current;
+      const nextDirection = scrollDelta > 0 ? "down" : scrollDelta < 0 ? "up" : scrollDirection;
+
+      if (nextDirection && nextDirection !== scrollDirection) {
+        scrollDirection = nextDirection;
+        directionStartScrollTop = nextScrollTop;
+      }
+
+      const directionDistance = Math.abs(nextScrollTop - directionStartScrollTop);
 
       if (nextScrollTop <= 8) {
         setHideFeedChrome(false);
       } else if (filterChromeInteractionRef.current) {
         setHideFeedChrome(false);
-      } else if (scrollDelta > 16 && nextScrollTop > 72) {
+      } else if (scrollDirection === "down" && directionDistance > 20 && nextScrollTop > 72) {
         setHideFeedChrome(true);
-      } else if (scrollDelta < -16) {
+      } else if (scrollDirection === "up" && directionDistance > 20) {
         setHideFeedChrome(false);
       }
 
@@ -443,13 +468,14 @@ const BrightNews = () => {
     document.addEventListener("touchend", handleFilterChromeEnd, { passive: true, capture: true });
     document.addEventListener("pointerdown", handleFilterChromeStart, { passive: true, capture: true });
     document.addEventListener("pointerup", handleFilterChromeEnd, { passive: true, capture: true });
-    scroller.addEventListener("scroll", handleScroll, { passive: true });
+    scrollTarget.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
+      window.clearTimeout(filterInteractionTimer);
       document.removeEventListener("touchstart", handleFilterChromeStart, { capture: true });
       document.removeEventListener("touchend", handleFilterChromeEnd, { capture: true });
       document.removeEventListener("pointerdown", handleFilterChromeStart, { capture: true });
       document.removeEventListener("pointerup", handleFilterChromeEnd, { capture: true });
-      scroller.removeEventListener("scroll", handleScroll);
+      scrollTarget.removeEventListener("scroll", handleScroll);
     };
   }, [tab]);
 
