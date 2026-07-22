@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run seo:generate && vite build",
     "assets:generate": "npx @capacitor/assets generate --assetPath resources --iconBackgroundColor '#e99b23' --iconBackgroundColorDark '#102033' --splashBackgroundColor '#fff7e8' --splashBackgroundColorDark '#102033' --logoSplashScale 0.22 --pwaNoAppleFetch true && mkdir -p public/icons && mv -f icons/* public/icons/ && rmdir icons",
     "mobile:build": "npm run build && npx cap sync",
     "android:bundle:release": "cd android && ./gradlew bundleRelease",
@@ -14,7 +14,8 @@
     "cap:open:ios": "npx cap open ios",
     "cap:open:android": "npx cap open android",
     "lint": "eslint .",
-    "seo:sitemap": "node scripts/generate-seo-sitemap.mjs",
+    "seo:generate": "node scripts/generate-seo-assets.mjs",
+    "seo:sitemap": "node scripts/generate-seo-assets.mjs",
     "preview": "vite preview",
     "ingest:gnews": "node --env-file=.env scripts/ingest-gnews.mjs",
     "ingest:gdelt": "node --env-file=.env scripts/ingest-gdelt.mjs",

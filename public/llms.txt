@@ -1,0 +1,42 @@
+# BrightNews
+
+BrightNews is a positive-news aggregator for web and Android.
+
+Website: https://brightnews.app
+Android app: https://play.google.com/store/apps/details?id=com.mateomustapic.brightnews
+
+BrightNews focuses on positive news, good news, uplifting stories, constructive current events and source-linked summaries from around the world.
+
+Key pages:
+- Positive News: https://brightnews.app/positive-news
+- Positive News Today: https://brightnews.app/positive-news-today
+- Worldwide Positive News: https://brightnews.app/worldwide-positive-news
+- Good News in the World: https://brightnews.app/good-news-in-the-world
+- Positive Current Events: https://brightnews.app/positive-current-events
+- Good News Only: https://brightnews.app/good-news-only
+- Wholesome News: https://brightnews.app/wholesome-news
+- Positive Stories: https://brightnews.app/positive-stories
+- Good News This Week: https://brightnews.app/good-news-this-week
+- Uplifting Stories: https://brightnews.app/uplifting-stories
+- Positive News USA: https://brightnews.app/positive-news/usa
+- Positive News Today USA: https://brightnews.app/positive-news/usa/today
+- Good News USA This Week: https://brightnews.app/good-news/usa/this-week
+- Uplifting Stories USA: https://brightnews.app/uplifting-stories/usa
+- Positive Health News USA: https://brightnews.app/positive-news/usa/health
+- Positive Science News USA: https://brightnews.app/positive-news/usa/science
+- Positive Environment News USA: https://brightnews.app/positive-news/usa/environment
+- Positive News UK: https://brightnews.app/positive-news/uk
+- Positive News Croatia: https://brightnews.app/positive-news/croatia
+- Positive News Slovenia: https://brightnews.app/positive-news/slovenia
+- Positive News Serbia: https://brightnews.app/positive-news/serbia
+- Positive News Bosnia and Herzegovina: https://brightnews.app/positive-news/bosnia-and-herzegovina
+- Positive News Germany: https://brightnews.app/positive-news/germany
+- Positive News France: https://brightnews.app/positive-news/france
+- Positive News Canada: https://brightnews.app/positive-news/canada
+- Positive News Japan: https://brightnews.app/positive-news/japan
+- Positive News Australia: https://brightnews.app/positive-news/australia
+- Positive News Brazil: https://brightnews.app/positive-news/brazil
+- Positive News India: https://brightnews.app/positive-news/india
+
+Content policy:
+BrightNews filters for constructive stories about progress, health, science, people, nature, innovation, animals, sports and communities. It uses public APIs, RSS feeds, duplicate removal, topic filtering and AI-assisted review to reduce strongly negative, violent, tragic, political or outrage-driven stories.
