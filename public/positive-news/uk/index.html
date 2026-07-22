@@ -28,41 +28,299 @@
     <meta name="twitter:image" content="https://brightnews.app/brightnews-og.png" />
     <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Organization","name":"BrightNews","url":"https://brightnews.app","logo":"https://brightnews.app/icons/icon-512.webp","sameAs":["https://play.google.com/store/apps/details?id=com.mateomustapic.brightnews"]},{"@context":"https://schema.org","@type":"WebSite","name":"BrightNews","alternateName":"Positive News by BrightNews","url":"https://brightnews.app","description":"Positive news, good news and uplifting stories from around the world.","publisher":{"@type":"Organization","name":"BrightNews","logo":{"@type":"ImageObject","url":"https://brightnews.app/icons/icon-512.webp"}}},{"@context":"https://schema.org","@type":"CollectionPage","name":"Positive News UK","headline":"Positive News UK | Good News and Uplifting Stories","description":"Positive and constructive news from UK, including health, science, nature, innovation and community stories.","keywords":"positive news UK, good news UK, uplifting British news","url":"https://brightnews.app/positive-news/uk","image":"https://brightnews.app/brightnews-og.png","dateModified":"2026-07-22","isPartOf":{"@type":"WebSite","name":"BrightNews","url":"https://brightnews.app"},"about":["positive news UK","good news UK","uplifting British news"]},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"BrightNews","item":"https://brightnews.app"},{"@type":"ListItem","position":2,"name":"Positive News UK","item":"https://brightnews.app/positive-news/uk"}]},{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is Positive News UK?","acceptedAnswer":{"@type":"Answer","text":"Positive News UK is a BrightNews roundup focused on positive news, good news, uplifting stories and constructive current events from credible source-linked articles."}},{"@type":"Question","name":"How does BrightNews choose positive news?","acceptedAnswer":{"@type":"Answer","text":"BrightNews gathers stories from public APIs, RSS feeds and selected source lists, removes duplicates, applies topic filters and uses AI-assisted review to reduce strongly negative, violent, tragic, political or outrage-driven stories."}},{"@type":"Question","name":"Does BrightNews replace mainstream news?","acceptedAnswer":{"@type":"Answer","text":"No. BrightNews is meant to add balance by making constructive and uplifting stories easier to find when mainstream feeds feel too negative."}}]}]</script>
     <style>
-      :root { color-scheme: light; --ink: #171b1f; --muted: #626a73; --line: #dde1e6; --brand: #f5b800; --paper: #f7f8fa; --card: #ffffff; }
+      :root {
+        color-scheme: light;
+        --bn-bg: #f6f7f8;
+        --bn-surface: #ffffff;
+        --bn-surface-soft: #f1f3f4;
+        --bn-border: #e3e6e8;
+        --bn-border-strong: #cfd4d8;
+        --bn-text-strong: #171a1d;
+        --bn-text-muted: #60666c;
+        --bn-text-subtle: #858b91;
+        --bn-accent: #f5b800;
+        --bn-accent-strong: #8a6500;
+        --bn-accent-bg: #fff7d6;
+        --bn-link: #0f5b97;
+        --bn-radius: 8px;
+      }
       * { box-sizing: border-box; }
-      body { margin: 0; background: var(--paper); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.6; }
+      html { background: var(--bn-bg); }
+      body {
+        margin: 0;
+        background: var(--bn-bg);
+        color: var(--bn-text-strong);
+        font-family: "Montserrat", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.6;
+        letter-spacing: 0;
+      }
       a { color: inherit; }
-      .wrap { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
-      .nav { display: flex; justify-content: space-between; gap: 20px; align-items: center; padding: 24px 0; }
-      .brand { display: inline-flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 800; text-decoration: none; }
-      .mark { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--brand); color: #fff; font-weight: 900; }
-      .button { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); text-decoration: none; font-weight: 750; }
-      .hero { padding: 56px 0 36px; border-top: 1px solid var(--line); }
-      .eyebrow { margin: 0 0 12px; color: #8a6200; font-size: 13px; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
-      h1 { max-width: 880px; margin: 0; font-size: clamp(42px, 7vw, 78px); line-height: .98; letter-spacing: 0; }
-      .lead { max-width: 820px; margin: 24px 0 0; color: var(--muted); font-size: clamp(18px, 2.2vw, 24px); }
-      .grid { display: grid; grid-template-columns: 1.3fr .7fr; gap: 24px; padding: 28px 0 64px; }
-      section, aside { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 28px; }
-      h2 { margin: 0 0 14px; font-size: 30px; line-height: 1.12; }
-      h3 { margin: 22px 0 8px; font-size: 20px; }
-      p { margin: 0 0 16px; }
-      ul { margin: 0; padding-left: 20px; }
-      li + li { margin-top: 8px; }
-      .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
-      .pill { border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; color: var(--muted); font-weight: 700; }
-      .links { display: grid; gap: 12px; }
-      .links a { display: block; padding: 14px; border: 1px solid var(--line); border-radius: 8px; text-decoration: none; }
-      .links strong { display: block; }
-      .links span { color: var(--muted); font-size: 14px; }
-      footer { padding: 32px 0 48px; color: var(--muted); }
-      @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } .nav { align-items: flex-start; } }
+      .wrap { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        align-items: center;
+        min-height: 86px;
+        border-bottom: 1px solid var(--bn-border);
+      }
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--bn-text-strong);
+        font-size: 28px;
+        font-weight: 800;
+        text-decoration: none;
+        line-height: 1;
+      }
+      .mark {
+        width: 52px;
+        height: 52px;
+        border-radius: 8px;
+        object-fit: cover;
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+      }
+      .nav-actions { display: flex; align-items: center; gap: 12px; }
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        padding: 0 18px;
+        border: 1px solid var(--bn-border);
+        border-radius: var(--bn-radius);
+        background: var(--bn-surface);
+        color: var(--bn-text-strong);
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+      .button--primary {
+        border-color: var(--bn-accent);
+        background: var(--bn-accent);
+        color: #171a1d;
+      }
+      .hero {
+        padding: 70px 0 34px;
+      }
+      .eyebrow {
+        margin: 0 0 14px;
+        color: var(--bn-text-subtle);
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+      }
+      .hero .eyebrow { color: var(--bn-accent-strong); }
+      h1 {
+        max-width: 920px;
+        margin: 0;
+        color: var(--bn-text-strong);
+        font-size: clamp(44px, 6.8vw, 84px);
+        font-weight: 800;
+        line-height: 1.03;
+        letter-spacing: 0;
+      }
+      .lead {
+        max-width: 820px;
+        margin: 22px 0 0;
+        color: var(--bn-text-muted);
+        font-size: clamp(18px, 2vw, 24px);
+        font-weight: 500;
+        line-height: 1.48;
+      }
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 26px;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 38px;
+        border: 1px solid var(--bn-border);
+        border-radius: 999px;
+        padding: 8px 13px;
+        background: var(--bn-surface);
+        color: var(--bn-text-muted);
+        font-size: 14px;
+        font-weight: 750;
+      }
+      .pill:first-child {
+        border-color: var(--bn-accent);
+        background: var(--bn-accent-bg);
+        color: var(--bn-accent-strong);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr);
+        gap: 24px;
+        padding: 24px 0 68px;
+        align-items: start;
+      }
+      section,
+      aside {
+        border: 1px solid var(--bn-border);
+        border-radius: var(--bn-radius);
+        background: var(--bn-surface);
+        padding: 30px;
+      }
+      section { max-width: 100%; }
+      aside { position: sticky; top: 20px; }
+      h2 {
+        margin: 0 0 16px;
+        color: var(--bn-text-strong);
+        font-size: clamp(28px, 3vw, 40px);
+        font-weight: 800;
+        line-height: 1.12;
+        letter-spacing: 0;
+      }
+      h3 {
+        margin: 28px 0 10px;
+        color: var(--bn-text-strong);
+        font-size: 22px;
+        font-weight: 800;
+        line-height: 1.22;
+      }
+      p {
+        margin: 0 0 16px;
+        color: var(--bn-text-muted);
+        font-size: 16px;
+        font-weight: 500;
+      }
+      section > p:first-of-type { color: var(--bn-text-strong); }
+      ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 10px;
+      }
+      li {
+        position: relative;
+        padding-left: 28px;
+        color: var(--bn-text-muted);
+        font-weight: 550;
+      }
+      li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: .58em;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--bn-accent);
+        box-shadow: 0 0 0 5px var(--bn-accent-bg);
+      }
+      details {
+        border-top: 1px solid var(--bn-border);
+        padding: 16px 0;
+      }
+      details:last-of-type { border-bottom: 1px solid var(--bn-border); }
+      summary {
+        cursor: pointer;
+        color: var(--bn-text-strong);
+        font-weight: 800;
+      }
+      details p {
+        margin: 10px 0 0;
+        font-size: 15px;
+      }
+      .links {
+        display: grid;
+        gap: 10px;
+      }
+      .links a {
+        display: block;
+        padding: 16px;
+        border: 1px solid var(--bn-border);
+        border-radius: var(--bn-radius);
+        background: var(--bn-surface);
+        text-decoration: none;
+        transition: border-color .2s ease, background .2s ease;
+      }
+      .links a:hover {
+        border-color: var(--bn-border-strong);
+        background: var(--bn-surface-soft);
+      }
+      .links strong {
+        display: block;
+        color: var(--bn-text-strong);
+        font-size: 15px;
+        font-weight: 800;
+        line-height: 1.25;
+      }
+      .links span {
+        display: block;
+        margin-top: 6px;
+        color: var(--bn-text-muted);
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1.45;
+      }
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 24px;
+      }
+      footer {
+        border-top: 1px solid var(--bn-border);
+        padding: 30px 0 46px;
+      }
+      footer p {
+        max-width: 820px;
+        color: var(--bn-text-subtle);
+        font-size: 14px;
+      }
+      @media (max-width: 900px) {
+        .wrap { width: min(100% - 36px, 720px); }
+        .grid { grid-template-columns: 1fr; padding-bottom: 48px; }
+        aside { position: static; }
+      }
+      @media (max-width: 620px) {
+        .wrap { width: calc(100% - 32px); }
+        .nav {
+          min-height: 82px;
+          gap: 12px;
+        }
+        .brand {
+          gap: 10px;
+          font-size: 25px;
+        }
+        .mark {
+          width: 46px;
+          height: 46px;
+        }
+        .button {
+          min-height: 44px;
+          padding: 0 13px;
+          font-size: 13px;
+        }
+        .nav-actions .button:first-child { display: none; }
+        .hero { padding: 48px 0 24px; }
+        h1 { font-size: clamp(40px, 13vw, 56px); }
+        .lead { font-size: 18px; }
+        section,
+        aside {
+          padding: 22px;
+        }
+        h2 { font-size: 28px; }
+      }
     </style>
   </head>
   <body>
     <header class="wrap">
       <nav class="nav" aria-label="BrightNews">
-        <a class="brand" href="/"><span class="mark">☀</span><span>BrightNews</span></a>
-        <a class="button" href="https://play.google.com/store/apps/details?id=com.mateomustapic.brightnews">Get Android app</a>
+        <a class="brand" href="/"><img class="mark" src="/icons/icon-96.webp" alt="" width="52" height="52" /><span>BrightNews</span></a>
+        <div class="nav-actions">
+          <a class="button" href="/">Open web app</a>
+          <a class="button button--primary" href="https://play.google.com/store/apps/details?id=com.mateomustapic.brightnews">Get Android app</a>
+        </div>
       </nav>
       <div class="hero">
         <p class="eyebrow">UK edition</p>
@@ -97,7 +355,10 @@
         <details><summary>How does BrightNews choose positive news?</summary><p>BrightNews gathers stories from public APIs, RSS feeds and selected source lists, removes duplicates, applies topic filters and uses AI-assisted review to reduce strongly negative, violent, tragic, political or outrage-driven stories.</p></details>
         <details><summary>Does BrightNews replace mainstream news?</summary><p>No. BrightNews is meant to add balance by making constructive and uplifting stories easier to find when mainstream feeds feel too negative.</p></details>
         <p>Open the BrightNews web app for the full feed, saved stories, topic filters, country filters and the newest stories from around the world.</p>
-        <p><a class="button" href="/">Open BrightNews web app</a></p>
+        <div class="cta-row">
+          <a class="button button--primary" href="/">Open BrightNews web app</a>
+          <a class="button" href="https://play.google.com/store/apps/details?id=com.mateomustapic.brightnews">Get Android app</a>
+        </div>
       </section>
       <aside aria-labelledby="more-roundups">
         <p class="eyebrow">Explore more</p>
