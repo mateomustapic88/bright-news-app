@@ -5,6 +5,8 @@ import { SEO_ROUTES, SITE_URL, GOOGLE_PLAY_URL } from "../src/brightnews/seoRout
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(__dirname, "..", "public");
+const generatedAt = new Date().toISOString().slice(0, 10);
+const ogImageUrl = `${SITE_URL}/brightnews-og.png`;
 
 const escapeHtml = value => String(value || "")
   .replaceAll("&", "&amp;")
@@ -38,11 +40,13 @@ const urls = [
     loc: `${SITE_URL}/`,
     changefreq: "daily",
     priority: "1.0",
+    lastmod: generatedAt,
   },
   ...SEO_ROUTES.map(route => ({
     loc: `${SITE_URL}${route.path}`,
     changefreq: routeChangefreq(route),
     priority: routePriority(route),
+    lastmod: generatedAt,
   })),
 ];
 
@@ -101,24 +105,102 @@ const getRelatedRoutes = route => SEO_ROUTES
   .filter(item => item.path !== route.path)
   .slice(0, 12);
 
+const getFaqItems = route => ([
+  {
+    question: `What is ${route.heading}?`,
+    answer: `${route.heading} is a BrightNews roundup focused on positive news, good news, uplifting stories and constructive current events from credible source-linked articles.`,
+  },
+  {
+    question: "How does BrightNews choose positive news?",
+    answer: "BrightNews gathers stories from public APIs, RSS feeds and selected source lists, removes duplicates, applies topic filters and uses AI-assisted review to reduce strongly negative, violent, tragic, political or outrage-driven stories.",
+  },
+  {
+    question: "Does BrightNews replace mainstream news?",
+    answer: "No. BrightNews is meant to add balance by making constructive and uplifting stories easier to find when mainstream feeds feel too negative.",
+  },
+]);
+
 const renderSeoPage = route => {
   const canonicalUrl = `${SITE_URL}${route.path}`;
   const theme = getRouteTheme(route);
   const intro = getIntro(route);
   const relatedRoutes = getRelatedRoutes(route);
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    name: route.heading,
-    description: route.description,
-    keywords: route.keywords,
-    url: canonicalUrl,
-    isPartOf: {
-      "@type": "WebSite",
+  const faqItems = getFaqItems(route);
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
       name: "BrightNews",
       url: SITE_URL,
+      logo: `${SITE_URL}/icons/icon-512.webp`,
+      sameAs: [
+        GOOGLE_PLAY_URL,
+      ],
     },
-  };
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "BrightNews",
+      alternateName: "Positive News by BrightNews",
+      url: SITE_URL,
+      description: "Positive news, good news and uplifting stories from around the world.",
+      publisher: {
+        "@type": "Organization",
+        name: "BrightNews",
+        logo: {
+          "@type": "ImageObject",
+          url: `${SITE_URL}/icons/icon-512.webp`,
+        },
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: route.heading,
+      headline: route.title,
+      description: route.description,
+      keywords: route.keywords,
+      url: canonicalUrl,
+      image: ogImageUrl,
+      dateModified: generatedAt,
+      isPartOf: {
+        "@type": "WebSite",
+        name: "BrightNews",
+        url: SITE_URL,
+      },
+      about: route.keywords.split(",").map(keyword => keyword.trim()).filter(Boolean).slice(0, 8),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "BrightNews",
+          item: SITE_URL,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: route.heading,
+          item: canonicalUrl,
+        },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqItems.map(item => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.answer,
+        },
+      })),
+    },
+  ];
 
   return `<!doctype html>
 <html lang="en">
@@ -128,18 +210,26 @@ const renderSeoPage = route => {
     <title>${escapeHtml(route.title)}</title>
     <meta name="description" content="${escapeHtml(route.description)}" />
     <meta name="keywords" content="${escapeHtml(route.keywords)}" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="author" content="BrightNews" />
     <link rel="canonical" href="${escapeHtml(canonicalUrl)}" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="home" href="${escapeHtml(SITE_URL)}" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
     <meta property="og:title" content="${escapeHtml(route.title)}" />
     <meta property="og:description" content="${escapeHtml(route.description)}" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="${escapeHtml(canonicalUrl)}" />
     <meta property="og:site_name" content="BrightNews" />
+    <meta property="og:image" content="${escapeHtml(ogImageUrl)}" />
+    <meta property="og:image:width" content="1024" />
+    <meta property="og:image:height" content="500" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${escapeHtml(route.title)}" />
     <meta name="twitter:description" content="${escapeHtml(route.description)}" />
+    <meta name="twitter:image" content="${escapeHtml(ogImageUrl)}" />
     <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
     <style>
       :root { color-scheme: light; --ink: #171b1f; --muted: #626a73; --line: #dde1e6; --brand: #f5b800; --paper: #f7f8fa; --card: #ffffff; }
@@ -205,6 +295,8 @@ const renderSeoPage = route => {
         </ul>
         <h3>How BrightNews filters stories</h3>
         <p>BrightNews gathers public news from APIs, RSS feeds and selected source lists, removes duplicates, applies topic filters, and uses AI-assisted review to reduce political, violent, tragic or outrage-driven stories. The goal is not to ignore reality, but to create a more balanced place for constructive and uplifting news.</p>
+        <h3>Frequently asked questions</h3>
+        ${faqItems.map(item => `<details><summary>${escapeHtml(item.question)}</summary><p>${escapeHtml(item.answer)}</p></details>`).join("\n        ")}
         <p>Open the BrightNews web app for the full feed, saved stories, topic filters, country filters and the newest stories from around the world.</p>
         <p><a class="button" href="/">Open BrightNews web app</a></p>
       </section>
@@ -236,6 +328,7 @@ const sitemap = [
   ...urls.map(url => [
     "  <url>",
     `    <loc>${url.loc}</loc>`,
+    `    <lastmod>${url.lastmod}</lastmod>`,
     `    <changefreq>${url.changefreq}</changefreq>`,
     `    <priority>${url.priority}</priority>`,
     "  </url>",

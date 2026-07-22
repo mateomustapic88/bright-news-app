@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://brightnews.app/sitemap.xml
+LLMs: https://brightnews.app/llms.txt
