@@ -197,17 +197,15 @@ Deno.serve(async req => {
       });
     }
 
-    await acknowledgeSubscription(accessToken, productId, purchaseToken);
-
     const { data: profile, error: profileError } = await adminClient
       .from("profiles")
-      .update({
+      .upsert({
+        id: userData.user.id,
         plan: "premium",
         premium_until: entitlement.expiryTime,
         google_play_purchase_token: purchaseToken,
         google_play_product_id: productId,
-      })
-      .eq("id", userData.user.id)
+      }, { onConflict: "id" })
       .select("*")
       .single();
 
@@ -215,7 +213,19 @@ Deno.serve(async req => {
       throw new Error(profileError.message);
     }
 
-    return Response.json({ ok: true, profile }, { headers: corsHeaders });
+    let acknowledgeError = null;
+    try {
+      await acknowledgeSubscription(accessToken, productId, purchaseToken);
+    } catch (error) {
+      acknowledgeError = error instanceof Error ? error.message : "Unable to acknowledge Google Play subscription.";
+      console.error("Google Play subscription acknowledgement failed after entitlement sync.", {
+        userId: userData.user.id,
+        productId,
+        acknowledgeError,
+      });
+    }
+
+    return Response.json({ ok: true, profile, acknowledgeError }, { headers: corsHeaders });
   } catch (error) {
     return Response.json({
       ok: false,

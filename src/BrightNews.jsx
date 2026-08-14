@@ -284,6 +284,7 @@ const BrightNews = () => {
   const categoryInitializedRef = useRef(false);
   const appLanguageInitializedRef = useRef(false);
   const storyLanguageInitializedRef = useRef(false);
+  const premiumRestoreAttemptedRef = useRef("");
   const uiLanguage = getUiLanguage(appLanguage);
   const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
   const appVersionLabel = useMemo(() => {
@@ -740,6 +741,91 @@ const BrightNews = () => {
     setAnalyticsUserProperty("plan", isPremium ? "premium" : "free");
     setAnalyticsUserProperty("is_admin", effectiveProfile?.is_admin ? "true" : "false");
   }, [effectiveProfile?.is_admin, isPremium, session?.user]);
+
+  const handleRestorePremiumPurchase = useCallback(async ({ silent = false } = {}) => {
+    if (!session?.user || !isNativeApp()) {
+      if (!silent) {
+        setAuthError(t("premium.androidOnly"));
+        setPremiumPurchaseFeedback({
+          variant: "error",
+          message: t("premium.androidOnly"),
+        });
+      }
+      return { restored: false };
+    }
+
+    if (!silent) {
+      setPremiumPurchaseLoading(true);
+      setAuthError("");
+      setAuthMessage(t("premium.restoringPurchase"));
+      setPremiumPurchaseFeedback({
+        variant: "info",
+        message: t("premium.restoringPurchase"),
+      });
+    }
+
+    try {
+      const { syncActivePremiumSubscription } = await import("./lib/googlePlayBilling");
+      const result = await syncActivePremiumSubscription();
+
+      if (!result.restored) {
+        if (!silent) {
+          setAuthMessage("");
+          setPremiumPurchaseFeedback({
+            variant: "info",
+            message: t("premium.restoreNoPurchase"),
+          });
+        }
+        return result;
+      }
+
+      const nextProfile = result.profile || await loadProfile(session.user.id);
+      setProfile(nextProfile);
+      setSourceReadsUsed(0);
+      setAuthError("");
+      setAuthMessage(t("premium.restoreSuccess"));
+      setPremiumPurchaseFeedback({
+        variant: "accent",
+        message: t("premium.restoreSuccess"),
+      });
+      setShareFeedback({
+        variant: "accent",
+        message: t("premium.restoreSuccess"),
+      });
+      trackEvent("premium_restore_success", {
+        signed_in: true,
+        silent,
+      });
+      return result;
+    } catch (restoreError) {
+      if (!silent) {
+        setAuthMessage("");
+        setAuthError(restoreError?.message || t("premium.restoreError"));
+        setPremiumPurchaseFeedback({
+          variant: "error",
+          message: restoreError?.message || t("premium.restoreError"),
+        });
+      }
+      trackEvent("premium_restore_error", {
+        signed_in: true,
+        silent,
+        message: restoreError?.message || "unknown",
+      });
+      return { restored: false, error: restoreError };
+    } finally {
+      if (!silent) {
+        setPremiumPurchaseLoading(false);
+      }
+    }
+  }, [session?.user, t]);
+
+  useEffect(() => {
+    if (!session?.user || !profile || profileLoading || isPremium || !isNativeApp()) return;
+    if (premiumRestoreAttemptedRef.current === session.user.id) return;
+
+    premiumRestoreAttemptedRef.current = session.user.id;
+    handleRestorePremiumPurchase({ silent: true });
+  }, [handleRestorePremiumPurchase, isPremium, profile, profileLoading, session?.user]);
 
   const handleDismissOnboarding = () => {
     writeOnboardingDismissed(true);
@@ -1842,6 +1928,7 @@ const BrightNews = () => {
             handleConfirmPersonalization={handleConfirmPersonalization}
             personalizationSaving={personalizationSaving}
             handleStartPremiumPurchase={handleStartPremiumPurchase}
+            handleRestorePremiumPurchase={handleRestorePremiumPurchase}
             premiumPurchaseLoading={premiumPurchaseLoading}
             premiumPurchaseFeedback={premiumPurchaseFeedback}
             premiumCheckoutEnabled={PREMIUM_CHECKOUT_ENABLED}

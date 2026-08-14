@@ -32,6 +32,7 @@ const AccountTab = ({
   handleConfirmPersonalization,
   personalizationSaving = false,
   handleStartPremiumPurchase,
+  handleRestorePremiumPurchase,
   premiumPurchaseLoading = false,
   premiumPurchaseFeedback = null,
   premiumCheckoutEnabled = true,
@@ -191,6 +192,16 @@ const AccountTab = ({
             >
               {premiumPurchaseLoading ? t("premium.processing") : t("premium.choosePlan")}
             </button>
+            {handleRestorePremiumPurchase ? (
+              <button
+                type="button"
+                className="bn-button bn-button--secondary"
+                onClick={() => handleRestorePremiumPurchase()}
+                disabled={premiumPurchaseLoading}
+              >
+                {premiumPurchaseLoading ? t("premium.processing") : t("premium.restorePurchase")}
+              </button>
+            ) : null}
             {premiumPurchaseFeedback ? (
               <p className={`bn-premium-card__feedback bn-premium-card__feedback--${premiumPurchaseFeedback.variant || "info"}`}>
                 {premiumPurchaseFeedback.message}

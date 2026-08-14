@@ -1,6 +1,5 @@
 package com.mateomustapic.brightnews;
 
-import com.android.billingclient.api.AcknowledgePurchaseParams;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
@@ -220,32 +219,12 @@ public class GooglePlayBillingPlugin extends Plugin implements PurchasesUpdatedL
             }
 
             if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
-                acknowledgeAndResolve(purchase);
+                resolvePurchaseCall(purchaseToJson(purchase));
                 return;
             }
         }
 
         rejectPurchaseCall("No matching Premium purchase returned.");
-    }
-
-    private void acknowledgeAndResolve(Purchase purchase) {
-        if (purchase.isAcknowledged()) {
-            resolvePurchaseCall(purchaseToJson(purchase));
-            return;
-        }
-
-        AcknowledgePurchaseParams params = AcknowledgePurchaseParams.newBuilder()
-            .setPurchaseToken(purchase.getPurchaseToken())
-            .build();
-
-        billingClient.acknowledgePurchase(params, billingResult -> {
-            if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
-                rejectPurchaseCall(billingResult.getDebugMessage());
-                return;
-            }
-
-            resolvePurchaseCall(purchaseToJson(purchase));
-        });
     }
 
     private JSObject purchaseToJson(Purchase purchase) {

@@ -58,3 +58,42 @@ export const queryActivePremiumSubscriptions = async () => {
   const result = await callBillingPlugin("queryActiveSubscriptions");
   return Array.isArray(result?.purchases) ? result.purchases : [];
 };
+
+export const syncActivePremiumSubscription = async () => {
+  if (!isNativeApp()) {
+    throw new Error("Premium restore is available in the Android app.");
+  }
+
+  const purchases = await queryActivePremiumSubscriptions();
+  const purchase = purchases.find(item => (
+    item?.purchaseToken &&
+    !item?.pending &&
+    Array.isArray(item?.products) &&
+    item.products.includes(PREMIUM_PRODUCT_ID)
+  ));
+
+  if (!purchase) {
+    return { restored: false, profile: null };
+  }
+
+  if (!supabase) {
+    throw new Error("Supabase configuration is missing.");
+  }
+
+  const { data, error } = await supabase.functions.invoke("verify-google-play-subscription", {
+    body: {
+      productId: PREMIUM_PRODUCT_ID,
+      purchaseToken: purchase.purchaseToken,
+    },
+  });
+
+  if (error) {
+    throw new Error(error.message || "Unable to restore Premium purchase.");
+  }
+
+  if (!data?.ok) {
+    throw new Error(data?.error || "Unable to restore Premium purchase.");
+  }
+
+  return { restored: true, purchase, profile: data.profile || null };
+};
