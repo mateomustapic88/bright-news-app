@@ -109,6 +109,7 @@ Deno.serve(async req => {
 
     return Response.json({ ok: true, url: session.url }, { headers: corsHeaders });
   } catch (error) {
+    console.error("Stripe checkout session creation failed.", error);
     return Response.json({
       ok: false,
       error: error instanceof Error ? error.message : "Unable to create Stripe checkout session.",

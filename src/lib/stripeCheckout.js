@@ -14,7 +14,10 @@ export const startStripePremiumCheckout = async () => {
   });
 
   if (error) {
-    throw new Error(error.message || "Unable to open Premium checkout.");
+    const errorPayload = typeof error.context?.json === "function"
+      ? await error.context.json().catch(() => null)
+      : null;
+    throw new Error(errorPayload?.error || error.message || "Unable to open Premium checkout.");
   }
 
   if (!data?.ok || !data?.url) {
