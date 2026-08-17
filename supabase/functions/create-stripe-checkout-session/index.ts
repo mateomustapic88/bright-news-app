@@ -76,20 +76,26 @@ Deno.serve(async req => {
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
-    if (!supabaseUrl || !anonKey) {
+    if (!supabaseUrl || !serviceRoleKey) {
       throw new Error("Supabase function environment is not configured.");
     }
 
     const body = await req.json().catch(() => ({}));
     const authHeader = req.headers.get("authorization") || "";
-    const userClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { authorization: authHeader } },
-    });
-    const { data: userData, error: userError } = await userClient.auth.getUser();
+    const accessToken = authHeader.replace(/^Bearer\s+/i, "").trim();
+    const adminClient = createClient(supabaseUrl, serviceRoleKey);
+    const { data: userData, error: userError } = accessToken
+      ? await adminClient.auth.getUser(accessToken)
+      : { data: null, error: new Error("Missing authorization token.") };
 
     if (userError || !userData?.user) {
+      console.warn("Stripe checkout authentication failed.", {
+        hasAuthorizationHeader: Boolean(authHeader),
+        hasAccessToken: Boolean(accessToken),
+        error: userError?.message || "No user returned.",
+      });
       return Response.json({ ok: false, error: "Not authenticated." }, {
         status: 401,
         headers: corsHeaders,
