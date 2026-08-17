@@ -82,6 +82,7 @@ Deno.serve(async req => {
       throw new Error("Supabase function environment is not configured.");
     }
 
+    const body = await req.json().catch(() => ({}));
     const authHeader = req.headers.get("authorization") || "";
     const userClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { authorization: authHeader } },
@@ -95,7 +96,6 @@ Deno.serve(async req => {
       });
     }
 
-    const body = await req.json().catch(() => ({}));
     const successUrl = sanitizeReturnUrl(body.successUrl, "/?premium=success");
     const cancelUrl = sanitizeReturnUrl(body.cancelUrl, "/?premium=cancel");
     const userId = userData.user.id;

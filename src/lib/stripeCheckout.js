@@ -1,5 +1,11 @@
 import { supabase } from "./supabase";
 
+const getFunctionUrl = functionName => {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  if (!supabaseUrl) throw new Error("Supabase configuration is missing.");
+  return `${supabaseUrl}/functions/v1/${functionName}`;
+};
+
 export const startStripePremiumCheckout = async () => {
   if (!supabase) {
     throw new Error("Supabase configuration is missing.");
@@ -11,21 +17,22 @@ export const startStripePremiumCheckout = async () => {
   }
 
   const origin = typeof window !== "undefined" ? window.location.origin : "https://brightnews.app";
-  const { data, error } = await supabase.functions.invoke("create-stripe-checkout-session", {
+  const response = await fetch(getFunctionUrl("create-stripe-checkout-session"), {
+    method: "POST",
     headers: {
-      authorization: `Bearer ${sessionData.session.access_token}`,
+      apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${sessionData.session.access_token}`,
+      "content-type": "application/json",
     },
-    body: {
+    body: JSON.stringify({
       successUrl: `${origin}/?premium=success`,
       cancelUrl: `${origin}/?premium=cancel`,
-    },
+    }),
   });
+  const data = await response.json().catch(() => null);
 
-  if (error) {
-    const errorPayload = typeof error.context?.json === "function"
-      ? await error.context.json().catch(() => null)
-      : null;
-    throw new Error(errorPayload?.error || error.message || "Unable to open Premium checkout.");
+  if (!response.ok) {
+    throw new Error(data?.error || "Unable to open Premium checkout.");
   }
 
   if (!data?.ok || !data?.url) {
