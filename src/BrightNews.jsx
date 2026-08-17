@@ -1475,21 +1475,47 @@ const BrightNews = () => {
     }
 
     if (!isNativeApp()) {
-      setUpgradeDialogOpen(false);
-      setTab("account");
-      setAuthMessage(t("premium.androidOnly"));
+      setPremiumPurchaseLoading(true);
+      setAuthMessage(t("premium.openingStripeCheckout"));
       setAuthError("");
       setPremiumPurchaseFeedback({
         variant: "info",
-        message: t("premium.androidOnly"),
+        message: t("premium.openingStripeCheckout"),
       });
       setShareFeedback({
         variant: "info",
-        message: t("premium.androidOnly"),
+        message: t("premium.openingStripeCheckout"),
       });
-      trackEvent("premium_android_required", {
+      trackEvent("premium_purchase_start", {
         signed_in: true,
+        platform: "web",
       });
+
+      try {
+        const { startStripePremiumCheckout } = await import("./lib/stripeCheckout");
+        await startStripePremiumCheckout();
+      } catch (checkoutError) {
+        setUpgradeDialogOpen(false);
+        setTab("account");
+        setAuthMessage("");
+        setAuthError(checkoutError?.message || t("premium.purchaseError"));
+        setPremiumPurchaseFeedback({
+          variant: "error",
+          message: checkoutError?.message || t("premium.purchaseError"),
+        });
+        setShareFeedback({
+          variant: "error",
+          message: checkoutError?.message || t("premium.purchaseError"),
+        });
+        trackEvent("premium_purchase_error", {
+          signed_in: true,
+          platform: "web",
+          message: checkoutError?.message || "unknown",
+        });
+      } finally {
+        setPremiumPurchaseLoading(false);
+      }
+
       return;
     }
 
@@ -1841,7 +1867,7 @@ const BrightNews = () => {
         onClose={() => setUpgradeDialogOpen(false)}
         onStartPremiumPurchase={handleStartPremiumPurchase}
         purchaseLoading={premiumPurchaseLoading}
-        purchaseStatus={premiumPurchaseLoading ? t("premium.openingGooglePlay") : ""}
+        purchaseStatus={premiumPurchaseLoading ? t(isNativeApp() ? "premium.openingGooglePlay" : "premium.openingStripeCheckout") : ""}
         checkoutEnabled={PREMIUM_CHECKOUT_ENABLED}
         readLimit={FREE_SOURCE_READ_LIMIT}
         t={t}
