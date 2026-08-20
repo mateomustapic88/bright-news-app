@@ -59,6 +59,7 @@ const AccountTab = ({
   const accountEmail = session?.user?.email || "";
   const avatarUrl = session?.user?.user_metadata?.avatar_url || "";
   const isPremium = isPremiumProfile(profile);
+  const isSignedIn = Boolean(session?.user);
   const planLabel = isPremium ? t("premium.planPremium") : t("premium.planFree");
   const [draftPreferences, setDraftPreferences] = useState(userPreferences || {});
   const preferredRegions = draftPreferences?.preferredRegions || [];
@@ -83,6 +84,72 @@ const AccountTab = ({
       [field]: next,
     }));
   };
+
+  const accountFooter = (
+    <footer className="bn-account-footer">
+      <div className="bn-account-footer__links">
+        <a href={feedbackMailto} onClick={handleFeedbackClick} className="bn-account-footer__link">
+          {t("account.sendBetaFeedback")}
+        </a>
+        <span aria-hidden="true" className="bn-account-footer__dot">·</span>
+        <a href={LEGAL_LINKS.support} target="_blank" rel="noreferrer" className="bn-account-footer__link">
+          {t("account.support")}
+        </a>
+        <span aria-hidden="true" className="bn-account-footer__dot">·</span>
+        <a href={LEGAL_LINKS.privacy} target="_blank" rel="noreferrer" className="bn-account-footer__link">
+          {t("account.privacyPolicy")}
+        </a>
+        <span aria-hidden="true" className="bn-account-footer__dot">·</span>
+        <a
+          href={LEGAL_LINKS.deletion}
+          target="_blank"
+          rel="noreferrer"
+          className="bn-account-footer__link bn-account-footer__link--danger"
+        >
+          {t("account.accountDeletion")}
+        </a>
+      </div>
+      <p className="bn-account-footer__hint">
+        {t("account.supportEmail")} <a href={SUPPORT_MAILTO}>{SUPPORT_EMAIL}</a>
+      </p>
+      {appVersionLabel ? (
+        <p className="bn-account-footer__version">
+          {t("account.appVersion", { version: appVersionLabel })}
+        </p>
+      ) : null}
+    </footer>
+  );
+
+  if (!isSignedIn) {
+    return (
+      <section className="bn-tab bn-account-tab">
+        <header className="bn-account-page-header">
+          <p>{t("account.resourcesTitle")}</p>
+          <h2>{t("account.signedOutTitle").replace(/^[^\p{L}\p{N}]+/u, "")}</h2>
+        </header>
+
+        <AuthPanel
+          session={session}
+          profile={profile}
+          profileLoading={profileLoading}
+          authLoading={authLoading}
+          authMessage={authMessage}
+          authError={authError}
+          syncingSaved={syncingSaved}
+          handleSignOut={handleSignOut}
+          handleGoogleSignIn={handleGoogleSignIn}
+          handleEmailAuth={handleEmailAuth}
+          t={t}
+        />
+
+        {syncingSaved && <p className="bn-feedback bn-feedback--accent">{t("auth.syncingSaved")}</p>}
+        {authMessage && <p className="bn-feedback bn-feedback--info">{authMessage}</p>}
+        {authError && <p className="bn-feedback bn-feedback--error">{authError}</p>}
+
+        {accountFooter}
+      </section>
+    );
+  }
 
   return (
     <section className="bn-tab bn-account-tab">
@@ -363,38 +430,7 @@ const AccountTab = ({
         </fieldset>
       </section>
 
-      <footer className="bn-account-footer">
-        <div className="bn-account-footer__links">
-          <a href={feedbackMailto} onClick={handleFeedbackClick} className="bn-account-footer__link">
-            {t("account.sendBetaFeedback")}
-          </a>
-          <span aria-hidden="true" className="bn-account-footer__dot">·</span>
-          <a href={LEGAL_LINKS.support} target="_blank" rel="noreferrer" className="bn-account-footer__link">
-            {t("account.support")}
-          </a>
-          <span aria-hidden="true" className="bn-account-footer__dot">·</span>
-          <a href={LEGAL_LINKS.privacy} target="_blank" rel="noreferrer" className="bn-account-footer__link">
-            {t("account.privacyPolicy")}
-          </a>
-          <span aria-hidden="true" className="bn-account-footer__dot">·</span>
-          <a
-            href={LEGAL_LINKS.deletion}
-            target="_blank"
-            rel="noreferrer"
-            className="bn-account-footer__link bn-account-footer__link--danger"
-          >
-            {t("account.accountDeletion")}
-          </a>
-        </div>
-        <p className="bn-account-footer__hint">
-          {t("account.supportEmail")} <a href={SUPPORT_MAILTO}>{SUPPORT_EMAIL}</a>
-        </p>
-        {appVersionLabel ? (
-          <p className="bn-account-footer__version">
-            {t("account.appVersion", { version: appVersionLabel })}
-          </p>
-        ) : null}
-      </footer>
+      {accountFooter}
     </section>
   );
 };
