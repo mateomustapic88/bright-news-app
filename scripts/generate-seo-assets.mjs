@@ -18,6 +18,9 @@ const routePriority = route => {
   if (route.path === "/positive-news") return "0.95";
   if (route.path === "/positive-news-today") return "0.9";
   if (
+    route.path === "/good-news-today" ||
+    route.path === "/positive-world-news" ||
+    route.path === "/uplifting-news" ||
     route.path === "/worldwide-positive-news" ||
     route.path === "/good-news-in-the-world" ||
     route.path === "/positive-current-events" ||

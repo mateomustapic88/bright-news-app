@@ -17,6 +17,15 @@ import StoryCard from "../components/StoryCard";
 import RegionIcon from "../components/RegionIcon";
 
 const FEATURED_POOL_SIZE = 12;
+const SEO_DISCOVERY_LINKS = [
+  { href: "/positive-news-today", label: "Positive news today" },
+  { href: "/good-news-today", label: "Good news today" },
+  { href: "/uplifting-news", label: "Uplifting news" },
+  { href: "/worldwide-positive-news", label: "Worldwide positive news" },
+  { href: "/positive-world-news", label: "Positive world news" },
+  { href: "/positive-current-events", label: "Positive current events" },
+];
+
 const getFeaturedStory = (stories, category, storyFilter) => {
   const featuredPool = stories.slice(0, FEATURED_POOL_SIZE);
 
@@ -447,6 +456,15 @@ const HomeTab = ({
               ))}
             </div>
           </div>
+
+          <nav className="bn-home-tab__seo-links" aria-label="Positive news roundups">
+            <span>Explore more good news</span>
+            {SEO_DISCOVERY_LINKS.map(link => (
+              <a key={link.href} href={link.href}>
+                {link.label}
+              </a>
+            ))}
+          </nav>
         </>
       )}
 

@@ -11,6 +11,7 @@ const FLAG_CODES = {
   fr: "fr",
   ca: "ca",
   jp: "jp",
+  my: "my",
   au: "au",
   br: "br",
   in: "in",

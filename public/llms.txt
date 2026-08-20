@@ -10,7 +10,9 @@ BrightNews focuses on positive news, good news, uplifting stories, constructive 
 Key pages:
 - Positive News: https://brightnews.app/positive-news
 - Positive News Today: https://brightnews.app/positive-news-today
+- Good News Today: https://brightnews.app/good-news-today
 - Worldwide Positive News: https://brightnews.app/worldwide-positive-news
+- Positive World News: https://brightnews.app/positive-world-news
 - Good News in the World: https://brightnews.app/good-news-in-the-world
 - Positive Current Events: https://brightnews.app/positive-current-events
 - Good News Only: https://brightnews.app/good-news-only
@@ -18,6 +20,7 @@ Key pages:
 - Positive Stories: https://brightnews.app/positive-stories
 - Good News This Week: https://brightnews.app/good-news-this-week
 - Uplifting Stories: https://brightnews.app/uplifting-stories
+- Uplifting News: https://brightnews.app/uplifting-news
 - Positive News USA: https://brightnews.app/positive-news/usa
 - Positive News Today USA: https://brightnews.app/positive-news/usa/today
 - Good News USA This Week: https://brightnews.app/good-news/usa/this-week
@@ -34,6 +37,7 @@ Key pages:
 - Positive News France: https://brightnews.app/positive-news/france
 - Positive News Canada: https://brightnews.app/positive-news/canada
 - Positive News Japan: https://brightnews.app/positive-news/japan
+- Positive News Malaysia: https://brightnews.app/positive-news/malaysia
 - Positive News Australia: https://brightnews.app/positive-news/australia
 - Positive News Brazil: https://brightnews.app/positive-news/brazil
 - Positive News India: https://brightnews.app/positive-news/india

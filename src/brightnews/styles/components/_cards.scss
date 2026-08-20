@@ -342,7 +342,21 @@
     padding: 24px;
   }
 
-  .bn-story-card.is-expanded .bn-story-card__icon {
+  .bn-story-card.is-expanded .bn-story-card__header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .bn-story-card.is-expanded .bn-story-card__icon.has-image {
+    width: 100%;
+    height: auto;
+    max-height: 280px;
+    aspect-ratio: 21 / 8;
+    border-radius: 18px;
+  }
+
+  .bn-story-card.is-expanded .bn-story-card__icon.is-placeholder {
     width: 96px;
     height: 96px;
     border-radius: 24px;
@@ -434,6 +448,7 @@
   .bn-story-card.is-expanded .bn-story-card__icon.has-image {
     width: 100%;
     height: auto;
+    max-height: 220px;
     aspect-ratio: 16 / 9;
     border-radius: 18px;
   }

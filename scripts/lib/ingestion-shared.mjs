@@ -28,6 +28,7 @@ export const REGION_CONFIG = [
   { code: "fr", country: "fr", lang: "fr" },
   { code: "ca", country: "ca", lang: "en" },
   { code: "jp", country: "jp", lang: "ja" },
+  { code: "my", country: "my", lang: "en" },
   { code: "au", country: "au", lang: "en" },
   { code: "br", country: "br", lang: "pt" },
   { code: "in", country: "in", lang: "en" },
@@ -959,6 +960,7 @@ const REGION_HINTS = {
   fr: ["france", "french", "français", "paris", "lyon", "marseille"],
   ca: ["canada", "canadian", "toronto", "montreal", "vancouver", "ottawa"],
   jp: ["japan", "japanese", "日本", "東京", "大阪", "京都"],
+  my: ["malaysia", "malaysian", "kuala lumpur", "selangor", "penang", "johor", "sabah", "sarawak", "putrajaya"],
   au: ["australia", "australian"],
   br: ["brazil", "brazilian", "brasil", "brasileiro", "são paulo", "rio de janeiro"],
   in: ["india", "indian", "bharat", "delhi", "mumbai", "bengaluru", "bangalore"],
@@ -973,11 +975,17 @@ const DOMAIN_REGION_HINTS = {
   ".fr": "fr",
   ".ca": "ca",
   ".jp": "jp",
+  ".my": "my",
   ".br": "br",
   ".in": "in",
   ".co.uk": "uk",
   ".uk": "uk",
   ".au": "au",
+  "astroawani.com": "my",
+  "bernama.com": "my",
+  "freemalaysiatoday.com": "my",
+  "malaymail.com": "my",
+  "malaysiakini.com": "my",
 };
 
 const extractTagAttributes = (block, tagName) => {
@@ -1040,6 +1048,11 @@ const SOURCE_QUALITY_PROFILES = [
   { match: "novasloboda.ba", score: 0.66 },
   { match: "nezavisne.com", score: 0.68 },
   { match: "delo.si", score: 0.78 },
+  { match: "astroawani.com", score: 0.72 },
+  { match: "bernama.com", score: 0.8 },
+  { match: "freemalaysiatoday.com", score: 0.7 },
+  { match: "malaymail.com", score: 0.7 },
+  { match: "malaysiakini.com", score: 0.74 },
 ];
 
 export const resolveCategory = ({ title, description, content = "", tags = [] }) => {
