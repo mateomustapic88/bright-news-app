@@ -3,12 +3,26 @@ import { isBlockedStoryImageUrl } from "../../lib/storyImages.js";
 import { getCategoryMeta } from "../constants";
 import AppIcon from "./AppIcon";
 
+const CATEGORY_PLACEHOLDER_IMAGES = {
+  Environment: "/images/placeholders/planet.jpg",
+  Science: "/images/placeholders/science.jpg",
+  Community: "/images/placeholders/people.jpg",
+  Health: "/images/placeholders/health.jpg",
+  Animals: "/images/placeholders/animals.jpg",
+  Sports: "/images/placeholders/sports.jpg",
+  Innovation: "/images/placeholders/tech.jpg",
+};
+
+const DEFAULT_PLACEHOLDER_IMAGE = "/images/placeholders/positive-news.jpg";
+
 const shouldSuppressStoryImage = story => isBlockedStoryImageUrl(story?.imageUrl);
 
 const StoryMedia = ({ story, className = "", imageClassName = "", fallbackClassName = "" }) => {
   const [imageFailed, setImageFailed] = useState(false);
+  const [placeholderFailed, setPlaceholderFailed] = useState(false);
   const hasImage = Boolean(story.imageUrl) && !imageFailed && !shouldSuppressStoryImage(story);
   const category = getCategoryMeta(story.category);
+  const placeholderImage = CATEGORY_PLACEHOLDER_IMAGES[story.category] || DEFAULT_PLACEHOLDER_IMAGE;
   const classes = [className, hasImage ? "has-image" : "is-placeholder"].filter(Boolean).join(" ");
 
   return (
@@ -21,6 +35,14 @@ const StoryMedia = ({ story, className = "", imageClassName = "", fallbackClassN
           className={imageClassName}
           onError={() => setImageFailed(true)}
           referrerPolicy="no-referrer"
+        />
+      ) : !placeholderFailed ? (
+        <img
+          src={placeholderImage}
+          alt=""
+          loading="lazy"
+          className={imageClassName}
+          onError={() => setPlaceholderFailed(true)}
         />
       ) : (
         <div className={`bn-story-placeholder ${fallbackClassName}`.trim()} aria-hidden="true">
