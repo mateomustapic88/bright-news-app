@@ -738,6 +738,19 @@
   border-bottom: 1px solid var(--bn-divider);
 }
 
+.bn-account-card--identity .bn-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
+.bn-account-card--identity .bn-button svg {
+  flex: 0 0 auto;
+}
+
 .bn-account-identity__avatar {
   width: 60px;
   height: 60px;
