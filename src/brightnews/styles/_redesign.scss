@@ -1524,9 +1524,14 @@
   }
 
   .bn-account-card--identity .bn-button {
-    width: 44px;
-    padding: 0;
-    font-size: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-width: 112px;
+    padding: 0 14px;
+    gap: 7px;
+    font-size: 13px;
   }
 
   .bn-premium-card {
