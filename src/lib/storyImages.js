@@ -1,6 +1,7 @@
 export const STORY_IMAGE_URL_BLOCKLIST = [
   "goodnewsnetwork.org/wp-content/uploads/2017/11/2017-gnn-logo",
   "reasonstobecheerful.world/wp-content/uploads/2019/08/rtbc_logo.svg",
+  "images.yourstory.com/assets/images/google_preferred.webp",
 ];
 
 export const BRANDING_IMAGE_PATTERN = /(?:^|[/_.-])(logo|logos|favicon|icon|avatar|sprite)(?:[/_.-]|$)/i;

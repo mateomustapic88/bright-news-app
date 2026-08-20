@@ -94,6 +94,7 @@ const getImageCandidateScore = (value, source = "unknown") => {
   if (IMAGE_RICH_FORMAT_PATTERN.test(candidate)) score += 3;
   if (IMAGE_UPLOAD_HINT_PATTERN.test(candidate)) score += 2;
   if (/[\?&](?:w|width|h|height)=([2-9]\d{2,}|\d{4,})/i.test(candidate)) score += 1;
+  if (/[\?&](?:w|width|h|height)=([1-9]\d|1[0-9]\d)(?:&|$)/i.test(candidate)) score -= 2;
   if (/[\?&](?:fit|crop|fm|format)=/i.test(candidate)) score += 0.5;
 
   if (IMAGE_VECTOR_PATTERN.test(candidate)) score -= 3;

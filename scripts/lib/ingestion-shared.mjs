@@ -1,5 +1,5 @@
 import { normalizeExternalUrl } from "../../src/lib/urls.js";
-import { countKeywordHits, matchesKeyword, normalizeHaystack, stripHtml, toSentence } from "./html-text.mjs";
+import { countKeywordHits, decodeHtmlEntitiesDeep, matchesKeyword, normalizeHaystack, stripHtml, toSentence } from "./html-text.mjs";
 import {
   extractImageUrlFromArticle,
   extractImageUrlFromHtml,
@@ -1441,6 +1441,13 @@ const extractTagValue = (block, tagName) => {
   return match ? toSentence(match[1]) : "";
 };
 
+const extractRawTagValue = (block, tagName) => {
+  const match = block.match(new RegExp(`<${tagName}[^>]*>([\\s\\S]*?)</${tagName}>`, "i"));
+  return match
+    ? decodeHtmlEntitiesDeep(String(match[1] || "").replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1"))
+    : "";
+};
+
 const extractTagValues = (block, tagName) =>
   Array.from(block.matchAll(new RegExp(`<${tagName}[^>]*>([\\s\\S]*?)</${tagName}>`, "gi")))
     .map(match => toSentence(match[1]))
@@ -1454,6 +1461,8 @@ export const parseRssItems = xml =>
     const mediaThumbnailAttributes = extractTagAttributesAll(block, "media:thumbnail");
     const enclosureAttributes = extractTagAttributesAll(block, "enclosure");
     const itunesImageAttributes = extractTagAttributes(block, "itunes:image");
+    const rawDescription = extractRawTagValue(block, "description");
+    const rawContent = extractRawTagValue(block, "content:encoded");
     const htmlDescription = extractTagValue(block, "description");
     const htmlContent = extractTagValue(block, "content:encoded");
     const imageUrl =
@@ -1471,8 +1480,8 @@ export const parseRssItems = xml =>
         .map(value => normalizeExternalUrl(value))
         .find(isLikelyImageUrl) ||
       normalizeExternalUrl(itunesImageAttributes.href || itunesImageAttributes.url || "") ||
-      extractImageUrlFromHtml(htmlContent) ||
-      extractImageUrlFromHtml(htmlDescription);
+      extractImageUrlFromHtml(rawContent) ||
+      extractImageUrlFromHtml(rawDescription);
 
     return {
       title: extractTagValue(block, "title"),
