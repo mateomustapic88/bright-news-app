@@ -62,6 +62,7 @@ const AccountTab = ({
   const isSignedIn = Boolean(session?.user);
   const planLabel = isPremium ? t("premium.planPremium") : t("premium.planFree");
   const [draftPreferences, setDraftPreferences] = useState(userPreferences || {});
+  const [openSettingsMenu, setOpenSettingsMenu] = useState(null);
   const preferredRegions = draftPreferences?.preferredRegions || [];
   const preferredCategories = draftPreferences?.preferredCategories || [];
   const strictPositiveFilter = Boolean(draftPreferences?.strictPositiveFilter);
@@ -73,6 +74,13 @@ const AccountTab = ({
     hideSavedStories;
   const preferencesChanged =
     JSON.stringify(draftPreferences || {}) !== JSON.stringify(userPreferences || {});
+  const themeOptions = [
+    { id: "system", label: t("topbar.themeSystem") },
+    { id: "light", label: t("topbar.themeLight") },
+    { id: "dark", label: t("topbar.themeDark") },
+  ];
+  const currentThemeOption = themeOptions.find(item => item.id === themePreference) || themeOptions[0];
+  const currentLanguage = appLanguages.find(item => item.id === appLanguage) || appLanguages[0];
 
   const togglePreference = (field, value) => {
     const current = field === "preferredRegions" ? preferredRegions : preferredCategories;
@@ -83,6 +91,46 @@ const AccountTab = ({
       ...currentPreferences,
       [field]: next,
     }));
+  };
+
+  const renderSettingsMenu = ({ id, value, label, options, onChange }) => {
+    const isOpen = openSettingsMenu === id;
+
+    return (
+      <div className={`bn-account-select${isOpen ? " is-open" : ""}`}>
+        <button
+          type="button"
+          className="bn-account-select__button"
+          onClick={() => setOpenSettingsMenu(current => (current === id ? null : id))}
+          aria-haspopup="menu"
+          aria-expanded={isOpen}
+        >
+          <span>{label}</span>
+          <AppIcon name="chevronDown" size={16} />
+        </button>
+
+        {isOpen ? (
+          <div className="bn-account-select__menu" role="menu">
+            {options.map(item => (
+              <button
+                key={item.id}
+                type="button"
+                className={`bn-account-select__item${item.id === value ? " is-active" : ""}`}
+                onClick={() => {
+                  onChange?.(item.id);
+                  setOpenSettingsMenu(null);
+                }}
+                role="menuitemradio"
+                aria-checked={item.id === value}
+              >
+                {item.emoji ? <span className="bn-account-select__emoji">{item.emoji}</span> : null}
+                <span>{item.label}</span>
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </div>
+    );
   };
 
   const accountFooter = (
@@ -284,32 +332,40 @@ const AccountTab = ({
           <h2 id="bn-account-settings-title">{t("topbar.language")} &amp; {t("topbar.themeSystem")}</h2>
         </div>
 
-        <label className="bn-account-setting-row">
+        <div className="bn-account-setting-row">
           <span className="bn-account-setting-row__icon"><AppIcon name="moon" size={20} /></span>
           <span className="bn-account-setting-row__copy">
             <strong>{t("topbar.themeLight").replace(/\s+theme$/i, "")}</strong>
             <small>{t(`topbar.theme${themePreference === "dark" ? "Dark" : themePreference === "light" ? "Light" : "System"}`)}</small>
           </span>
-          <select value={themePreference} onChange={event => setThemePreference?.(event.target.value)}>
-            <option value="system">{t("topbar.themeSystem")}</option>
-            <option value="light">{t("topbar.themeLight")}</option>
-            <option value="dark">{t("topbar.themeDark")}</option>
-          </select>
-        </label>
+          {renderSettingsMenu({
+            id: "theme",
+            value: themePreference,
+            label: currentThemeOption.label,
+            options: themeOptions,
+            onChange: setThemePreference,
+          })}
+        </div>
 
         {appLanguages.length > 1 ? (
-          <label className="bn-account-setting-row">
+          <div className="bn-account-setting-row">
             <span className="bn-account-setting-row__icon"><AppIcon name="language" size={20} /></span>
             <span className="bn-account-setting-row__copy">
               <strong>{t("topbar.language")}</strong>
               <small>{getLanguageLabel(appLanguage, uiLanguage)}</small>
             </span>
-            <select value={appLanguage} onChange={event => setAppLanguage?.(event.target.value)}>
-              {appLanguages.map(item => (
-                <option key={item.id} value={item.id}>{getLanguageLabel(item.id, uiLanguage)}</option>
-              ))}
-            </select>
-          </label>
+            {renderSettingsMenu({
+              id: "language",
+              value: appLanguage,
+              label: currentLanguage ? getLanguageLabel(currentLanguage.id, uiLanguage) : t("topbar.language"),
+              options: appLanguages.map(item => ({
+                id: item.id,
+                label: getLanguageLabel(item.id, uiLanguage),
+                emoji: item.emoji,
+              })),
+              onChange: setAppLanguage,
+            })}
+          </div>
         ) : null}
       </section>
 
