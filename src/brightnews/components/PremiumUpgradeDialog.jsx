@@ -8,6 +8,7 @@ const PremiumUpgradeDialog = ({
   purchaseLoading = false,
   purchaseStatus = "",
   checkoutEnabled = true,
+  requiresSignIn = false,
   readLimit,
   t,
 }) => {
@@ -25,7 +26,9 @@ const PremiumUpgradeDialog = ({
       <div className="bn-premium-dialog__header">
         <div>
           <p className="bn-premium-dialog__eyebrow">{t("premium.eyebrow")}</p>
-          <h2 id="bn-premium-dialog-title">{t("premium.limitTitle")}</h2>
+          <h2 id="bn-premium-dialog-title">
+            {t(requiresSignIn ? "premium.limitTitleSignedOut" : "premium.limitTitle")}
+          </h2>
         </div>
         <button
           type="button"
@@ -38,7 +41,7 @@ const PremiumUpgradeDialog = ({
       </div>
 
       <p className="bn-premium-dialog__copy">
-        {t("premium.limitDescription", { limit: readLimit })}
+        {t(requiresSignIn ? "premium.limitDescriptionSignedOut" : "premium.limitDescription", { limit: readLimit })}
       </p>
 
       <div className="bn-premium-dialog__price">
@@ -63,7 +66,9 @@ const PremiumUpgradeDialog = ({
             onClick={onStartPremiumPurchase}
             disabled={purchaseLoading}
           >
-            {purchaseLoading ? t("premium.processing") : t("premium.choosePlan")}
+            {purchaseLoading
+              ? t("premium.processing")
+              : t(requiresSignIn ? "premium.signInToUnlock" : "premium.choosePlan")}
           </button>
         ) : null}
         <button type="button" className="bn-button bn-button--secondary" onClick={onClose}>
@@ -71,7 +76,9 @@ const PremiumUpgradeDialog = ({
         </button>
       </div>
       <p className="bn-premium-dialog__note">
-        {checkoutEnabled ? purchaseStatus || t("premium.billingNote") : t("premium.checkoutPaused")}
+        {checkoutEnabled
+          ? purchaseStatus || t(requiresSignIn ? "premium.signInRequiredNote" : "premium.billingNote")
+          : t("premium.checkoutPaused")}
       </p>
     </DialogOverlay>
   );

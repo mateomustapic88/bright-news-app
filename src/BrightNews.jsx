@@ -1869,6 +1869,7 @@ const BrightNews = () => {
         purchaseLoading={premiumPurchaseLoading}
         purchaseStatus={premiumPurchaseLoading ? t(isNativeApp() ? "premium.openingGooglePlay" : "premium.openingStripeCheckout") : ""}
         checkoutEnabled={PREMIUM_CHECKOUT_ENABLED}
+        requiresSignIn={!session?.user}
         readLimit={FREE_SOURCE_READ_LIMIT}
         t={t}
       />
@@ -1995,6 +1996,7 @@ const BrightNews = () => {
         <SourceReadMeter
           sourceReadState={sourceReadState}
           onUpgradeClick={handleSourceMeterClick}
+          requiresSignIn={!session?.user}
           t={t}
         />
       ) : null}

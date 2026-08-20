@@ -312,6 +312,11 @@
     "strictFilterTitle": "Ekstra strog pozitivni filter",
     "strictFilterDescription": "Prednost daj varnejšim, jasneje pozitivnim zgodbam, ko se filtriranje izboljšuje.",
     "freshFeedTitle": "Svež feed",
-    "freshFeedDescription": "Skrij novice, ki si jih že shranil/a, iz personaliziranega feeda."
+    "freshFeedDescription": "Skrij novice, ki si jih že shranil/a, iz personaliziranega feeda.",
+    "limitTitleSignedOut": "Prijavi se za odklep Premiuma",
+    "limitDescriptionSignedOut": "Danes si porabil/a svojih {limit} brezplačnih branj virov. Najprej se prijavi, da lahko BrightNews poveže Premium s tvojim računom, nato nadgradi za neomejene izvorne povezave in personalizacijo.",
+    "signInToUnlock": "Prijavi se za Premium",
+    "signInRequiredNote": "Premium je povezan s tvojim računom. Pred nakupom se prijavi, da se naročnina pravilno aktivira.",
+    "sourceMeterSignIn": "Prijavi se za Premium"
   }
 }

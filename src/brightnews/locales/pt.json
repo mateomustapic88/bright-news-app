@@ -312,6 +312,11 @@
     "strictFilterTitle": "Filtro positivo extra rígido",
     "strictFilterDescription": "Prefira histórias mais seguras e claramente positivas conforme o filtro melhora.",
     "freshFeedTitle": "Feed fresco",
-    "freshFeedDescription": "Ocultar histórias já salvas do seu feed personalizado."
+    "freshFeedDescription": "Ocultar histórias já salvas do seu feed personalizado.",
+    "limitTitleSignedOut": "Entre para desbloquear o Premium",
+    "limitDescriptionSignedOut": "Você usou suas {limit} leituras gratuitas de fontes hoje. Entre primeiro para que o BrightNews conecte o Premium à sua conta e depois assine para ter links de fontes ilimitados e personalização.",
+    "signInToUnlock": "Entrar para desbloquear Premium",
+    "signInRequiredNote": "O Premium fica conectado à sua conta. Entre antes de comprar para que a assinatura seja ativada corretamente.",
+    "sourceMeterSignIn": "Entrar para Premium"
   }
 }

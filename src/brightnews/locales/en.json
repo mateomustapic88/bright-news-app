@@ -300,7 +300,12 @@
     "strictFilterTitle": "Extra-strict positive filter",
     "strictFilterDescription": "Prefer safer, more clearly uplifting stories when filtering improves.",
     "freshFeedTitle": "Fresh feed",
-    "freshFeedDescription": "Hide stories you already saved from your personalized feed."
+    "freshFeedDescription": "Hide stories you already saved from your personalized feed.",
+    "limitTitleSignedOut": "Sign in to unlock Premium",
+    "limitDescriptionSignedOut": "You’ve used your {limit} free source reads today. Sign in first so BrightNews can attach Premium to your account, then upgrade for unlimited source links and personalization.",
+    "signInToUnlock": "Sign in to unlock Premium",
+    "signInRequiredNote": "Premium is connected to your account. Please sign in before buying so your subscription activates correctly.",
+    "sourceMeterSignIn": "Sign in to unlock Premium"
   },
   "feedback": {
     "signInSuccess": "Signed in successfully.",

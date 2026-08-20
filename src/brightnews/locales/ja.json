@@ -312,6 +312,11 @@
     "strictFilterTitle": "より厳しいポジティブフィルター",
     "strictFilterDescription": "フィルター改善時に、より安全で明確に前向きな記事を優先します。",
     "freshFeedTitle": "新鮮なフィード",
-    "freshFeedDescription": "パーソナライズフィードから保存済み記事を非表示にします。"
+    "freshFeedDescription": "パーソナライズフィードから保存済み記事を非表示にします。",
+    "limitTitleSignedOut": "サインインしてPremiumを有効化",
+    "limitDescriptionSignedOut": "本日の無料ソース閲覧 {limit} 件を使い切りました。Premiumをアカウントに正しく紐づけるため、購入前にサインインしてください。その後、無制限のソースリンクとパーソナライズを利用できます。",
+    "signInToUnlock": "サインインしてPremiumへ",
+    "signInRequiredNote": "Premiumはアカウントに紐づきます。購入前にサインインすると、サブスクリプションが正しく有効化されます。",
+    "sourceMeterSignIn": "サインインしてPremiumへ"
   }
 }

@@ -312,6 +312,11 @@
     "strictFilterTitle": "Extra-strenger positiver Filter",
     "strictFilterDescription": "Bevorzuge sicherere, klarer aufbauende Stories, sobald sich die Filter verbessern.",
     "freshFeedTitle": "Frischer Feed",
-    "freshFeedDescription": "Blende Stories aus, die du bereits in deinem personalisierten Feed gespeichert hast."
+    "freshFeedDescription": "Blende Stories aus, die du bereits in deinem personalisierten Feed gespeichert hast.",
+    "limitTitleSignedOut": "Anmelden, um Premium freizuschalten",
+    "limitDescriptionSignedOut": "Du hast heute deine {limit} kostenlosen Quellenaufrufe genutzt. Melde dich zuerst an, damit BrightNews Premium mit deinem Konto verbinden kann, und upgrade dann für unbegrenzte Quellenlinks und Personalisierung.",
+    "signInToUnlock": "Anmelden und Premium freischalten",
+    "signInRequiredNote": "Premium ist mit deinem Konto verbunden. Bitte melde dich vor dem Kauf an, damit dein Abo korrekt aktiviert wird.",
+    "sourceMeterSignIn": "Anmelden für Premium"
   }
 }
