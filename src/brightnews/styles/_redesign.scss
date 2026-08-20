@@ -552,7 +552,8 @@
   border-radius: 0;
 }
 
-.bn-story-card.is-expanded .bn-story-card__icon.has-image {
+.bn-story-card.is-expanded .bn-story-card__icon.has-image,
+.bn-story-card.is-expanded .bn-story-card__icon.is-placeholder {
   width: 100%;
   height: auto;
   max-height: 280px;
@@ -1467,7 +1468,8 @@
     border-radius: 5px;
   }
 
-  .bn-story-card.is-expanded .bn-story-card__icon.has-image {
+  .bn-story-card.is-expanded .bn-story-card__icon.has-image,
+  .bn-story-card.is-expanded .bn-story-card__icon.is-placeholder {
     width: 100%;
     height: auto;
     max-height: 220px;
