@@ -1335,6 +1335,15 @@
   background: var(--bn-surface-soft);
 }
 
+.bn-support-dialog__closing {
+  margin: 18px 0 0;
+  color: var(--bn-accent-strong);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+  text-align: center;
+}
+
 .bn-auth-panel,
 .bn-auth-help,
 .bn-auth-method,

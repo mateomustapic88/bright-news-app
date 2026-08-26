@@ -45,6 +45,8 @@ const SupportProjectDialog = ({
           {t("supportProject.notNow")}
         </button>
       </div>
+
+      <p className="bn-support-dialog__closing">{t("supportProject.closing")}</p>
     </DialogOverlay>
   );
 };

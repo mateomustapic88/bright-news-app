@@ -313,9 +313,10 @@
     "description": "BrightNews is an independent hobby project built to make daily news feel more positive and constructive. If it helps you, you can support hosting, APIs, and development from $1.",
     "cta": "Support from $1",
     "modalTitle": "Help keep BrightNews independent",
-    "modalDescription": "BrightNews is built as an independent hobby project. If it makes your daily news feel a little better, you can support hosting, APIs, and future development from $1.",
+    "modalDescription": "BrightNews is built as an independent hobby project. Your support helps add more sources, improve filtering, cover infrastructure costs, and keep the project independent.",
     "notNow": "Maybe later",
-    "close": "Close support message"
+    "close": "Close support message",
+    "closing": "Let’s make our lives more positive and our future brighter together!"
   },
   "feedback": {
     "signInSuccess": "Signed in successfully.",
