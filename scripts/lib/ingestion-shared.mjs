@@ -699,6 +699,13 @@ const LOCAL_POSITIVE_LEAN_VENDORS = new Set([
   "quarks_de",
   "rki_de",
   "dw_wissenschaft_de",
+  "thehindu_technology_in",
+  "thebetterindia",
+  "mongabay_india",
+  "thewire_science_in",
+  "yourstory",
+  "indiabioscience",
+  "citizenmatters_in",
 ]);
 
 const COMMUNITY_POSITIVE_HINTS = [
@@ -1053,6 +1060,13 @@ const SOURCE_QUALITY_PROFILES = [
   { match: "freemalaysiatoday.com", score: 0.7 },
   { match: "malaymail.com", score: 0.7 },
   { match: "malaysiakini.com", score: 0.74 },
+  { match: "thehindu.com", score: 0.82 },
+  { match: "thebetterindia.com", score: 0.84 },
+  { match: "india.mongabay.com", score: 0.84 },
+  { match: "science.thewire.in", score: 0.78 },
+  { match: "yourstory.com", score: 0.74 },
+  { match: "indiabioscience.org", score: 0.82 },
+  { match: "citizenmatters.in", score: 0.76 },
 ];
 
 export const resolveCategory = ({ title, description, content = "", tags = [] }) => {

@@ -88,12 +88,34 @@ const maxRetries = Number(getEnv("OPENAI_REVIEW_MAX_RETRIES") || 3);
 const minimumConfidence = Number(getEnv("OPENAI_REVIEW_MIN_CONFIDENCE") || 0.6);
 const maxDescriptionChars = Number(getEnv("AI_REVIEW_MAX_DESCRIPTION_CHARS") || 1200);
 const maxContentChars = Number(getEnv("AI_REVIEW_MAX_CONTENT_CHARS") || 2200);
+const reviewRegionCodes = String(getEnv("AI_REVIEW_REGION_CODES") || "")
+  .split(",")
+  .map(value => value.trim())
+  .filter(Boolean);
+const reviewCategories = String(getEnv("AI_REVIEW_CATEGORIES") || "")
+  .split(",")
+  .map(value => value.trim())
+  .filter(Boolean);
 
 if (!supabaseUrl) {
   throw new Error("Missing required environment variable: SUPABASE_URL or VITE_SUPABASE_URL");
 }
 
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
+
+const applyReviewScope = query => {
+  let nextQuery = query;
+
+  if (reviewRegionCodes.length > 0) {
+    nextQuery = nextQuery.in("region_code", reviewRegionCodes);
+  }
+
+  if (reviewCategories.length > 0) {
+    nextQuery = nextQuery.in("category", reviewCategories);
+  }
+
+  return nextQuery;
+};
 
 const truncateText = (value, maxChars) => {
   const text = String(value || "").trim();
@@ -410,13 +432,13 @@ export const run = async () => {
   const aiReviewer = getAiReviewer();
 
   if (!aiReviewer) {
-    const { data: rows, error } = await supabase
+    const { data: rows, error } = await applyReviewScope(supabase
       .from("raw_articles")
-      .select("id, vendor, title, description, content")
+      .select("id, vendor, source_name, source_url, image_url, published_at, title, description, content, category, region_code")
       .eq("review_status", "pending")
       .is("published_story_id", null)
       .order("published_at", { ascending: false })
-      .limit(reviewLimit);
+      .limit(reviewLimit));
 
     if (error) throw new Error(error.message);
 
@@ -427,9 +449,14 @@ export const run = async () => {
     for (const row of rows || []) {
       const decision = inferReviewDecision({
         vendor: row.vendor,
+        sourceName: row.source_name,
+        sourceUrl: row.source_url,
+        imageUrl: row.image_url,
+        publishedAt: row.published_at,
         title: row.title,
         description: row.description,
         content: row.content,
+        tags: [row.category, row.region_code, row.source_name, row.source_url].filter(Boolean),
       });
 
       const { error: updateError } = await supabase
@@ -462,13 +489,13 @@ export const run = async () => {
     return fallbackResult;
   }
 
-  const { data: rows, error } = await supabase
+  const { data: rows, error } = await applyReviewScope(supabase
     .from("raw_articles")
     .select("id, source_name, title, description, content, category, region_code, source_url, review_notes")
     .in("review_status", ["pending", "approved"])
     .is("published_story_id", null)
     .order("published_at", { ascending: false })
-    .limit(reviewLimit);
+    .limit(reviewLimit));
 
   if (error) throw new Error(error.message);
 
