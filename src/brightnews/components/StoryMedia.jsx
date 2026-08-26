@@ -10,19 +10,45 @@ const CATEGORY_PLACEHOLDER_IMAGES = {
   Health: "/images/placeholders/health.jpg",
   Animals: "/images/placeholders/animals.jpg",
   Sports: "/images/placeholders/sports.jpg",
-  Innovation: "/images/placeholders/tech.jpg",
+  Innovation: [
+    "/images/placeholders/tech.jpg",
+    "/images/placeholders/tech-1.jpg",
+    "/images/placeholders/tech-2.jpg",
+  ],
 };
 
 const DEFAULT_PLACEHOLDER_IMAGE = "/images/placeholders/positive-news.jpg";
 
 const shouldSuppressStoryImage = story => isBlockedStoryImageUrl(story?.imageUrl);
 
+const getStablePlaceholderIndex = (story, imageCount) => {
+  if (imageCount <= 1) return 0;
+
+  const stableValue = String(story?.id || story?.sourceUrl || story?.headline || "");
+  let hash = 0;
+
+  for (let index = 0; index < stableValue.length; index += 1) {
+    hash = ((hash << 5) - hash) + stableValue.charCodeAt(index);
+    hash |= 0;
+  }
+
+  return Math.abs(hash) % imageCount;
+};
+
+const getPlaceholderImage = story => {
+  const configuredImage = CATEGORY_PLACEHOLDER_IMAGES[story.category] || DEFAULT_PLACEHOLDER_IMAGE;
+
+  if (!Array.isArray(configuredImage)) return configuredImage;
+
+  return configuredImage[getStablePlaceholderIndex(story, configuredImage.length)] || configuredImage[0];
+};
+
 const StoryMedia = ({ story, className = "", imageClassName = "", fallbackClassName = "" }) => {
   const [imageFailed, setImageFailed] = useState(false);
   const [placeholderFailed, setPlaceholderFailed] = useState(false);
   const hasImage = Boolean(story.imageUrl) && !imageFailed && !shouldSuppressStoryImage(story);
   const category = getCategoryMeta(story.category);
-  const placeholderImage = CATEGORY_PLACEHOLDER_IMAGES[story.category] || DEFAULT_PLACEHOLDER_IMAGE;
+  const placeholderImage = getPlaceholderImage(story);
   const classes = [className, hasImage ? "has-image" : "is-placeholder"].filter(Boolean).join(" ");
 
   return (
