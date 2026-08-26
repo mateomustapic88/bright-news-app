@@ -1,5 +1,4 @@
 import DialogOverlay from "./DialogOverlay";
-import AppIcon from "./AppIcon";
 
 const SupportProjectDialog = ({
   open,
@@ -12,9 +11,6 @@ const SupportProjectDialog = ({
   return (
     <DialogOverlay ariaLabelledBy="bn-support-dialog-title" surfaceClassName="bn-support-dialog">
       <div className="bn-support-dialog__header">
-        <span className="bn-support-dialog__icon">
-          <AppIcon name="heart" size={22} />
-        </span>
         <button
           type="button"
           className="bn-report-dialog__close"
