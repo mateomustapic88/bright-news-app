@@ -5,6 +5,7 @@ import {
   PREFERRED_REGION_KEY,
   SAVED_STORIES_KEY,
   STORY_LANGUAGE_FILTER_KEY,
+  SUPPORT_MODAL_DISMISSED_KEY,
   THEME_PREFERENCE_KEY,
   THEME_PREFERENCES,
   USER_PREFERENCES_KEY,
@@ -41,6 +42,26 @@ export const writeOnboardingDismissed = value => {
     window.localStorage.setItem(ONBOARDING_DISMISSED_KEY, String(Boolean(value)));
   } catch {
     // Keep onboarding non-blocking if storage is unavailable.
+  }
+};
+
+export const readSupportModalDismissedToday = () => {
+  if (typeof window === "undefined") return true;
+
+  try {
+    return window.localStorage.getItem(SUPPORT_MODAL_DISMISSED_KEY) === getTodayKey();
+  } catch {
+    return true;
+  }
+};
+
+export const writeSupportModalDismissedToday = () => {
+  if (typeof window === "undefined") return;
+
+  try {
+    window.localStorage.setItem(SUPPORT_MODAL_DISMISSED_KEY, getTodayKey());
+  } catch {
+    // Keep support prompt non-blocking if storage is unavailable.
   }
 };
 

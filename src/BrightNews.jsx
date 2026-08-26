@@ -63,12 +63,14 @@ import {
   readOnboardingDismissed,
   readPreferredRegion,
   readSavedStories,
+  readSupportModalDismissedToday,
   readThemePreference,
   readUserPreferences,
   writeAppLanguage,
   writeOnboardingDismissed,
   writePreferredRegion,
   writeStoryLanguageFilter,
+  writeSupportModalDismissedToday,
   writeThemePreference,
   writeUserPreferences,
 } from "./brightnews/storage";
@@ -81,6 +83,7 @@ import PremiumUpgradeDialog from "./brightnews/components/PremiumUpgradeDialog";
 import SourceReadMeter from "./brightnews/components/SourceReadMeter";
 import StatusDialog from "./brightnews/components/StatusDialog";
 import StoryReportDialog from "./brightnews/components/StoryReportDialog";
+import SupportProjectDialog from "./brightnews/components/SupportProjectDialog";
 import TopBar from "./brightnews/components/TopBar";
 import DiscoverTab from "./brightnews/tabs/DiscoverTab";
 import AccountTab from "./brightnews/tabs/AccountTab";
@@ -254,6 +257,11 @@ const BrightNews = () => {
   const [profileLoading, setProfileLoading] = useState(false);
   const [sourceReadsUsed, setSourceReadsUsed] = useState(readLocalSourceReadCount);
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
+  const [supportDialogOpen, setSupportDialogOpen] = useState(() => (
+    Boolean(SUPPORT_PAYMENT_URL) &&
+    !isNativeApp() &&
+    !readSupportModalDismissedToday()
+  ));
   const [premiumPurchaseLoading, setPremiumPurchaseLoading] = useState(false);
   const [premiumPurchaseFeedback, setPremiumPurchaseFeedback] = useState(null);
   const [appInfo, setAppInfo] = useState(null);
@@ -834,6 +842,15 @@ const BrightNews = () => {
       signed_in: Boolean(session?.user),
     });
   };
+
+  const handleDismissSupportDialog = useCallback((reason = "dismiss") => {
+    writeSupportModalDismissedToday();
+    setSupportDialogOpen(false);
+    trackEvent("support_prompt_dismiss", {
+      reason,
+      signed_in: Boolean(session?.user),
+    });
+  }, [session?.user]);
 
   useEffect(() => {
     if (availableRegionCodes.includes(region)) return;
@@ -2019,6 +2036,15 @@ const BrightNews = () => {
           session={session}
           handleDismiss={handleDismissOnboarding}
           handleGoogleSignIn={handleGoogleSignIn}
+          t={t}
+        />
+      )}
+
+      {!showOnboarding && (
+        <SupportProjectDialog
+          open={supportDialogOpen}
+          onClose={handleDismissSupportDialog}
+          supportPaymentUrl={SUPPORT_PAYMENT_URL}
           t={t}
         />
       )}

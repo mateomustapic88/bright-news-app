@@ -96,6 +96,7 @@ export const STORY_LANGUAGE_FILTER_KEY = "brightnews.storyLanguageFilter";
 export const THEME_PREFERENCE_KEY = "brightnews.themePreference";
 export const SOURCE_READS_KEY = "brightnews.sourceReads";
 export const USER_PREFERENCES_KEY = "brightnews.userPreferences";
+export const SUPPORT_MODAL_DISMISSED_KEY = "brightnews.supportModalDismissedDate";
 
 export const FREE_SOURCE_READ_LIMIT = 5;
 export const PREMIUM_PRODUCT_ID = "brightnews_premium_monthly";

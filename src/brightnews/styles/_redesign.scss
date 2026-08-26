@@ -882,7 +882,16 @@
   align-items: center;
   justify-content: center;
   min-width: 150px;
+  border: 1px solid var(--bn-accent);
+  cursor: pointer;
   text-decoration: none;
+}
+
+.bn-support-card__button:hover,
+.bn-support-card__button:focus-visible {
+  border-color: var(--bn-accent-strong);
+  background: var(--bn-accent-bg);
+  color: var(--bn-accent-strong);
 }
 
 .bn-account-settings {
@@ -1212,6 +1221,7 @@
 
 .bn-onboarding__surface,
 .bn-premium-dialog,
+.bn-support-dialog,
 .bn-status-dialog,
 .bn-report-dialog {
   border: 1px solid var(--bn-border-strong);
@@ -1221,12 +1231,14 @@
 }
 
 .bn-onboarding__surface,
-.bn-premium-dialog {
+.bn-premium-dialog,
+.bn-support-dialog {
   background-image: none;
 }
 
 .bn-onboarding__hero h2,
-.bn-premium-dialog h2 {
+.bn-premium-dialog h2,
+.bn-support-dialog h2 {
   font-family: var(--bn-font);
   letter-spacing: 0;
 }
@@ -1243,6 +1255,62 @@
 .bn-onboarding__icon {
   border-radius: 6px;
   box-shadow: none;
+}
+
+.bn-support-dialog {
+  width: min(100% - 32px, 460px);
+  padding: 22px;
+}
+
+.bn-support-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.bn-support-dialog__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--bn-accent) 16%, var(--bn-surface));
+  color: var(--bn-accent-strong);
+}
+
+.bn-support-dialog__copy {
+  display: grid;
+  gap: 9px;
+}
+
+.bn-support-dialog__copy h2 {
+  margin: 0;
+  color: var(--bn-text-strong);
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.bn-support-dialog__copy p:not(.bn-premium-card__eyebrow) {
+  margin: 0;
+  color: var(--bn-text-muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.bn-support-dialog__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.bn-support-dialog__actions .bn-button {
+  justify-content: center;
+  min-height: 44px;
+  text-decoration: none;
 }
 
 .bn-auth-panel,
@@ -1742,10 +1810,15 @@
   }
 
   .bn-onboarding__surface,
-  .bn-premium-dialog {
+  .bn-premium-dialog,
+  .bn-support-dialog {
     width: calc(100% - 24px);
     max-height: calc(100dvh - 24px);
     border-radius: 8px;
+  }
+
+  .bn-support-dialog__actions {
+    grid-template-columns: 1fr;
   }
 }
 
