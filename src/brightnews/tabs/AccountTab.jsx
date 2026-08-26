@@ -36,6 +36,8 @@ const AccountTab = ({
   premiumPurchaseLoading = false,
   premiumPurchaseFeedback = null,
   premiumCheckoutEnabled = true,
+  supportPaymentUrl = "",
+  showSupportCard = false,
   appVersionLabel = "",
   handleGoogleSignIn,
   handleEmailAuth,
@@ -325,6 +327,24 @@ const AccountTab = ({
           </>
         )}
       </section>
+
+      {showSupportCard && supportPaymentUrl ? (
+        <section className="bn-account-card bn-support-card">
+          <div className="bn-support-card__copy">
+            <p className="bn-premium-card__eyebrow"><AppIcon name="heart" size={16} /> {t("supportProject.eyebrow")}</p>
+            <h2>{t("supportProject.title")}</h2>
+            <p>{t("supportProject.description")}</p>
+          </div>
+          <a
+            href={supportPaymentUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="bn-button bn-button--secondary bn-support-card__button"
+          >
+            {t("supportProject.cta")}
+          </a>
+        </section>
+      ) : null}
 
       <section className="bn-account-settings" aria-labelledby="bn-account-settings-title">
         <div className="bn-account-settings__header">

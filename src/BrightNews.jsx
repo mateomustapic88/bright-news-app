@@ -11,7 +11,7 @@ import {
 } from "./lib/analytics";
 import { shareStory } from "./lib/shareStory";
 import { supabase } from "./lib/supabase";
-import { buildFeedbackMailto } from "./lib/appConfig";
+import { buildFeedbackMailto, SUPPORT_PAYMENT_URL } from "./lib/appConfig";
 import {
   getAuthRedirectUrl,
   isMobileAuthCallback,
@@ -1959,6 +1959,8 @@ const BrightNews = () => {
             premiumPurchaseLoading={premiumPurchaseLoading}
             premiumPurchaseFeedback={premiumPurchaseFeedback}
             premiumCheckoutEnabled={PREMIUM_CHECKOUT_ENABLED}
+            supportPaymentUrl={SUPPORT_PAYMENT_URL}
+            showSupportCard={!isNativeApp()}
             appVersionLabel={appVersionLabel}
             handleSignOut={handleSignOut}
             handleGoogleSignIn={handleGoogleSignIn}

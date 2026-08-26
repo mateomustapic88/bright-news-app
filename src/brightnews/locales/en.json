@@ -307,6 +307,12 @@
     "signInRequiredNote": "Premium is connected to your account. Please sign in before buying so your subscription activates correctly.",
     "sourceMeterSignIn": "Sign in to unlock Premium"
   },
+  "supportProject": {
+    "eyebrow": "Independent project",
+    "title": "Support BrightNews",
+    "description": "BrightNews is an independent hobby project built to make daily news feel more positive and constructive. If it helps you, you can support hosting, APIs, and development from $1.",
+    "cta": "Support from $1"
+  },
   "feedback": {
     "signInSuccess": "Signed in successfully.",
     "savedSynced": "Saved stories are synced to your account.",

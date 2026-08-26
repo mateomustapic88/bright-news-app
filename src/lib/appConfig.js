@@ -3,6 +3,7 @@ export const APP_ID = "com.mateomustapic.brightnews";
 export const MOBILE_AUTH_SCHEME = APP_ID;
 export const SUPPORT_EMAIL = "brightnews.global@gmail.com";
 export const SUPPORT_MAILTO = `mailto:${SUPPORT_EMAIL}`;
+export const SUPPORT_PAYMENT_URL = import.meta.env.VITE_SUPPORT_PAYMENT_URL || "";
 const withBasePath = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
 
 export const LEGAL_LINKS = {

@@ -848,6 +848,43 @@
   background: var(--bn-surface);
 }
 
+.bn-support-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 22px;
+  border: 1px solid var(--bn-divider);
+  border-radius: 8px;
+  background: var(--bn-surface);
+}
+
+.bn-support-card__copy {
+  display: grid;
+  gap: 7px;
+}
+
+.bn-support-card__copy h2 {
+  font-family: var(--bn-font);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.bn-support-card__copy p:not(.bn-premium-card__eyebrow) {
+  max-width: 640px;
+  color: var(--bn-text-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.bn-support-card__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 150px;
+  text-decoration: none;
+}
+
 .bn-account-settings {
   border-top: 1px solid var(--bn-divider);
 }
@@ -1644,6 +1681,15 @@
 
   .bn-premium-card__price {
     font-size: 11px;
+  }
+
+  .bn-support-card {
+    grid-template-columns: 1fr;
+    padding: 18px;
+  }
+
+  .bn-support-card__button {
+    width: 100%;
   }
 
   .bn-account-setting-row {
