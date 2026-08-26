@@ -36,12 +36,16 @@ const SupportProjectDialog = ({
           href={supportPaymentUrl}
           target="_blank"
           rel="noreferrer"
-          className="bn-button bn-button--primary"
+          className="bn-button bn-support-dialog__button bn-support-dialog__button--primary"
           onClick={() => onClose("support_click")}
         >
           {t("supportProject.cta")}
         </a>
-        <button type="button" className="bn-button bn-button--secondary" onClick={() => onClose("not_now")}>
+        <button
+          type="button"
+          className="bn-button bn-support-dialog__button bn-support-dialog__button--secondary"
+          onClick={() => onClose("not_now")}
+        >
           {t("supportProject.notNow")}
         </button>
       </div>

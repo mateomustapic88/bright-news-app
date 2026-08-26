@@ -1258,8 +1258,8 @@
 }
 
 .bn-support-dialog {
-  width: min(100% - 32px, 460px);
-  padding: 22px;
+  width: min(100% - 32px, 520px);
+  padding: 24px;
 }
 
 .bn-support-dialog__header {
@@ -1276,7 +1276,7 @@
   width: 46px;
   height: 46px;
   border-radius: 8px;
-  background: color-mix(in srgb, var(--bn-accent) 16%, var(--bn-surface));
+  background: color-mix(in srgb, var(--bn-accent) 18%, var(--bn-surface));
   color: var(--bn-accent-strong);
 }
 
@@ -1288,9 +1288,9 @@
 .bn-support-dialog__copy h2 {
   margin: 0;
   color: var(--bn-text-strong);
-  font-size: 26px;
+  font-size: clamp(24px, 4vw, 32px);
   font-weight: 800;
-  line-height: 1.05;
+  line-height: 1.08;
 }
 
 .bn-support-dialog__copy p:not(.bn-premium-card__eyebrow) {
@@ -1301,16 +1301,45 @@
 }
 
 .bn-support-dialog__actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   margin-top: 22px;
 }
 
-.bn-support-dialog__actions .bn-button {
+.bn-support-dialog__button {
   justify-content: center;
   min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--bn-divider);
+  cursor: pointer;
   text-decoration: none;
+}
+
+.bn-support-dialog__button--primary {
+  border-color: #e8b000;
+  background: var(--bn-accent);
+  color: #171a1d;
+  box-shadow: 0 10px 22px rgba(245, 184, 0, 0.22);
+}
+
+.bn-support-dialog__button--primary:hover,
+.bn-support-dialog__button--primary:focus-visible {
+  border-color: var(--bn-accent-strong);
+  background: color-mix(in srgb, var(--bn-accent) 88%, #ffffff);
+  color: #171a1d;
+}
+
+.bn-support-dialog__button--secondary {
+  background: var(--bn-surface);
+  color: var(--bn-text-strong);
+}
+
+.bn-support-dialog__button--secondary:hover,
+.bn-support-dialog__button--secondary:focus-visible {
+  border-color: var(--bn-border-strong);
+  background: var(--bn-surface-soft);
 }
 
 .bn-auth-panel,
@@ -1818,7 +1847,12 @@
   }
 
   .bn-support-dialog__actions {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bn-support-dialog__button {
+    width: 100%;
   }
 }
 
