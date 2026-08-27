@@ -97,6 +97,7 @@ export const THEME_PREFERENCE_KEY = "brightnews.themePreference";
 export const SOURCE_READS_KEY = "brightnews.sourceReads";
 export const USER_PREFERENCES_KEY = "brightnews.userPreferences";
 export const SUPPORT_MODAL_DISMISSED_KEY = "brightnews.supportModalDismissedDate";
+export const SUPPORT_MODAL_SUPPORTED_KEY = "brightnews.supportModalSupported";
 
 export const FREE_SOURCE_READ_LIMIT = 5;
 export const PREMIUM_PRODUCT_ID = "brightnews_premium_monthly";

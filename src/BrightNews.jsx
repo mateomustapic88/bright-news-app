@@ -64,6 +64,7 @@ import {
   readPreferredRegion,
   readSavedStories,
   readSupportModalDismissedToday,
+  readSupportModalSupported,
   readThemePreference,
   readUserPreferences,
   writeAppLanguage,
@@ -71,6 +72,7 @@ import {
   writePreferredRegion,
   writeStoryLanguageFilter,
   writeSupportModalDismissedToday,
+  writeSupportModalSupported,
   writeThemePreference,
   writeUserPreferences,
 } from "./brightnews/storage";
@@ -260,6 +262,7 @@ const BrightNews = () => {
   const [supportDialogOpen, setSupportDialogOpen] = useState(() => (
     Boolean(SUPPORT_PAYMENT_URL) &&
     !isNativeApp() &&
+    !readSupportModalSupported() &&
     !readSupportModalDismissedToday()
   ));
   const [premiumPurchaseLoading, setPremiumPurchaseLoading] = useState(false);
@@ -844,6 +847,10 @@ const BrightNews = () => {
   };
 
   const handleDismissSupportDialog = useCallback((reason = "dismiss") => {
+    if (reason === "support_click") {
+      writeSupportModalSupported();
+    }
+
     writeSupportModalDismissedToday();
     setSupportDialogOpen(false);
     trackEvent("support_prompt_dismiss", {
