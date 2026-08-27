@@ -13,14 +13,19 @@ Key pages:
 - Good News Today: https://brightnews.app/good-news-today
 - Worldwide Positive News: https://brightnews.app/worldwide-positive-news
 - Positive World News: https://brightnews.app/positive-world-news
+- Positive World News Today: https://brightnews.app/positive-world-news-today
 - Good News in the World: https://brightnews.app/good-news-in-the-world
 - Positive Current Events: https://brightnews.app/positive-current-events
 - Good News Only: https://brightnews.app/good-news-only
 - Wholesome News: https://brightnews.app/wholesome-news
 - Positive Stories: https://brightnews.app/positive-stories
+- Positive News Stories: https://brightnews.app/positive-news-stories
+- Positive News of the Day: https://brightnews.app/positive-news-of-the-day
+- Uplifting News Today: https://brightnews.app/uplifting-news-today
 - Good News This Week: https://brightnews.app/good-news-this-week
 - Uplifting Stories: https://brightnews.app/uplifting-stories
 - Uplifting News: https://brightnews.app/uplifting-news
+- Good News About the Environment: https://brightnews.app/good-news-about-the-environment
 - Positive News USA: https://brightnews.app/positive-news/usa
 - Positive News Today USA: https://brightnews.app/positive-news/usa/today
 - Good News USA This Week: https://brightnews.app/good-news/usa/this-week

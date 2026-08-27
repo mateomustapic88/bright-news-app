@@ -44,6 +44,29 @@ const usaRoute = ({
   storyFilter,
 });
 
+const topicalRoute = ({
+  path,
+  title,
+  heading,
+  eyebrow,
+  description,
+  keywords,
+  intro,
+  categoryId = "all",
+  storyFilter = "newest",
+}) => ({
+  path,
+  title,
+  heading,
+  eyebrow,
+  description,
+  keywords,
+  intro,
+  regionCode: "world",
+  categoryId,
+  storyFilter,
+});
+
 export const SEO_ROUTES = [
   {
     path: "/positive-news",
@@ -116,6 +139,18 @@ export const SEO_ROUTES = [
     regionCode: "world",
     storyFilter: "newest",
   },
+  topicalRoute({
+    path: "/positive-world-news-today",
+    title: "Positive World News Today | Uplifting Global Stories",
+    heading: "Positive World News Today",
+    eyebrow: "Today's world roundup",
+    description: "Positive world news today with uplifting global stories about progress, communities, health, science, nature and innovation.",
+    keywords: "positive world news today, positive news around the world today, good world news today, uplifting world news today",
+    intro: [
+      "Positive world news today gives readers a direct way to find constructive global stories without starting from crisis-heavy headlines.",
+      "This roundup focuses on hopeful current events from multiple countries, including progress in health, science, nature, education, communities and innovation.",
+    ],
+  }),
   {
     path: "/good-news-in-the-world",
     title: "Good News in the World | Positive Stories Worldwide",
@@ -187,6 +222,45 @@ export const SEO_ROUTES = [
     regionCode: "world",
     storyFilter: "top",
   },
+  topicalRoute({
+    path: "/positive-news-stories",
+    title: "Positive News Stories | Good News and Uplifting Updates",
+    heading: "Positive News Stories",
+    eyebrow: "Stories worth reading",
+    description: "Positive news stories from credible sources, focused on good news, uplifting updates and constructive progress around the world.",
+    keywords: "positive news stories, good news stories, uplifting news stories, positive stories today, inspiring news stories",
+    intro: [
+      "Positive news stories make it easier to notice useful progress, human kindness, scientific discovery and community improvements.",
+      "BrightNews keeps the original source link attached, so each uplifting story can be explored in context instead of becoming another unsourced social post.",
+    ],
+    storyFilter: "top",
+  }),
+  topicalRoute({
+    path: "/positive-news-of-the-day",
+    title: "Positive News of the Day | Good News Worth Reading",
+    heading: "Positive News of the Day",
+    eyebrow: "Daily good news",
+    description: "Positive news of the day with uplifting stories, good news and constructive current events from around the world.",
+    keywords: "positive news of the day, positive news for the day, good news of the day, uplifting news of the day",
+    intro: [
+      "Positive news of the day is for readers who want one calmer place to catch up on constructive stories.",
+      "The page highlights good news from the latest BrightNews feed, with source-linked summaries across people, health, science, nature, innovation and communities.",
+    ],
+    storyFilter: "featured",
+  }),
+  topicalRoute({
+    path: "/uplifting-news-today",
+    title: "Uplifting News Today | Positive Stories and Good News",
+    heading: "Uplifting News Today",
+    eyebrow: "Today's uplifting news",
+    description: "Uplifting news today with positive stories, good news and constructive current events from credible sources.",
+    keywords: "uplifting news today, positive uplifting news today, good uplifting news, uplifting stories today",
+    intro: [
+      "Uplifting news today should still be credible, timely and useful. BrightNews focuses on source-linked stories instead of vague feel-good posts.",
+      "Browse constructive current events and positive stories about people making progress, science moving forward and communities improving daily life.",
+    ],
+    storyFilter: "top",
+  }),
   {
     path: "/good-news-this-week",
     title: "Good News This Week | Positive Stories and Uplifting News",
@@ -229,6 +303,20 @@ export const SEO_ROUTES = [
     regionCode: "world",
     storyFilter: "top",
   },
+  topicalRoute({
+    path: "/good-news-about-the-environment",
+    title: "Good News About the Environment | Positive Nature News",
+    heading: "Good News About the Environment",
+    eyebrow: "Nature and climate solutions",
+    description: "Good news about the environment, including positive nature stories, conservation progress and constructive climate solutions.",
+    keywords: "good news about the environment, positive environmental news, good climate news, positive nature news, conservation good news",
+    intro: [
+      "Good news about the environment is not about pretending problems do not exist. It is about tracking conservation wins, restoration work and practical climate solutions.",
+      "This page collects positive environmental news from source-linked stories about nature recovery, community action, cleaner technology and measurable progress.",
+    ],
+    categoryId: "Environment",
+    storyFilter: "featured",
+  }),
   countryRoute({ slug: "usa", country: "USA", regionCode: "us", adjective: "American" }),
   usaRoute({
     path: "/positive-news/usa/today",

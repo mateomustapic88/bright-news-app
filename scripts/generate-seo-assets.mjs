@@ -16,15 +16,19 @@ const escapeHtml = value => String(value || "")
 
 const routePriority = route => {
   if (route.path === "/positive-news") return "0.95";
-  if (route.path === "/positive-news-today") return "0.9";
+  if (route.path === "/positive-news-today" || route.path === "/positive-world-news-today") return "0.9";
   if (
     route.path === "/good-news-today" ||
     route.path === "/positive-world-news" ||
+    route.path === "/positive-news-of-the-day" ||
+    route.path === "/positive-news-stories" ||
+    route.path === "/uplifting-news-today" ||
     route.path === "/uplifting-news" ||
     route.path === "/worldwide-positive-news" ||
     route.path === "/good-news-in-the-world" ||
     route.path === "/positive-current-events" ||
-    route.path === "/good-news-only"
+    route.path === "/good-news-only" ||
+    route.path === "/good-news-about-the-environment"
   ) return "0.9";
   if (
     route.path === "/good-news-this-week" ||
@@ -54,6 +58,41 @@ const urls = [
 ];
 
 const getRouteTheme = route => {
+  if (route.path === "/positive-world-news-today") {
+    return {
+      audience: "readers searching for positive global headlines today",
+      angle: "fresh worldwide progress, cross-border community work, useful discoveries and constructive current events",
+    };
+  }
+
+  if (route.path === "/positive-news-stories") {
+    return {
+      audience: "readers searching for positive news stories with real sources",
+      angle: "human stories, community progress, discoveries, health wins and practical examples of people improving daily life",
+    };
+  }
+
+  if (route.path === "/positive-news-of-the-day") {
+    return {
+      audience: "readers who want one positive news update for the day",
+      angle: "daily uplifting stories, source-linked summaries and constructive updates across multiple topics",
+    };
+  }
+
+  if (route.path === "/uplifting-news-today") {
+    return {
+      audience: "readers looking for uplifting news today",
+      angle: "current good news, useful progress, hopeful stories and practical updates that avoid outrage-driven framing",
+    };
+  }
+
+  if (route.path === "/good-news-about-the-environment") {
+    return {
+      audience: "readers asking whether there is good news about the environment",
+      angle: "nature restoration, conservation progress, climate solutions, cleaner technology and community-led environmental wins",
+    };
+  }
+
   if (route.path.includes("/usa")) {
     return {
       audience: "readers in the United States",
@@ -106,7 +145,69 @@ const getIntro = route => {
 
 const getRelatedRoutes = route => SEO_ROUTES
   .filter(item => item.path !== route.path)
+  .sort((left, right) => {
+    const leftScore = Number(left.regionCode === route.regionCode) + Number(left.categoryId === route.categoryId);
+    const rightScore = Number(right.regionCode === route.regionCode) + Number(right.categoryId === route.categoryId);
+    return rightScore - leftScore;
+  })
   .slice(0, 12);
+
+const getExpectationItems = route => {
+  if (route.path.includes("/usa")) {
+    return [
+      "Positive American news selected for constructive value, not outrage.",
+      "Uplifting USA stories about people, communities, health, science, nature and innovation.",
+      "Fresh source-linked summaries for readers who want good news from America without losing context.",
+      "Country-focused filtering so readers can follow United States stories separately from the world feed.",
+    ];
+  }
+
+  if (route.categoryId === "Environment") {
+    return [
+      "Good environmental news about restoration, conservation and practical climate solutions.",
+      "Positive nature stories that focus on progress while still linking to original reporting.",
+      "Updates about communities, researchers and organizations improving the environment.",
+      "A calmer way to follow environmental progress without doomscrolling every climate headline.",
+    ];
+  }
+
+  if (route.path.includes("today") || route.path.includes("day")) {
+    return [
+      "Fresh positive news and good news stories from the latest BrightNews feed.",
+      "Uplifting current events about people, health, science, nature, innovation and communities.",
+      "Source-linked summaries that help you quickly decide what is worth reading in full.",
+      "A daily alternative for readers who want constructive updates before negative headlines take over.",
+    ];
+  }
+
+  if (route.path.includes("stories")) {
+    return [
+      "Positive stories selected for human value, practical progress and credibility.",
+      "Uplifting stories from real sources rather than unsourced social posts.",
+      "Good news about people, communities, discoveries, nature, health and innovation.",
+      "A source-linked reading path for anyone trying to find more inspiring news stories.",
+    ];
+  }
+
+  return [
+    "Positive news and good news stories selected for constructive value.",
+    "Uplifting stories about people, communities, health, science, nature and innovation.",
+    "Source-linked summaries that make it easier to read more without losing context.",
+    "A calmer way to follow current events when mainstream feeds feel too negative.",
+  ];
+};
+
+const getFilterCopy = route => {
+  if (route.categoryId === "Environment") {
+    return "BrightNews gathers public environmental and general news from APIs, RSS feeds and selected source lists, removes duplicates, applies topic filters, and uses AI-assisted review to reduce disaster-only, political, violent or outrage-driven stories. The goal is to surface constructive environmental progress without hiding the original source.";
+  }
+
+  if (route.regionCode && route.regionCode !== "world") {
+    return `BrightNews gathers public news related to ${route.heading.replace(/^Positive News\s*/i, "")} from APIs, RSS feeds and selected source lists, removes duplicates, applies country and topic filters, and uses AI-assisted review to reduce strongly negative, violent, tragic, political or outrage-driven stories.`;
+  }
+
+  return "BrightNews gathers public news from APIs, RSS feeds and selected source lists, removes duplicates, applies topic filters, and uses AI-assisted review to reduce strongly negative, violent, tragic, political or outrage-driven stories. The goal is not to ignore reality, but to create a more balanced place for constructive and uplifting news.";
+};
 
 const getFaqItems = route => ([
   {
@@ -129,6 +230,8 @@ const renderSeoPage = route => {
   const intro = getIntro(route);
   const relatedRoutes = getRelatedRoutes(route);
   const faqItems = getFaqItems(route);
+  const expectationItems = getExpectationItems(route);
+  const filterCopy = getFilterCopy(route);
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -549,13 +652,10 @@ const renderSeoPage = route => {
         <p>This page is made for ${escapeHtml(theme.audience)}. It focuses on ${escapeHtml(theme.angle)} while keeping links back to original reporting and credible sources.</p>
         <h3>What you can expect</h3>
         <ul>
-          <li>Positive news and good news stories selected for constructive value.</li>
-          <li>Uplifting stories about people, communities, health, science, nature and innovation.</li>
-          <li>Source-linked summaries that make it easier to read more without losing context.</li>
-          <li>A calmer way to follow current events when mainstream feeds feel too negative.</li>
+          ${expectationItems.map(item => `<li>${escapeHtml(item)}</li>`).join("\n          ")}
         </ul>
         <h3>How BrightNews filters stories</h3>
-        <p>BrightNews gathers public news from APIs, RSS feeds and selected source lists, removes duplicates, applies topic filters, and uses AI-assisted review to reduce political, violent, tragic or outrage-driven stories. The goal is not to ignore reality, but to create a more balanced place for constructive and uplifting news.</p>
+        <p>${escapeHtml(filterCopy)}</p>
         <h3>Frequently asked questions</h3>
         ${faqItems.map(item => `<details><summary>${escapeHtml(item.question)}</summary><p>${escapeHtml(item.answer)}</p></details>`).join("\n        ")}
         <p>Open the BrightNews web app for the full feed, saved stories, topic filters, country filters and the newest stories from around the world.</p>

@@ -21,9 +21,12 @@ const SEO_DISCOVERY_LINKS = [
   { href: "/positive-news-today", label: "Positive news today" },
   { href: "/good-news-today", label: "Good news today" },
   { href: "/uplifting-news", label: "Uplifting news" },
+  { href: "/uplifting-news-today", label: "Uplifting news today" },
   { href: "/worldwide-positive-news", label: "Worldwide positive news" },
   { href: "/positive-world-news", label: "Positive world news" },
+  { href: "/positive-world-news-today", label: "Positive world news today" },
   { href: "/positive-current-events", label: "Positive current events" },
+  { href: "/good-news-about-the-environment", label: "Good news about the environment" },
 ];
 
 const getFeaturedStory = (stories, category, storyFilter) => {
