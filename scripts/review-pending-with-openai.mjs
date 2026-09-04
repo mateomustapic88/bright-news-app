@@ -9,7 +9,6 @@ import {
 } from "./lib/ingestion-shared.mjs";
 
 const OPENAI_API_URL = "https://api.openai.com/v1/responses";
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta";
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const OPENAI_REVIEW_SCHEMA = {
   type: "object",
@@ -78,8 +77,6 @@ const supabaseServiceRoleKey = getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY");
 const reviewProvider = (getEnv("AI_REVIEW_PROVIDER") || "groq").trim().toLowerCase();
 const openAiApiKey = getEnv("OPENAI_API_KEY");
 const openAiModel = getEnv("OPENAI_REVIEW_MODEL") || "gpt-5-mini";
-const geminiApiKey = getEnv("GEMINI_API_KEY");
-const geminiModel = getEnv("GEMINI_REVIEW_MODEL") || "gemini-2.0-flash-lite";
 const groqApiKey = getEnv("GROQ_API_KEY");
 const groqModel = getEnv("GROQ_REVIEW_MODEL") || "llama-3.1-8b-instant";
 const reviewLimit = Number(getEnv("OPENAI_REVIEW_LIMIT") || 200);
@@ -134,29 +131,6 @@ const buildArticleInput = row => JSON.stringify({
   source_url: row.source_url,
   review_notes: row.review_notes,
 }, null, 2);
-
-const toGeminiSchema = schema => {
-  if (Array.isArray(schema)) {
-    return schema.map(item => toGeminiSchema(item));
-  }
-
-  if (!schema || typeof schema !== "object") {
-    return schema;
-  }
-
-  return Object.fromEntries(
-    Object.entries(schema)
-      .filter(([key]) => key !== "additionalProperties")
-      .map(([key, value]) => [key, toGeminiSchema(value)]),
-  );
-};
-
-const GEMINI_REVIEW_SCHEMA = toGeminiSchema(OPENAI_REVIEW_SCHEMA);
-const getGeminiModelPath = model => (
-  String(model || "").startsWith("models/")
-    ? String(model)
-    : `models/${model}`
-);
 
 const extractOutputText = payload => {
   if (typeof payload.output_text === "string" && payload.output_text.trim()) {
@@ -225,78 +199,12 @@ const classifyWithOpenAI = async row => {
   }
 };
 
-const extractGeminiText = payload => {
-  for (const candidate of payload.candidates || []) {
-    for (const part of candidate.content?.parts || []) {
-      if (typeof part.text === "string" && part.text.trim()) {
-        return part.text;
-      }
-    }
-  }
-
-  return "";
-};
-
 const normalizeJsonText = text =>
   String(text || "")
     .trim()
     .replace(/^```(?:json)?\s*/i, "")
     .replace(/\s*```$/i, "")
     .trim();
-
-const classifyWithGemini = async row => {
-  const articleInput = buildArticleInput(row);
-
-  for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
-    const response = await fetch(
-      `${GEMINI_API_URL}/${getGeminiModelPath(geminiModel)}:generateContent?key=${encodeURIComponent(geminiApiKey)}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          systemInstruction: {
-            parts: [{ text: REVIEW_INSTRUCTIONS }],
-          },
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: `Review this article:\n${articleInput}` }],
-            },
-          ],
-          generationConfig: {
-            temperature: 0,
-            maxOutputTokens: 300,
-            responseMimeType: "application/json",
-            responseSchema: GEMINI_REVIEW_SCHEMA,
-          },
-        }),
-      },
-    );
-
-    const payload = await response.json();
-
-    if (response.ok) {
-      const outputText = normalizeJsonText(extractGeminiText(payload));
-      if (!outputText) {
-        throw new Error("Gemini returned no structured output text.");
-      }
-
-      return JSON.parse(outputText);
-    }
-
-    const message = payload?.error?.message || `Gemini error ${response.status}`;
-    const shouldRetry = (response.status === 429 || response.status >= 500) && attempt < maxRetries;
-
-    if (shouldRetry) {
-      await sleep(1000 * (attempt + 1));
-      continue;
-    }
-
-    throw new Error(message);
-  }
-};
 
 const classifyWithGroq = async row => {
   const articleInput = buildArticleInput(row);
@@ -350,17 +258,8 @@ const classifyWithGroq = async row => {
 };
 
 const getAiReviewer = () => {
-  if (reviewProvider === "gemini") {
-    if (!geminiApiKey) return null;
-    return {
-      provider: "gemini",
-      model: geminiModel,
-      classify: classifyWithGemini,
-    };
-  }
-
   if (reviewProvider === "openai") {
-    if (!openAiApiKey) return null;
+    if (!openAiApiKey) return getAiReviewerFallback("openai");
     return {
       provider: "openai",
       model: openAiModel,
@@ -369,11 +268,33 @@ const getAiReviewer = () => {
   }
 
   if (reviewProvider === "groq") {
-    if (!groqApiKey) return null;
+    if (!groqApiKey) return getAiReviewerFallback("groq");
     return {
       provider: "groq",
       model: groqModel,
       classify: classifyWithGroq,
+    };
+  }
+
+  return getAiReviewerFallback(reviewProvider);
+};
+
+const getAiReviewerFallback = unavailableProvider => {
+  if (groqApiKey) {
+    return {
+      provider: "groq",
+      model: groqModel,
+      classify: classifyWithGroq,
+      fallbackFrom: unavailableProvider,
+    };
+  }
+
+  if (openAiApiKey) {
+    return {
+      provider: "openai",
+      model: openAiModel,
+      classify: classifyWithOpenAI,
+      fallbackFrom: unavailableProvider,
     };
   }
 
@@ -437,7 +358,7 @@ export const run = async () => {
       .select("id, vendor, source_name, source_url, image_url, published_at, title, description, content, category, region_code")
       .eq("review_status", "pending")
       .is("published_story_id", null)
-      .order("published_at", { ascending: false })
+      .order("published_at", { ascending: false, nullsFirst: false })
       .limit(reviewLimit));
 
     if (error) throw new Error(error.message);
@@ -491,10 +412,10 @@ export const run = async () => {
 
   const { data: rows, error } = await applyReviewScope(supabase
     .from("raw_articles")
-    .select("id, source_name, title, description, content, category, region_code, source_url, review_notes")
+    .select("id, vendor, source_name, source_url, image_url, published_at, title, description, content, category, region_code, review_notes")
     .in("review_status", ["pending", "approved"])
     .is("published_story_id", null)
-    .order("published_at", { ascending: false })
+    .order("published_at", { ascending: false, nullsFirst: false })
     .limit(reviewLimit));
 
   if (error) throw new Error(error.message);
@@ -502,10 +423,40 @@ export const run = async () => {
   let approved = 0;
   let pending = 0;
   let rejected = 0;
+  let aiFailures = 0;
+  let heuristicFallbacks = 0;
 
   for (const row of rows || []) {
-    const review = await aiReviewer.classify(row);
-    const payload = buildUpdatePayload(row, review);
+    let payload;
+
+    try {
+      const review = await aiReviewer.classify(row);
+      payload = buildUpdatePayload(row, review);
+    } catch (error) {
+      aiFailures += 1;
+      heuristicFallbacks += 1;
+
+      const decision = inferReviewDecision({
+        vendor: row.vendor,
+        sourceName: row.source_name,
+        sourceUrl: row.source_url,
+        imageUrl: row.image_url,
+        publishedAt: row.published_at,
+        title: row.title,
+        description: row.description,
+        content: row.content,
+        tags: [row.category, row.region_code, row.source_name, row.source_url].filter(Boolean),
+      });
+
+      payload = {
+        review_status: decision.reviewStatus,
+        rejected_reason: decision.rejectedReason,
+        category: row.category,
+        region_code: row.region_code,
+        emoji: getCategoryEmoji(row.category),
+        review_notes: `${decision.reviewNotes} AI fallback after ${aiReviewer.provider} error: ${String(error?.message || "unknown error").slice(0, 220)}`,
+      };
+    }
 
     const { error: updateError } = await supabase
       .from("raw_articles")
@@ -529,6 +480,9 @@ export const run = async () => {
     rejected,
     provider: aiReviewer.provider,
     model: aiReviewer.model,
+    fallbackFrom: aiReviewer.fallbackFrom || null,
+    aiFailures,
+    heuristicFallbacks,
   };
 
   console.log(JSON.stringify(result, null, 2));

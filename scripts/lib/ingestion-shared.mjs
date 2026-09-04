@@ -127,8 +127,7 @@ export const TRUSTED_AUTO_APPROVE_VENDORS = new Set(["goodnewsnetwork", "positiv
 const MIN_POSITIVE_SCORE = 0.6;
 const hasAiReviewer = Boolean(
   process.env.OPENAI_API_KEY ||
-  process.env.GROQ_API_KEY ||
-  process.env.GEMINI_API_KEY,
+  process.env.GROQ_API_KEY,
 );
 const HEURISTIC_AUTO_APPROVE_SCORE = Number(process.env.HEURISTIC_AUTO_APPROVE_SCORE || 0.66);
 const MIN_SOURCE_QUALITY_SCORE = Number(process.env.MIN_SOURCE_QUALITY_SCORE || 0.38);

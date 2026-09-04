@@ -112,7 +112,7 @@ const loadRepublishCandidates = async () => {
       .eq("review_status", "published")
       .is("published_story_id", null)
       .ilike("review_notes", "%Moved out of live feed due to published story cap.%")
-      .order("published_at", { ascending: false })
+      .order("published_at", { ascending: false, nullsFirst: false })
       .limit(republishCandidateLimit),
   );
 
@@ -154,7 +154,7 @@ export const run = async () => {
         .select(rawArticleStoryColumns)
         .eq("review_status", "approved")
         .is("published_story_id", null)
-        .order("published_at", { ascending: false })
+        .order("published_at", { ascending: false, nullsFirst: false })
         .limit(publishApprovedLimit),
     );
 
