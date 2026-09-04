@@ -61,6 +61,7 @@ export const inferReviewDecision = ({
     POSITIVE_KEYWORDS,
     COMMUNITY_POSITIVE_HINTS,
     LOCAL_POSITIVE_LEAN_VENDORS,
+    LOCAL_POSITIVE_LEAN_SOURCE_MATCHES = new Set(),
     INFORMATIVE_POSITIVE_CATEGORY_TAGS,
     LOCAL_INFORMATIVE_KEYWORDS,
     TRUSTED_AUTO_APPROVE_VENDORS,
@@ -70,6 +71,8 @@ export const inferReviewDecision = ({
   } = config;
 
   const haystack = normalizeHaystack([title, description, content, tags.join(" ")]);
+  const normalizedVendor = String(vendor || "").toLowerCase();
+  const normalizedSourceName = String(sourceName || "").toLowerCase();
   const normalizedTags = tags.map(tag => toSentence(tag).toLowerCase());
   const normalizedTitle = toSentence(title).toLowerCase();
   const normalizedSourceUrl = normalizeExternalUrl(sourceUrl || tags.find(tag => tag.startsWith?.("http")) || "");
@@ -126,7 +129,13 @@ export const inferReviewDecision = ({
 
   const positiveScore = countKeywordHits(haystack, POSITIVE_KEYWORDS);
   const hasCommunityPositiveHint = COMMUNITY_POSITIVE_HINTS.some(keyword => matchesKeyword(haystack, keyword));
-  const isLocalPositiveLeanVendor = LOCAL_POSITIVE_LEAN_VENDORS.has(vendor);
+  const isLocalPositiveLeanVendor =
+    LOCAL_POSITIVE_LEAN_VENDORS.has(vendor) ||
+    Array.from(LOCAL_POSITIVE_LEAN_SOURCE_MATCHES).some(match =>
+      normalizedVendor.includes(match) ||
+      normalizedSourceName.includes(match) ||
+      normalizedSourceUrl.includes(match)
+    );
   const hasInformativePositiveCategory = normalizedTags.some(tag => INFORMATIVE_POSITIVE_CATEGORY_TAGS.has(tag));
   const informativeScore = countKeywordHits(haystack, LOCAL_INFORMATIVE_KEYWORDS);
   const adjustedPositiveScore =
@@ -165,8 +174,15 @@ export const inferReviewDecision = ({
     };
   }
 
-  if (!hasAiReviewer &&
-      (sourceAdjustedScore >= effectiveAutoApproveScore || canAutoApproveStrongLocal)) {
+  if (!hasAiReviewer && canAutoApproveStrongLocal) {
+    return {
+      reviewStatus: "approved",
+      rejectedReason: "",
+      reviewNotes: `Auto-approved from strong local positive source because AI review is unavailable (positive ${candidateScore.toFixed(2)}, source ${sourceQualityScore.toFixed(2)}, blended ${sourceAdjustedScore.toFixed(2)}).`,
+    };
+  }
+
+  if (!hasAiReviewer && sourceAdjustedScore >= effectiveAutoApproveScore) {
     return {
       reviewStatus: "pending",
       rejectedReason: "",

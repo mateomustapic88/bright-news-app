@@ -21,6 +21,7 @@ const maxRetries = Number(getEnv("PUBLISH_APPROVED_MAX_RETRIES") || 3);
 const retryDelayMs = Number(getEnv("PUBLISH_APPROVED_RETRY_DELAY_MS") || 1500);
 const publishApprovedLimit = Number(getEnv("PUBLISH_APPROVED_LIMIT") || 25);
 const republishCandidateLimit = Number(getEnv("PUBLISH_REPUBLISH_LIMIT") || 0);
+const sourceUrlLookupBatchSize = Number(getEnv("PUBLISH_SOURCE_URL_LOOKUP_BATCH_SIZE") || 25);
 const rawArticleStoryColumns = [
   "id",
   "source_url",
@@ -84,16 +85,23 @@ const loadExistingStoriesBySourceUrl = async sourceUrls => {
     return [];
   }
 
-  const { data, error } = await withRetries(
-    "Failed to load existing stories by source URL",
-    () => supabase
-      .from("stories")
-      .select("id, source_url")
-      .in("source_url", uniqueSourceUrls),
-  );
+  const existingStories = [];
 
-  if (error) throw new Error(error.message);
-  return data || [];
+  for (let index = 0; index < uniqueSourceUrls.length; index += sourceUrlLookupBatchSize) {
+    const batch = uniqueSourceUrls.slice(index, index + sourceUrlLookupBatchSize);
+    const { data, error } = await withRetries(
+      "Failed to load existing stories by source URL",
+      () => supabase
+        .from("stories")
+        .select("id, source_url")
+        .in("source_url", batch),
+    );
+
+    if (error) throw new Error(error.message);
+    existingStories.push(...(data || []));
+  }
+
+  return existingStories;
 };
 
 const loadRepublishCandidates = async () => {
