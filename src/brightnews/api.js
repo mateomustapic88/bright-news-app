@@ -55,21 +55,27 @@ const applyPersonalizedStoryFilters = (query, preferences = {}) => {
   return nextQuery;
 };
 
+const getPopularSinceDate = () => {
+  const date = new Date();
+  date.setDate(date.getDate() - 7);
+  return date.toISOString();
+};
+
 const applyStoryOrdering = (query, storyFilter = "newest") => {
   if (storyFilter === "top") {
     return query
+      .gte("published_at", getPopularSinceDate())
       .order("saved_count", { ascending: false })
-      .order("published_at", { ascending: false });
+      .order("published_at", { ascending: false, nullsFirst: false });
   }
 
   if (storyFilter === "featured") {
     return query
-      .order("is_pinned", { ascending: false })
       .order("saved_count", { ascending: false })
-      .order("published_at", { ascending: false });
+      .order("published_at", { ascending: false, nullsFirst: false });
   }
 
-  return query.order("published_at", { ascending: false });
+  return query.order("published_at", { ascending: false, nullsFirst: false });
 };
 
 export const loadStories = async (regionCode, categoryId, options = {}) => {
