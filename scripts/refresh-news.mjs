@@ -5,7 +5,7 @@ import { run as runGuardianIngest } from "./ingest-guardian.mjs";
 import { run as runGoogleNewsRssIngest } from "./ingest-google-news-rss.mjs";
 import { run as runNewsDataIngest } from "./ingest-newsdata.mjs";
 import { run as runRssIngest } from "./ingest-rss.mjs";
-import { run as runOpenAiReview } from "./review-pending-with-openai.mjs";
+import { run as runGroqReview } from "./review-pending-with-groq.mjs";
 import { run as runPublishApproved } from "./publish-approved-stories.mjs";
 
 export const run = async () => {
@@ -15,7 +15,7 @@ export const run = async () => {
   const googleNewsRss = { skipped: false };
   const newsdata = { skipped: false };
   const rss = { skipped: false };
-  const openai = { skipped: false };
+  const review = { skipped: false };
   const published = { skipped: false };
 
   try {
@@ -61,10 +61,10 @@ export const run = async () => {
   }
 
   try {
-    Object.assign(openai, await runOpenAiReview());
+    Object.assign(review, await runGroqReview());
   } catch (error) {
-    openai.skipped = true;
-    openai.error = error.message;
+    review.skipped = true;
+    review.error = error.message;
   }
 
   try {
@@ -74,7 +74,7 @@ export const run = async () => {
     published.error = error.message;
   }
 
-  const result = { gnews, gdelt, guardian, googleNewsRss, newsdata, rss, openai, published };
+  const result = { gnews, gdelt, guardian, googleNewsRss, newsdata, rss, review, published };
   console.log(JSON.stringify(result, null, 2));
   return result;
 };

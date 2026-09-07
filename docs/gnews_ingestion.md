@@ -70,7 +70,7 @@ npm run refresh:news
   - supports per-feed caps through `INGEST_RSS_MAX_ITEMS_PER_FEED`
   - maps source tags into BrightNews categories and regions
 - `review:pending`
-  - sends pending candidate stories to OpenAI for a final uplifting/not-uplifting decision
+  - sends pending candidate stories to Groq for a final uplifting/not-uplifting decision
   - updates category and region if the model gives a better fit
   - only approved rows are eligible for publication
 - `publish:approved`
@@ -82,17 +82,14 @@ npm run refresh:news
 - `refresh:news`
   - runs `ingest:gnews`, `ingest:gdelt`, `ingest:google-news-rss`, `ingest:rss`, `review:pending`, then `publish:approved`
 
-## Optional AI review env vars
+## Optional Groq review env vars
 
 ```env
-AI_REVIEW_PROVIDER=groq
 GROQ_API_KEY=your-groq-api-key
 GROQ_REVIEW_MODEL=llama-3.1-8b-instant
-OPENAI_API_KEY=your-openai-api-key
-OPENAI_REVIEW_MODEL=gpt-5-mini
-OPENAI_REVIEW_LIMIT=200
+AI_REVIEW_LIMIT=200
 AI_REVIEW_PER_REGION_LIMIT=12
-OPENAI_REVIEW_MIN_CONFIDENCE=0.6
+AI_REVIEW_MIN_CONFIDENCE=0.6
 AI_REVIEW_MAX_DESCRIPTION_CHARS=1200
 AI_REVIEW_MAX_CONTENT_CHARS=2200
 HEURISTIC_AUTO_APPROVE_SCORE=0.75
@@ -110,7 +107,7 @@ MAX_PUBLISHED_STORIES=150
 
 `AI_REVIEW_PER_REGION_LIMIT` keeps the default review run balanced across countries, so one noisy source or country cannot consume the whole queue.
 
-`HEURISTIC_AUTO_APPROVE_SCORE` controls how aggressive the no-AI fallback is. Local-source heuristic auto-approval is disabled by default; set `ALLOW_LOCAL_HEURISTIC_AUTO_APPROVE=true` only if you accept broader automated local approvals. Trusted positive-news sources can still auto-approve when AI is unavailable.
+`HEURISTIC_AUTO_APPROVE_SCORE` controls how aggressive the no-Groq fallback is. Local-source heuristic auto-approval is disabled by default; set `ALLOW_LOCAL_HEURISTIC_AUTO_APPROVE=true` only if you accept broader automated local approvals. Trusted positive-news sources can still auto-approve when Groq is unavailable.
 
 ## Cron example
 
@@ -138,16 +135,13 @@ Optional GitHub repository secrets:
 - `GNEWS_API_KEY`
 - `NEWSDATA_API_KEY`
 - `GROQ_API_KEY`
-- `OPENAI_API_KEY`
 
 Optional GitHub repository variables:
 
-- `AI_REVIEW_PROVIDER`
 - `GROQ_REVIEW_MODEL`
-- `OPENAI_REVIEW_MODEL`
-- `OPENAI_REVIEW_LIMIT`
+- `AI_REVIEW_LIMIT`
 - `AI_REVIEW_PER_REGION_LIMIT`
-- `OPENAI_REVIEW_MIN_CONFIDENCE`
+- `AI_REVIEW_MIN_CONFIDENCE`
 - `HEURISTIC_AUTO_APPROVE_SCORE`
 - `ALLOW_LOCAL_HEURISTIC_AUTO_APPROVE`
 - `INGEST_GNEWS_MAX_RESULTS`

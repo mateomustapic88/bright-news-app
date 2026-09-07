@@ -8,53 +8,7 @@ import {
   sleep,
 } from "./lib/ingestion-shared.mjs";
 
-const OPENAI_API_URL = "https://api.openai.com/v1/responses";
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-const OPENAI_REVIEW_SCHEMA = {
-  type: "object",
-  additionalProperties: false,
-  properties: {
-    action: {
-      type: "string",
-      enum: ["approve", "pending", "reject"],
-    },
-    confidence: {
-      type: "number",
-      minimum: 0,
-      maximum: 1,
-    },
-    genuinely_uplifting: {
-      type: "boolean",
-    },
-    category: {
-      type: "string",
-      enum: CATEGORY_CONFIG.map(item => item.category),
-    },
-    region_code: {
-      type: "string",
-      enum: REGION_CONFIG.map(item => item.code),
-    },
-    contains_politics: {
-      type: "boolean",
-    },
-    contains_disaster: {
-      type: "boolean",
-    },
-    reason: {
-      type: "string",
-    },
-  },
-  required: [
-    "action",
-    "confidence",
-    "genuinely_uplifting",
-    "category",
-    "region_code",
-    "contains_politics",
-    "contains_disaster",
-    "reason",
-  ],
-};
 
 const REVIEW_INSTRUCTIONS = [
   "You classify news items for BrightNews, a positive-news app.",
@@ -74,16 +28,13 @@ const getRequiredEnv = name => {
 
 const supabaseUrl = getEnv("SUPABASE_URL") || getEnv("VITE_SUPABASE_URL");
 const supabaseServiceRoleKey = getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY");
-const reviewProvider = (getEnv("AI_REVIEW_PROVIDER") || "groq").trim().toLowerCase();
-const openAiApiKey = getEnv("OPENAI_API_KEY");
-const openAiModel = getEnv("OPENAI_REVIEW_MODEL") || "gpt-5-mini";
 const groqApiKey = getEnv("GROQ_API_KEY");
 const groqModel = getEnv("GROQ_REVIEW_MODEL") || "llama-3.1-8b-instant";
-const reviewLimit = Number(getEnv("OPENAI_REVIEW_LIMIT") || 200);
+const reviewLimit = Number(getEnv("AI_REVIEW_LIMIT") || 200);
 const reviewPerRegionLimit = Number(getEnv("AI_REVIEW_PER_REGION_LIMIT") || 12);
-const reviewDelayMs = Number(getEnv("OPENAI_REVIEW_DELAY_MS") || 300);
-const maxRetries = Number(getEnv("OPENAI_REVIEW_MAX_RETRIES") || 3);
-const minimumConfidence = Number(getEnv("OPENAI_REVIEW_MIN_CONFIDENCE") || 0.6);
+const reviewDelayMs = Number(getEnv("AI_REVIEW_DELAY_MS") || 300);
+const maxRetries = Number(getEnv("AI_REVIEW_MAX_RETRIES") || 3);
+const minimumConfidence = Number(getEnv("AI_REVIEW_MIN_CONFIDENCE") || 0.6);
 const maxDescriptionChars = Number(getEnv("AI_REVIEW_MAX_DESCRIPTION_CHARS") || 1200);
 const maxContentChars = Number(getEnv("AI_REVIEW_MAX_CONTENT_CHARS") || 2200);
 const reviewRegionCodes = String(getEnv("AI_REVIEW_REGION_CODES") || "")
@@ -224,73 +175,6 @@ const buildArticleInput = row => JSON.stringify({
   review_notes: row.review_notes,
 }, null, 2);
 
-const extractOutputText = payload => {
-  if (typeof payload.output_text === "string" && payload.output_text.trim()) {
-    return payload.output_text;
-  }
-
-  for (const outputItem of payload.output || []) {
-    if (!Array.isArray(outputItem.content)) continue;
-
-    for (const contentItem of outputItem.content) {
-      if (contentItem.type === "output_text" && contentItem.text) {
-        return contentItem.text;
-      }
-    }
-  }
-
-  return "";
-};
-
-const classifyWithOpenAI = async row => {
-  const articleInput = buildArticleInput(row);
-
-  for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
-    const response = await fetch(OPENAI_API_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${openAiApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: openAiModel,
-        instructions: REVIEW_INSTRUCTIONS,
-        input: `Review this article:\n${articleInput}`,
-        max_output_tokens: 300,
-        text: {
-          format: {
-            type: "json_schema",
-            name: "uplifting_article_review",
-            schema: OPENAI_REVIEW_SCHEMA,
-            strict: true,
-          },
-        },
-      }),
-    });
-
-    const payload = await response.json();
-
-    if (response.ok) {
-      const outputText = extractOutputText(payload);
-      if (!outputText) {
-        throw new Error("OpenAI returned no structured output text.");
-      }
-
-      return JSON.parse(outputText);
-    }
-
-    const message = payload?.error?.message || `OpenAI error ${response.status}`;
-    const shouldRetry = (response.status === 429 || response.status >= 500) && attempt < maxRetries;
-
-    if (shouldRetry) {
-      await sleep(1000 * (attempt + 1));
-      continue;
-    }
-
-    throw new Error(message);
-  }
-};
-
 const normalizeJsonText = text =>
   String(text || "")
     .trim()
@@ -350,47 +234,13 @@ const classifyWithGroq = async row => {
 };
 
 const getAiReviewer = () => {
-  if (reviewProvider === "openai") {
-    if (!openAiApiKey) return getAiReviewerFallback("openai");
-    return {
-      provider: "openai",
-      model: openAiModel,
-      classify: classifyWithOpenAI,
-    };
-  }
+  if (!groqApiKey) return null;
 
-  if (reviewProvider === "groq") {
-    if (!groqApiKey) return getAiReviewerFallback("groq");
-    return {
-      provider: "groq",
-      model: groqModel,
-      classify: classifyWithGroq,
-    };
-  }
-
-  return getAiReviewerFallback(reviewProvider);
-};
-
-const getAiReviewerFallback = unavailableProvider => {
-  if (groqApiKey) {
-    return {
-      provider: "groq",
-      model: groqModel,
-      classify: classifyWithGroq,
-      fallbackFrom: unavailableProvider,
-    };
-  }
-
-  if (openAiApiKey) {
-    return {
-      provider: "openai",
-      model: openAiModel,
-      classify: classifyWithOpenAI,
-      fallbackFrom: unavailableProvider,
-    };
-  }
-
-  return null;
+  return {
+    provider: "groq",
+    model: groqModel,
+    classify: classifyWithGroq,
+  };
 };
 
 const buildUpdatePayload = (row, review) => {
@@ -490,7 +340,7 @@ export const run = async () => {
       balancedByRegion,
       reviewLimit,
       reviewPerRegionLimit: balancedByRegion ? reviewPerRegionLimit : null,
-      reason: `${reviewProvider.toUpperCase()} reviewer is unavailable.`,
+      reason: "Groq reviewer is unavailable.",
     };
 
     console.log(JSON.stringify(fallbackResult, null, 2));
@@ -559,7 +409,6 @@ export const run = async () => {
     rejected,
     provider: aiReviewer.provider,
     model: aiReviewer.model,
-    fallbackFrom: aiReviewer.fallbackFrom || null,
     aiFailures,
     heuristicFallbacks,
     balancedByRegion,
