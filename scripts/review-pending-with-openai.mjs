@@ -80,6 +80,7 @@ const openAiModel = getEnv("OPENAI_REVIEW_MODEL") || "gpt-5-mini";
 const groqApiKey = getEnv("GROQ_API_KEY");
 const groqModel = getEnv("GROQ_REVIEW_MODEL") || "llama-3.1-8b-instant";
 const reviewLimit = Number(getEnv("OPENAI_REVIEW_LIMIT") || 200);
+const reviewPerRegionLimit = Number(getEnv("AI_REVIEW_PER_REGION_LIMIT") || 12);
 const reviewDelayMs = Number(getEnv("OPENAI_REVIEW_DELAY_MS") || 300);
 const maxRetries = Number(getEnv("OPENAI_REVIEW_MAX_RETRIES") || 3);
 const minimumConfidence = Number(getEnv("OPENAI_REVIEW_MIN_CONFIDENCE") || 0.6);
@@ -112,6 +113,97 @@ const applyReviewScope = query => {
   }
 
   return nextQuery;
+};
+
+const REVIEW_SELECT_COLUMNS = [
+  "id",
+  "vendor",
+  "source_name",
+  "source_url",
+  "image_url",
+  "published_at",
+  "title",
+  "description",
+  "content",
+  "category",
+  "region_code",
+  "review_notes",
+  "created_at",
+].join(", ");
+
+const applyCategoryScope = query => {
+  if (reviewCategories.length === 0) return query;
+  return query.in("category", reviewCategories);
+};
+
+const dedupeRows = rows => {
+  const rowById = new Map();
+
+  for (const row of rows || []) {
+    if (!row?.id || rowById.has(row.id)) continue;
+    rowById.set(row.id, row);
+  }
+
+  return [...rowById.values()];
+};
+
+const loadRowsForReview = async statusFilter => {
+  const hasExplicitRegionScope = reviewRegionCodes.length > 0;
+  const shouldUseBalancedRegions = !hasExplicitRegionScope && reviewPerRegionLimit > 0;
+
+  if (!shouldUseBalancedRegions) {
+    let query = supabase
+      .from("raw_articles")
+      .select(REVIEW_SELECT_COLUMNS)
+      .is("published_story_id", null)
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .limit(reviewLimit);
+
+    query = Array.isArray(statusFilter)
+      ? query.in("review_status", statusFilter)
+      : query.eq("review_status", statusFilter);
+    query = applyReviewScope(query);
+
+    const { data, error } = await query;
+    if (error) throw new Error(error.message);
+
+    return {
+      rows: data || [],
+      balancedByRegion: false,
+    };
+  }
+
+  const rows = [];
+  const regionCodes = REGION_CONFIG.map(item => item.code);
+
+  for (const regionCode of regionCodes) {
+    let query = supabase
+      .from("raw_articles")
+      .select(REVIEW_SELECT_COLUMNS)
+      .eq("region_code", regionCode)
+      .is("published_story_id", null)
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .limit(reviewPerRegionLimit);
+
+    query = Array.isArray(statusFilter)
+      ? query.in("review_status", statusFilter)
+      : query.eq("review_status", statusFilter);
+    query = applyCategoryScope(query);
+
+    const { data, error } = await query;
+    if (error) throw new Error(error.message);
+
+    rows.push(...(data || []));
+  }
+
+  return {
+    rows: dedupeRows(rows)
+      .sort((first, second) =>
+        String(second.published_at || second.created_at || "")
+          .localeCompare(String(first.published_at || first.created_at || "")))
+      .slice(0, reviewLimit),
+    balancedByRegion: true,
+  };
 };
 
 const truncateText = (value, maxChars) => {
@@ -353,15 +445,7 @@ export const run = async () => {
   const aiReviewer = getAiReviewer();
 
   if (!aiReviewer) {
-    const { data: rows, error } = await applyReviewScope(supabase
-      .from("raw_articles")
-      .select("id, vendor, source_name, source_url, image_url, published_at, title, description, content, category, region_code")
-      .eq("review_status", "pending")
-      .is("published_story_id", null)
-      .order("published_at", { ascending: false, nullsFirst: false })
-      .limit(reviewLimit));
-
-    if (error) throw new Error(error.message);
+    const { rows, balancedByRegion } = await loadRowsForReview("pending");
 
     let approved = 0;
     let pending = 0;
@@ -403,6 +487,9 @@ export const run = async () => {
       approved,
       pending,
       rejected,
+      balancedByRegion,
+      reviewLimit,
+      reviewPerRegionLimit: balancedByRegion ? reviewPerRegionLimit : null,
       reason: `${reviewProvider.toUpperCase()} reviewer is unavailable.`,
     };
 
@@ -410,15 +497,7 @@ export const run = async () => {
     return fallbackResult;
   }
 
-  const { data: rows, error } = await applyReviewScope(supabase
-    .from("raw_articles")
-    .select("id, vendor, source_name, source_url, image_url, published_at, title, description, content, category, region_code, review_notes")
-    .in("review_status", ["pending", "approved"])
-    .is("published_story_id", null)
-    .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(reviewLimit));
-
-  if (error) throw new Error(error.message);
+  const { rows, balancedByRegion } = await loadRowsForReview(["pending", "approved"]);
 
   let approved = 0;
   let pending = 0;
@@ -483,6 +562,9 @@ export const run = async () => {
     fallbackFrom: aiReviewer.fallbackFrom || null,
     aiFailures,
     heuristicFallbacks,
+    balancedByRegion,
+    reviewLimit,
+    reviewPerRegionLimit: balancedByRegion ? reviewPerRegionLimit : null,
   };
 
   console.log(JSON.stringify(result, null, 2));

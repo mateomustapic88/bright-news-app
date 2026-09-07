@@ -161,6 +161,7 @@ export const inferReviewDecision = ({
   );
   const hasStrongLocalPositiveSignal = hasCommunityPositiveHint || informativeScore > 0;
   const canAutoApproveStrongLocal =
+    thresholds.allowLocalHeuristicAutoApprove &&
     isLocalPositiveLeanVendor &&
     hasStrongLocalPositiveSignal &&
     sourceQualityScore >= thresholds.autoApproveMinSourceQualityScore &&

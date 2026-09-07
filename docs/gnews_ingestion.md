@@ -90,9 +90,8 @@ GROQ_API_KEY=your-groq-api-key
 GROQ_REVIEW_MODEL=llama-3.1-8b-instant
 OPENAI_API_KEY=your-openai-api-key
 OPENAI_REVIEW_MODEL=gpt-5-mini
-GEMINI_API_KEY=your-gemini-api-key
-GEMINI_REVIEW_MODEL=gemini-2.0-flash-lite
 OPENAI_REVIEW_LIMIT=200
+AI_REVIEW_PER_REGION_LIMIT=12
 OPENAI_REVIEW_MIN_CONFIDENCE=0.6
 AI_REVIEW_MAX_DESCRIPTION_CHARS=1200
 AI_REVIEW_MAX_CONTENT_CHARS=2200
@@ -109,7 +108,9 @@ INGEST_RSS_MAX_RETRIES=2
 MAX_PUBLISHED_STORIES=150
 ```
 
-`HEURISTIC_AUTO_APPROVE_SCORE` controls how aggressive the no-OpenAI fallback is. The current code default is `0.66`, which is tuned to let through stronger regional science/health stories without broadly opening the floodgates.
+`AI_REVIEW_PER_REGION_LIMIT` keeps the default review run balanced across countries, so one noisy source or country cannot consume the whole queue.
+
+`HEURISTIC_AUTO_APPROVE_SCORE` controls how aggressive the no-AI fallback is. Local-source heuristic auto-approval is disabled by default; set `ALLOW_LOCAL_HEURISTIC_AUTO_APPROVE=true` only if you accept broader automated local approvals. Trusted positive-news sources can still auto-approve when AI is unavailable.
 
 ## Cron example
 
@@ -138,17 +139,17 @@ Optional GitHub repository secrets:
 - `NEWSDATA_API_KEY`
 - `GROQ_API_KEY`
 - `OPENAI_API_KEY`
-- `GEMINI_API_KEY`
 
 Optional GitHub repository variables:
 
 - `AI_REVIEW_PROVIDER`
 - `GROQ_REVIEW_MODEL`
 - `OPENAI_REVIEW_MODEL`
-- `GEMINI_REVIEW_MODEL`
 - `OPENAI_REVIEW_LIMIT`
+- `AI_REVIEW_PER_REGION_LIMIT`
 - `OPENAI_REVIEW_MIN_CONFIDENCE`
 - `HEURISTIC_AUTO_APPROVE_SCORE`
+- `ALLOW_LOCAL_HEURISTIC_AUTO_APPROVE`
 - `INGEST_GNEWS_MAX_RESULTS`
 - `INGEST_GNEWS_PAGES`
 - `INGEST_GOOGLE_NEWS_RSS_MAX_ITEMS`
