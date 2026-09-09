@@ -1564,7 +1564,7 @@ export const upsertRawArticles = async (supabase, rows) => {
   for (const sourceUrlChunk of chunkArray(sourceUrls, existingLookupChunkSize)) {
     const { data, error: existingError } = await supabase
       .from("raw_articles")
-      .select("source_url, review_status, review_notes, rejected_reason, published_story_id")
+      .select("source_url, review_status, review_notes, rejected_reason, published_story_id, category, region_code, country_code, emoji")
       .in("source_url", sourceUrlChunk);
 
     if (existingError) {
@@ -1579,13 +1579,18 @@ export const upsertRawArticles = async (supabase, rows) => {
     const existing = existingBySourceUrl.get(row.source_url);
     if (!existing) return row;
 
-    if (existing.review_status === "published") {
+    // Re-fetching a source must not undo an AI or administrator's decision.
+    if (existing.review_status === "approved" || existing.review_status === "published" || String(existing.review_notes || "").startsWith("AI pending")) {
       return {
         ...row,
-        review_status: "published",
-        review_notes: existing.review_notes || row.review_notes,
-        rejected_reason: "",
-        published_story_id: existing.published_story_id || null,
+        review_status: existing.review_status,
+        review_notes: existing.review_notes,
+        rejected_reason: existing.rejected_reason,
+        published_story_id: existing.published_story_id,
+        category: existing.category,
+        region_code: existing.region_code,
+        country_code: existing.country_code,
+        emoji: existing.emoji,
       };
     }
 
@@ -1603,16 +1608,6 @@ export const upsertRawArticles = async (supabase, rows) => {
         review_status: "rejected",
         review_notes: existing.review_notes || row.review_notes,
         rejected_reason: existing.rejected_reason || row.rejected_reason,
-        published_story_id: existing.published_story_id || null,
-      };
-    }
-
-    if (existing.review_status === "approved" && row.review_status === "pending") {
-      return {
-        ...row,
-        review_status: "approved",
-        review_notes: existing.review_notes || row.review_notes,
-        rejected_reason: "",
         published_story_id: existing.published_story_id || null,
       };
     }

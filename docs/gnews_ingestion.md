@@ -86,7 +86,7 @@ npm run refresh:news
 
 ```env
 GROQ_API_KEY=your-groq-api-key
-GROQ_REVIEW_MODEL=llama-3.1-8b-instant
+GROQ_REVIEW_MODEL=qwen/qwen3.8-27b
 AI_REVIEW_LIMIT=200
 AI_REVIEW_PER_REGION_LIMIT=12
 AI_REVIEW_MIN_CONFIDENCE=0.6
@@ -105,24 +105,28 @@ INGEST_RSS_MAX_RETRIES=2
 MAX_PUBLISHED_STORIES=150
 ```
 
-`AI_REVIEW_PER_REGION_LIMIT` keeps the default review run balanced across countries, so one noisy source or country cannot consume the whole queue.
+`AI_REVIEW_PER_REGION_LIMIT` keeps the review run balanced across countries and publishers. Each run considers pending stories from the last 14 days. Articles already reviewed as ambiguous (`AI pending`) remain available for manual review rather than consuming every scheduled batch again.
 
-`HEURISTIC_AUTO_APPROVE_SCORE` controls how aggressive the no-Groq fallback is. Local-source heuristic auto-approval is disabled by default; set `ALLOW_LOCAL_HEURISTIC_AUTO_APPROVE=true` only if you accept broader automated local approvals. Trusted positive-news sources can still auto-approve when Groq is unavailable.
+The scheduled pipeline requires `GROQ_API_KEY`. Review checks the active Groq models before processing the queue; if the configured model is unavailable, it tries the known Qwen 3.8/3.6 replacements. If none are available it fails visibly. Per-article AI failures leave stories pending and cause the refresh job to fail, rather than approving them heuristically. Ingestion's initial heuristic triage remains separate.
+
+Publishing processes up to 200 approved articles per run (`PUBLISH_APPROVED_LIMIT`) and reconciles already-published source URLs so duplicates cannot keep occupying the queue. The workflow summary reports reviews, approvals, AI failures, publications, and latest story date. A failed review/publish stage or a feed older than 48 hours fails the job. Enable GitHub Actions failure notifications for this repository.
 
 ## Cron example
 
 ```cron
-0 */12 * * * cd /path/to/bright-news && /usr/bin/npm run refresh:news >> /tmp/bright-news-refresh.log 2>&1
+17 */6 * * * cd /path/to/bright-news && /usr/bin/npm run refresh:news >> /tmp/bright-news-refresh.log 2>&1
 ```
 
 ## GitHub Actions automation
+
+Queue indexes are defined in `docs/supabase_ingestion_queue_indexes.sql` and were applied to the linked production project during the September recovery. Re-ingestion preserves reviewed decisions and the reviewed country/category rather than replacing them with source defaults.
 
 The repo now includes a scheduled GitHub Actions workflow at
 `.github/workflows/refresh-news.yml`.
 
 By default it runs:
 
-- every 12 hours
+- every 6 hours (GitHub may delay scheduled jobs)
 - and manually through `Actions -> Refresh News -> Run workflow`
 
 Set these GitHub repository secrets before relying on it:

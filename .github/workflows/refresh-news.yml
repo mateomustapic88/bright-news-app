@@ -2,7 +2,7 @@ name: Refresh News
 
 on:
   schedule:
-    - cron: "0 */12 * * *"
+    - cron: "17 */6 * * *"
   workflow_dispatch:
 
 permissions:
@@ -10,11 +10,12 @@ permissions:
 
 concurrency:
   group: refresh-news
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
 
     steps:
       - name: Check out repository
@@ -33,9 +34,11 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: |
           test -n "$VITE_SUPABASE_URL" || (echo "Missing repository secret: VITE_SUPABASE_URL" && exit 1)
           test -n "$SUPABASE_SERVICE_ROLE_KEY" || (echo "Missing repository secret: SUPABASE_SERVICE_ROLE_KEY" && exit 1)
+          test -n "$GROQ_API_KEY" || (echo "Missing repository secret: GROQ_API_KEY" && exit 1)
 
       - name: Refresh BrightNews stories
         env:
@@ -45,7 +48,7 @@ jobs:
           GUARDIAN_API_KEY: ${{ secrets.GUARDIAN_API_KEY }}
           NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          GROQ_REVIEW_MODEL: ${{ vars.GROQ_REVIEW_MODEL }}
+          GROQ_REVIEW_MODEL: ${{ vars.GROQ_REVIEW_MODEL || 'qwen/qwen3.8-27b' }}
           AI_REVIEW_LIMIT: ${{ vars.AI_REVIEW_LIMIT }}
           AI_REVIEW_PER_REGION_LIMIT: ${{ vars.AI_REVIEW_PER_REGION_LIMIT }}
           AI_REVIEW_DELAY_MS: ${{ vars.AI_REVIEW_DELAY_MS }}
@@ -53,6 +56,7 @@ jobs:
           AI_REVIEW_MIN_CONFIDENCE: ${{ vars.AI_REVIEW_MIN_CONFIDENCE }}
           AI_REVIEW_MAX_DESCRIPTION_CHARS: ${{ vars.AI_REVIEW_MAX_DESCRIPTION_CHARS }}
           AI_REVIEW_MAX_CONTENT_CHARS: ${{ vars.AI_REVIEW_MAX_CONTENT_CHARS }}
+          PUBLISH_APPROVED_LIMIT: ${{ vars.PUBLISH_APPROVED_LIMIT || '200' }}
           HEURISTIC_AUTO_APPROVE_SCORE: ${{ vars.HEURISTIC_AUTO_APPROVE_SCORE }}
           INGEST_GNEWS_REGION_CODES: ${{ vars.INGEST_GNEWS_REGION_CODES || 'world,us,uk,hr,ca,in' }}
           INGEST_GNEWS_MAX_RESULTS: ${{ vars.INGEST_GNEWS_MAX_RESULTS }}

@@ -19,7 +19,7 @@ if (!supabaseUrl) {
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 const maxRetries = Number(getEnv("PUBLISH_APPROVED_MAX_RETRIES") || 3);
 const retryDelayMs = Number(getEnv("PUBLISH_APPROVED_RETRY_DELAY_MS") || 1500);
-const publishApprovedLimit = Number(getEnv("PUBLISH_APPROVED_LIMIT") || 25);
+const publishApprovedLimit = Number(getEnv("PUBLISH_APPROVED_LIMIT") || 200);
 const republishCandidateLimit = Number(getEnv("PUBLISH_REPUBLISH_LIMIT") || 0);
 const sourceUrlLookupBatchSize = Number(getEnv("PUBLISH_SOURCE_URL_LOOKUP_BATCH_SIZE") || 25);
 const rawArticleStoryColumns = [
@@ -187,7 +187,9 @@ export const run = async () => {
     stage = "load_existing_stories";
     const existingStories = await loadExistingStoriesBySourceUrl(candidateSourceUrls);
     const existingBySourceUrl = new Map(existingStories.map(story => [story.source_url, story.id]));
-    const rowsToInsert = normalizedApprovedRows.filter(row => !existingBySourceUrl.has(row.source_url));
+    const rowsToInsert = [...new Map(normalizedApprovedRows
+      .filter(row => !existingBySourceUrl.has(row.source_url))
+      .map(row => [row.source_url, row])).values()];
     const selectedRepublishRows = [];
     const selectedSourceUrls = new Set(rowsToInsert.map(row => row.source_url));
 
@@ -235,7 +237,7 @@ export const run = async () => {
     stage = "mark_raw_articles_published";
     let markedPublished = 0;
 
-    for (const row of candidateRowsToInsert) {
+    for (const row of [...normalizedApprovedRows, ...selectedRepublishRows]) {
       const publishedStoryId = publishedBySourceUrl.get(row.source_url);
       if (!publishedStoryId) continue;
 

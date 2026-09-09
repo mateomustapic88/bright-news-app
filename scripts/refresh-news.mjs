@@ -1,4 +1,7 @@
 import { pathToFileURL } from "node:url";
+import { createClient } from "@supabase/supabase-js";
+import { appendFileSync } from "node:fs";
+import { getRefreshFailures } from "./lib/review-runtime.mjs";
 import { run as runGnewsIngest } from "./ingest-gnews.mjs";
 import { run as runGdeltIngest } from "./ingest-gdelt.mjs";
 import { run as runGuardianIngest } from "./ingest-guardian.mjs";
@@ -75,7 +78,18 @@ export const run = async () => {
   }
 
   const result = { gnews, gdelt, guardian, googleNewsRss, newsdata, rss, review, published };
+  const supabase = createClient(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+  const { data, error } = await supabase.from("stories").select("published_at")
+    .order("published_at", { ascending: false, nullsFirst: false }).limit(1);
+  const latestPublishedAt = data?.[0]?.published_at;
+  const failures = getRefreshFailures(result, latestPublishedAt);
+  if (error) failures.push(`Freshness check failed: ${error.message}`);
+  result.health = { latestPublishedAt, failures };
   console.log(JSON.stringify(result, null, 2));
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    appendFileSync(process.env.GITHUB_STEP_SUMMARY, `## News refresh\n\nLatest story: ${latestPublishedAt || "unknown"}\n\nReviewed: ${review.reviewed || 0}; approved: ${review.approved || 0}; AI failures: ${review.aiFailures || 0}; published: ${published.published || 0}.\n\n${failures.length ? failures.join("\n\n") : "Review, publishing, and freshness checks passed."}\n`);
+  }
+  if (failures.length) throw new Error(failures.join(" "));
   return result;
 };
 
