@@ -33,6 +33,8 @@ test("refresh fails on review errors even with a fresh feed and successful publi
   assert.equal(getRefreshFailures({ review: { aiFailures: 5 }, published: {} }, new Date(now).toISOString(), now).length, 1);
   assert.equal(getRefreshFailures({ review: { skipped: true }, published: { skipped: true } }, "2026-09-01", now).length, 3);
   assert.equal(getRefreshFailures({ review: {}, published: {} }, null, now).length, 1);
+  assert.equal(getRefreshFailures({ rss: { fetched: 0 }, guardian: { skipped: true }, review: {}, published: {} }, new Date(now).toISOString(), now).length, 1);
+  assert.equal(getRefreshFailures({ rss: { fetched: 3 }, guardian: { skipped: true }, review: {}, published: {} }, new Date(now).toISOString(), now).length, 0);
 });
 
 test("re-ingestion preserves approved and published decisions and AI geography", async () => {

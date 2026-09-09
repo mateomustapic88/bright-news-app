@@ -185,12 +185,14 @@ Run these SQL files in Supabase:
 - region and category mapping are approximate
 - local/national coverage quality depends heavily on available source coverage inside each upstream API
 - stories can still remain `pending` for manual review when the model is not confident enough
-- cron deployment is not installed automatically by the repo
+- GitHub Actions runs the refresh every six hours; required repository secrets must remain configured
 
 ## Recommended next step
 
-Move these scripts into scheduled backend jobs and add better moderation tooling:
+The scheduled job runs ingestion regression tests first, fails on review/publishing errors or a stale overall feed, and includes per-country freshness in its summary. Editions older than 72 hours generate warnings for investigation; this never relaxes the approval rules. Enable GitHub Actions failure notifications for the repository.
+
+Further improvements:
 
 - admin UI for review instead of using Supabase table editor
 - richer source curation and dedupe rules
-- monitoring/logging for scheduled runs
+- external alerts for country freshness warnings

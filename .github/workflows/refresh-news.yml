@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Test ingestion and publishing safeguards
+        run: node --test tests/ingestion-runtime.test.mjs tests/publishing-queue.test.mjs
+
       - name: Validate required refresh environment variables
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}

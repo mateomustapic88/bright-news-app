@@ -2,6 +2,7 @@ import { pathToFileURL } from "node:url";
 import { createClient } from "@supabase/supabase-js";
 import { appendFileSync } from "node:fs";
 import { getRefreshFailures } from "./lib/review-runtime.mjs";
+import { REGION_CONFIG } from "./lib/ingestion-shared.mjs";
 import { run as runGnewsIngest } from "./ingest-gnews.mjs";
 import { run as runGdeltIngest } from "./ingest-gdelt.mjs";
 import { run as runGuardianIngest } from "./ingest-guardian.mjs";
@@ -84,10 +85,22 @@ export const run = async () => {
   const latestPublishedAt = data?.[0]?.published_at;
   const failures = getRefreshFailures(result, latestPublishedAt);
   if (error) failures.push(`Freshness check failed: ${error.message}`);
-  result.health = { latestPublishedAt, failures };
+  const regions = [];
+  for (const region of REGION_CONFIG) {
+    const { data: stories, error: regionError } = await supabase.from("stories").select("published_at")
+      .eq("region_code", region.code).order("published_at", { ascending: false, nullsFirst: false }).limit(1);
+    const newest = stories?.[0]?.published_at || null;
+    const stale = !newest || Date.now() - Date.parse(newest) > 72 * 60 * 60 * 1000;
+    regions.push({ region: region.code, latestPublishedAt: newest, stale });
+    if (regionError) failures.push(`Freshness check failed for ${region.code}: ${regionError.message}`);
+    // Sparse editions can legitimately have no suitable stories; flag them for review, not automatic approval.
+    if (stale && process.env.GITHUB_ACTIONS) console.warn(`::warning::No story dated within 72 hours for ${region.code}. Check source coverage and the review queue.`);
+  }
+  result.health = { latestPublishedAt, regions, failures };
   console.log(JSON.stringify(result, null, 2));
   if (process.env.GITHUB_STEP_SUMMARY) {
     appendFileSync(process.env.GITHUB_STEP_SUMMARY, `## News refresh\n\nLatest story: ${latestPublishedAt || "unknown"}\n\nReviewed: ${review.reviewed || 0}; approved: ${review.approved || 0}; AI failures: ${review.aiFailures || 0}; published: ${published.published || 0}.\n\n${failures.length ? failures.join("\n\n") : "Review, publishing, and freshness checks passed."}\n`);
+    appendFileSync(process.env.GITHUB_STEP_SUMMARY, `\n| Edition | Latest story (UTC) | Freshness |\n| --- | --- | --- |\n${regions.map(region => `| ${region.region} | ${region.latestPublishedAt || "none"} | ${region.stale ? "Check coverage: over 72 hours" : "Recent"} |`).join("\n")}\n`);
   }
   if (failures.length) throw new Error(failures.join(" "));
   return result;

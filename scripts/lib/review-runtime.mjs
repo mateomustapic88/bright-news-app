@@ -44,6 +44,8 @@ export const balancePublishers = (rows, limit) => {
 
 export const getRefreshFailures = (result, latestPublishedAt, now = Date.now()) => {
   const failures = [];
+  const ingestion = ["gnews", "gdelt", "guardian", "googleNewsRss", "newsdata", "rss"].map(key => result[key]).filter(Boolean);
+  if (ingestion.length && ingestion.every(stage => stage.skipped || stage.fetched === 0)) failures.push("All ingestion providers were skipped, failed, or returned no articles.");
   if (result.review?.skipped || result.review?.fallback || result.review?.aiFailures > 0) failures.push("AI review failed or used a degraded fallback.");
   if (result.published?.skipped) failures.push("Publishing failed.");
   const date = Date.parse(latestPublishedAt);
