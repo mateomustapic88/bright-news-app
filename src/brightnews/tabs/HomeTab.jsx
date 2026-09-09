@@ -110,6 +110,7 @@ const HomeTab = ({
   sourceReadState,
   t,
   uiLanguage,
+  briefing,
 }) => {
   const loadMoreRef = useRef(null);
   const [desktopFeedEnabled, setDesktopFeedEnabled] = useState(() => (
@@ -322,6 +323,8 @@ const HomeTab = ({
         </div>
       </div>
 
+      {briefing}
+
       {loading && firstLoad && (
         <StatusMessage variant="accent" showDot>
           {t("home.loading")}
@@ -337,6 +340,12 @@ const HomeTab = ({
           title={t("home.noStoriesTitle")}
           description={t("home.noStoriesDescription")}
         />
+      )}
+
+      {!loading && !error && stories.length === 0 && hasMore && onLoadMore && (
+        <button type="button" className="bn-reading-button" onClick={onLoadMore} disabled={loadingMore}>
+          <AppIcon name="chevronDown" size={16} />{t("reading.loadMore")}
+        </button>
       )}
 
       {featuredStory && (

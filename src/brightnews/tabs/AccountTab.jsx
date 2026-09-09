@@ -69,11 +69,12 @@ const AccountTab = ({
   const preferredCategories = draftPreferences?.preferredCategories || [];
   const strictPositiveFilter = Boolean(draftPreferences?.strictPositiveFilter);
   const hideSavedStories = Boolean(draftPreferences?.hideSavedStories);
+  const hideReadStories = Boolean(draftPreferences?.hideReadStories);
   const hasDraftPreferences =
     preferredRegions.length > 0 ||
     preferredCategories.length > 0 ||
     strictPositiveFilter ||
-    hideSavedStories;
+    hideSavedStories || hideReadStories;
   const preferencesChanged =
     JSON.stringify(draftPreferences || {}) !== JSON.stringify(userPreferences || {});
   const themeOptions = [
@@ -289,8 +290,9 @@ const AccountTab = ({
         <div className="bn-premium-card__features">
           <span><AppIcon name="shield" size={16} /> {t("premium.benefitUnlimitedSources")}</span>
           <span><AppIcon name="settings" size={16} /> {t("premium.benefitPersonalization")}</span>
-          <span><AppIcon name="filter" size={16} /> {t("premium.benefitStrictFilter")}</span>
-          <span><AppIcon name="sparkles" size={16} /> {t("premium.benefitFreshFeed")}</span>
+          <span><AppIcon name="sparkles" size={16} /> {t("reading.benefitBriefing")}</span>
+          <span><AppIcon name="bookmark" size={16} /> {t("reading.benefitLibrary")}</span>
+          <span><AppIcon name="check" size={16} /> {t("reading.benefitUnread")}</span>
         </div>
 
         {isPremium ? (
@@ -410,7 +412,7 @@ const AccountTab = ({
             <span className="bn-personalization-card__locked-icon"><AppIcon name="lock" size={20} /></span>
             <span>
               <strong>{t("premium.personalizationLockedTitle")}</strong>
-              <small>{t("premium.personalizationLockedDescription")}</small>
+              <small>{t("reading.personalizationLocked")}</small>
             </span>
             <button
               type="button"
@@ -457,6 +459,11 @@ const AccountTab = ({
           </div>
 
           <label className="bn-personalization-card__toggle">
+            <input type="checkbox" checked={hideReadStories} onChange={event => setDraftPreferences(current => ({ ...current, hideReadStories: event.target.checked }))} />
+            <span><strong>{t("reading.benefitUnread")}</strong><small>{t("reading.historyNote")}</small></span>
+          </label>
+
+          <label className="bn-personalization-card__toggle">
             <input
               type="checkbox"
               checked={strictPositiveFilter}
@@ -492,7 +499,7 @@ const AccountTab = ({
                 type="button"
                 className="bn-button bn-button--primary"
                 onClick={() => handleConfirmPersonalization(draftPreferences)}
-                disabled={personalizationSaving || !hasDraftPreferences}
+                disabled={personalizationSaving || (!hasDraftPreferences && !preferencesChanged)}
               >
                 {personalizationSaving ? t("premium.applyingPersonalization") : t("premium.applyPersonalization")}
               </button>

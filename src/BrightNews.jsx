@@ -92,6 +92,8 @@ import AccountTab from "./brightnews/tabs/AccountTab";
 import HomeTab from "./brightnews/tabs/HomeTab";
 import ReviewTab from "./brightnews/tabs/ReviewTab";
 import SavedTab from "./brightnews/tabs/SavedTab";
+import WeeklyBriefing from "./brightnews/components/WeeklyBriefing";
+import { getReadingStorage, readReadingHistory, writeReadingHistory, readHideReadPreference, writeHideReadPreference } from "./brightnews/readingHistory";
 
 const WEB_INITIAL_STORY_LIMIT = 50;
 const WEB_INCREMENTAL_STORY_LIMIT = 10;
@@ -115,6 +117,7 @@ const hasPreferenceValues = preferences => (
   (preferences?.preferredCategories || []).length > 0 ||
   Boolean(preferences?.strictPositiveFilter) ||
   Boolean(preferences?.hideSavedStories)
+  || Boolean(preferences?.hideReadStories)
 );
 
 const strictPositiveBlocklist = [
@@ -137,6 +140,7 @@ const applyPremiumStoryPreferences = (items, {
   isPremium,
   preferences,
   savedStoryIds = [],
+  readStoryIds = [],
   selectedRegion,
   selectedCategory,
 }) => {
@@ -146,6 +150,7 @@ const applyPremiumStoryPreferences = (items, {
   const preferredCategories = preferences?.preferredCategories || [];
   const strictPositiveFilter = Boolean(preferences?.strictPositiveFilter);
   const hideSavedStories = Boolean(preferences?.hideSavedStories);
+  const hideReadStories = Boolean(preferences?.hideReadStories);
 
   let nextItems = items;
 
@@ -173,7 +178,12 @@ const applyPremiumStoryPreferences = (items, {
     nextItems = nextItems.filter(story => !savedStorySet.has(story.id));
   }
 
-  if (hideSavedStories) {
+  if (hideReadStories) {
+    const readSet = new Set(readStoryIds);
+    nextItems = nextItems.filter(story => !readSet.has(story.id));
+  }
+
+  if (hideSavedStories || hideReadStories) {
     return nextItems;
   }
 
@@ -305,6 +315,24 @@ const BrightNews = () => {
   }, [appInfo]);
   const effectiveProfile = profile;
   const isPremium = isPremiumProfile(effectiveProfile);
+  const readingOwner = session?.user?.id || "guest";
+  const [readingHistory, setReadingHistory] = useState({ owner: "", ids: [] });
+  const readIds = readingHistory.owner === readingOwner ? readingHistory.ids : [];
+
+  useEffect(() => {
+    const load = () => setReadingHistory({ owner: readingOwner, ids: readReadingHistory(getReadingStorage(), readingOwner) });
+    load();
+    window.addEventListener("storage", load);
+    return () => window.removeEventListener("storage", load);
+  }, [readingOwner]);
+
+  const setStoryRead = (storyId, isRead) => {
+    const current = readingHistory.owner === readingOwner ? readIds : readReadingHistory(getReadingStorage(), readingOwner);
+    const ids = isRead ? [...new Set([...current, storyId])] : current.filter(id => id !== storyId);
+    writeReadingHistory(getReadingStorage(), readingOwner, ids);
+    setReadingHistory({ owner: readingOwner, ids });
+  };
+  const toggleStoryRead = storyId => setStoryRead(storyId, !readIds.includes(storyId));
   const sourceReadState = useMemo(() => ({
     isPremium,
     used: sourceReadsUsed,
@@ -881,6 +909,7 @@ const BrightNews = () => {
     isPremium: feedMode === "personalized" && personalizedFeedAvailable,
     preferences: userPreferences,
     savedStoryIds: saved,
+    readStoryIds: readIds,
     selectedRegion: "world",
     selectedCategory: "all",
   });
@@ -962,14 +991,14 @@ const BrightNews = () => {
 
   useEffect(() => {
     if (!session?.user) {
-      setUserPreferences(readUserPreferences());
+      setUserPreferences({ ...readUserPreferences(), hideReadStories: readHideReadPreference(getReadingStorage(), null) });
       return undefined;
     }
 
     let active = true;
 
     const syncPreferences = async () => {
-      const localPreferences = readUserPreferences();
+      const localPreferences = { ...readUserPreferences(), hideReadStories: readHideReadPreference(getReadingStorage(), session.user.id) };
 
       try {
         const remotePreferences = await loadUserPreferences(session.user.id);
@@ -977,6 +1006,7 @@ const BrightNews = () => {
           ? {
               ...remotePreferences,
               hideSavedStories: localPreferences.hideSavedStories,
+              hideReadStories: localPreferences.hideReadStories,
             }
           : localPreferences;
 
@@ -1621,6 +1651,7 @@ const BrightNews = () => {
     }
 
     setPersonalizationSaving(true);
+    writeHideReadPreference(getReadingStorage(), readingOwner, nextPreferences.hideReadStories);
     setUserPreferences(nextPreferences);
     setFeedMode("personalized");
     setRegion("world");
@@ -1687,6 +1718,7 @@ const BrightNews = () => {
 
     try {
       await openSourceUrl(normalizedUrl);
+      setStoryRead(story.id, true);
 
       if (!isPremium) {
         if (session?.user) {
@@ -1904,6 +1936,20 @@ const BrightNews = () => {
       >
         {tab === "home" && (
           <HomeTab
+            briefing={<WeeklyBriefing
+              isPremium={isPremium}
+              preferences={userPreferences}
+              onPersonalize={() => setTab("account")}
+              saved={saved}
+              toggleSave={toggleSave}
+              handleShareStory={handleShareStory}
+              handleReadSource={handleReadSource}
+              sourceReadState={sourceReadState}
+              readIds={readIds}
+              onToggleRead={toggleStoryRead}
+              t={t}
+              uiLanguage={uiLanguage}
+            />}
             region={region}
             regions={availableRegions}
             setRegion={handleSetRegion}
@@ -1949,6 +1995,9 @@ const BrightNews = () => {
 
         {tab === "saved" && (
           <SavedTab
+            isPremium={isPremium}
+            readIds={readIds}
+            onToggleRead={toggleStoryRead}
             savedStories={savedStories}
             saved={saved}
             session={session}

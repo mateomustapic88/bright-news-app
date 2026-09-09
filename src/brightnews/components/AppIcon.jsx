@@ -1,6 +1,8 @@
 import {
   Bookmark,
   ChevronDown,
+  ChevronUp,
+  Check,
   ChevronRight,
   CircleUserRound,
   Clock3,
@@ -46,6 +48,8 @@ const ICONS = {
   account: CircleUserRound,
   bookmark: Bookmark,
   chevronDown: ChevronDown,
+  chevronUp: ChevronUp,
+  check: Check,
   chevronRight: ChevronRight,
   clock: Clock3,
   compass: Compass,

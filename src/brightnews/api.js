@@ -122,6 +122,23 @@ export const loadStoriesPage = async (regionCode, categoryId, options = {}) => {
   };
 };
 
+export const loadWeeklyBriefing = async (week, preferences = {}) => {
+  if (!supabase) throw new Error("Supabase configuration is missing.");
+  let query = supabase.from("stories")
+    .select("id, headline, summary, category, location, image_url, source_url, published_at, region_code, saved_count, is_pinned")
+    .gte("published_at", week.start)
+    .lt("published_at", week.end);
+  query = applyPersonalizedStoryFilters(query, preferences);
+  const { data, error } = await query
+    .order("is_pinned", { ascending: false })
+    .order("saved_count", { ascending: false })
+    .order("published_at", { ascending: false })
+    .order("id", { ascending: true })
+    .limit(300);
+  if (error) throw new Error(error.message);
+  return (data || []).map(mapStoryRow);
+};
+
 export const loadSeoStories = async ({
   regionCode = "world",
   categoryId = "all",

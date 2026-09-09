@@ -222,6 +222,7 @@ export const readUserPreferences = () => {
       preferredCategories: [],
       strictPositiveFilter: false,
       hideSavedStories: false,
+      hideReadStories: false,
     };
   }
 
@@ -233,6 +234,7 @@ export const readUserPreferences = () => {
       preferredCategories: Array.isArray(parsed.preferredCategories) ? parsed.preferredCategories : [],
       strictPositiveFilter: Boolean(parsed.strictPositiveFilter),
       hideSavedStories: Boolean(parsed.hideSavedStories),
+      hideReadStories: Boolean(parsed.hideReadStories),
     };
   } catch {
     return {
@@ -240,6 +242,7 @@ export const readUserPreferences = () => {
       preferredCategories: [],
       strictPositiveFilter: false,
       hideSavedStories: false,
+      hideReadStories: false,
     };
   }
 };

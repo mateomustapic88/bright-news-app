@@ -16,6 +16,9 @@ const SavedStoryCard = ({
   sourceReadState,
   t,
   uiLanguage,
+  showSummary = false,
+  readIds = [],
+  onToggleRead,
 }) => {
   const category = getCategoryMeta(story.category);
   const themeClass = getCategoryThemeClass(story.category);
@@ -47,6 +50,7 @@ const SavedStoryCard = ({
           </div>
         </div>
         <h3 className="bn-card-title">{story.headline}</h3>
+        {showSummary && <p className="bn-weekly__summary">{story.summary}</p>}
         <div className="bn-saved-card__meta">
           <span className="bn-card-location bn-card-location--icon">
             <StoryActionIcon name="location" className="bn-card-meta__icon" />
@@ -62,6 +66,15 @@ const SavedStoryCard = ({
           sourceReadState={sourceReadState}
           onReadSource={handleReadSource}
         />
+        {onToggleRead && <button
+          type="button"
+          className="bn-reading-button bn-reading-button--status"
+          aria-pressed={readIds.includes(story.id)}
+          onClick={() => onToggleRead(story.id)}
+        >
+          <AppIcon name={readIds.includes(story.id) ? "check" : "clock"} size={16} />
+          {t(readIds.includes(story.id) ? "reading.markUnread" : "reading.markRead")}
+        </button>}
       </div>
     </article>
   );

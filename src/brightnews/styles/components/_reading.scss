@@ -1,0 +1,85 @@
+.bright-news {
+  .bn-weekly {
+    border-block: 1px solid var(--bn-border);
+    padding: 20px 0;
+    margin: 16px 0 24px;
+    color: var(--bn-text-strong);
+  }
+  .bn-weekly__heading, .bn-reading-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .bn-weekly__heading h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 19px;
+    line-height: 1.4;
+    margin: 0;
+    letter-spacing: 0;
+  }
+  .bn-weekly__heading p, .bn-reading-note {
+    margin: 6px 0;
+    color: var(--bn-text-muted);
+    font-size: 13px;
+  }
+  .bn-reading-toolbar { margin: 20px 0; }
+  .bn-reading-button, .bn-reading-segments button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 14px;
+    border: 1px solid var(--bn-border-strong);
+    border-radius: 6px;
+    background: var(--bn-surface);
+    color: var(--bn-text-strong);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0;
+    cursor: pointer;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    text-align: center;
+    svg { flex: 0 0 auto; }
+    &:hover { border-color: var(--bn-accent-strong); }
+    &:focus-visible { outline: 2px solid var(--bn-accent-strong); outline-offset: 3px; }
+    &[aria-pressed="true"] { background: var(--bn-accent-bg); border-color: var(--bn-accent); }
+  }
+  .bn-reading-segments { display: flex; flex-wrap: wrap; gap: 6px; }
+  .bn-reading-button--status { margin: 12px 0 0; display: flex; width: fit-content; }
+  .bn-weekly__stories { display: grid; gap: 16px; }
+  .bn-weekly__summary { font-size: 14px; color: var(--bn-text-muted); line-height: 1.65; margin: 12px 0; }
+  .bn-library-tools { display: grid; gap: 12px; margin-bottom: 20px; }
+  .bn-library-categories { display: flex; gap: 8px; flex-wrap: wrap; }
+  .bn-library-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--bn-border-strong);
+    border-radius: 6px;
+    padding: 0 12px;
+    background: var(--bn-surface);
+    color: var(--bn-text-muted);
+    &:focus-within { outline: 2px solid var(--bn-accent-strong); outline-offset: 2px; }
+    input {
+      min-width: 0;
+      width: 100%;
+      min-height: 44px;
+      background: transparent;
+      border: 0;
+      outline: 0;
+      color: var(--bn-text-strong);
+      font: inherit;
+      font-size: 14px;
+    }
+  }
+  .bn-weekly .bn-saved-card__content { min-width: 0; }
+  .bn-weekly .bn-card-title { overflow-wrap: anywhere; }
+}

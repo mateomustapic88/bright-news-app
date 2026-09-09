@@ -17,8 +17,9 @@ const PremiumUpgradeDialog = ({
   const benefits = [
     t("premium.benefitUnlimitedSources"),
     t("premium.benefitPersonalization"),
-    t("premium.benefitStrictFilter"),
-    t("premium.benefitSupport"),
+    t("reading.benefitBriefing"),
+    t("reading.benefitLibrary"),
+    t("reading.benefitUnread"),
   ];
 
   return (
