@@ -5,7 +5,6 @@ import { SEO_ROUTES, SITE_URL, GOOGLE_PLAY_URL } from "../src/brightnews/seoRout
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(__dirname, "..", "public");
-const generatedAt = new Date().toISOString().slice(0, 10);
 const ogImageUrl = `${SITE_URL}/brightnews-og.png`;
 
 const escapeHtml = value => String(value || "")
@@ -47,13 +46,11 @@ const urls = [
     loc: `${SITE_URL}/`,
     changefreq: "daily",
     priority: "1.0",
-    lastmod: generatedAt,
   },
   ...SEO_ROUTES.map(route => ({
     loc: `${SITE_URL}${route.path}`,
     changefreq: routeChangefreq(route),
     priority: routePriority(route),
-    lastmod: generatedAt,
   })),
 ];
 
@@ -268,7 +265,6 @@ const renderSeoPage = route => {
       keywords: route.keywords,
       url: canonicalUrl,
       image: ogImageUrl,
-      dateModified: generatedAt,
       isPartOf: {
         "@type": "WebSite",
         name: "BrightNews",
@@ -692,7 +688,6 @@ const sitemap = [
   ...urls.map(url => [
     "  <url>",
     `    <loc>${url.loc}</loc>`,
-    `    <lastmod>${url.lastmod}</lastmod>`,
     `    <changefreq>${url.changefreq}</changefreq>`,
     `    <priority>${url.priority}</priority>`,
     "  </url>",

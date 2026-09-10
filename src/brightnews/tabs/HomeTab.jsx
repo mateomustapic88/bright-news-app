@@ -353,7 +353,7 @@ const HomeTab = ({
           <div className="bn-home-tab__intro">
             <div>
               <span className="bn-home-tab__kicker">{t("home.highlights")}</span>
-              <h2>{t("home.title")}</h2>
+              <h1>{t("home.title")}</h1>
               <p>{t("home.description")}</p>
             </div>
           </div>

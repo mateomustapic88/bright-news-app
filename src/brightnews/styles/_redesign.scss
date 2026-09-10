@@ -362,10 +362,10 @@
   display: none;
 }
 
-.bn-home-tab__intro h2 {
+.bn-home-tab__intro h1 {
   margin: 0 0 6px;
   color: var(--bn-text-strong);
-  font-size: clamp(24px, 3vw, 36px);
+  font-size: 36px;
   font-weight: 800;
   line-height: 1.16;
 }
@@ -1522,8 +1522,8 @@
     margin: 24px 0 16px;
   }
 
-  .bn-home-tab__intro h2 {
-    font-size: clamp(22px, 6vw, 30px);
+  .bn-home-tab__intro h1 {
+    font-size: 28px;
   }
 
   .bn-section-label:first-of-type {
