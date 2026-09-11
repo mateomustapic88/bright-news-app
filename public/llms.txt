@@ -8,7 +8,7 @@ Android app: https://play.google.com/store/apps/details?id=com.mateomustapic.bri
 BrightNews focuses on positive news, good news, uplifting stories, constructive current events and source-linked summaries from around the world.
 
 Key pages:
-- Positive News: https://brightnews.app/positive-news
+- Positive news from around the world: https://brightnews.app/positive-news
 - Positive News Today: https://brightnews.app/positive-news-today
 - Good News Today: https://brightnews.app/good-news-today
 - Worldwide Positive News: https://brightnews.app/worldwide-positive-news
@@ -46,6 +46,14 @@ Key pages:
 - Positive News Australia: https://brightnews.app/positive-news/australia
 - Positive News Brazil: https://brightnews.app/positive-news/brazil
 - Positive News India: https://brightnews.app/positive-news/india
+- Pozitivne vijesti iz cijelog svijeta: https://brightnews.app/pozitivne-vijesti
+- Pozitivne vesti iz celog sveta: https://brightnews.app/pozitivne-vesti
+- Pozitivne vijesti iz cijelog svijeta: https://brightnews.app/bs/pozitivne-vijesti
+- Pozitivne novice z vsega sveta: https://brightnews.app/pozitivne-novice
+- Positive Nachrichten aus aller Welt: https://brightnews.app/positive-nachrichten
+- Bonnes nouvelles du monde entier: https://brightnews.app/bonnes-nouvelles
+- Notícias positivas do mundo inteiro: https://brightnews.app/noticias-positivas
+- 世界の明るいニュース: https://brightnews.app/ja/positive-news
 
 Content policy:
 BrightNews filters for constructive stories about progress, health, science, people, nature, innovation, animals, sports and communities. It uses public APIs, RSS feeds, duplicate removal, topic filtering and AI-assisted review to reduce strongly negative, violent, tragic, political or outrage-driven stories.

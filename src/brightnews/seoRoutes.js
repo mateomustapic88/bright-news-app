@@ -1,3 +1,5 @@
+import { LOCALIZED_SEO_PAGES } from "./seoLanguages.js";
+
 export const SITE_URL = import.meta.env?.VITE_SITE_URL || "https://brightnews.app";
 export const GOOGLE_PLAY_URL = "https://play.google.com/store/apps/details?id=com.mateomustapic.brightnews";
 
@@ -388,7 +390,8 @@ export const SEO_ROUTES = [
   countryRoute({ slug: "australia", country: "Australia", regionCode: "au", adjective: "Australian" }),
   countryRoute({ slug: "brazil", country: "Brazil", regionCode: "br", adjective: "Brazilian" }),
   countryRoute({ slug: "india", country: "India", regionCode: "in", adjective: "Indian" }),
-];
+  ...LOCALIZED_SEO_PAGES.filter(page => page.locale !== "en"),
+].map(route => route.path === "/positive-news" ? { ...route, ...LOCALIZED_SEO_PAGES[0] } : route);
 
 export const getSeoRoute = pathname => {
   const normalizedPathname = String(pathname || "/").replace(/\/+$/, "") || "/";

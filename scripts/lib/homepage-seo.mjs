@@ -1,3 +1,5 @@
+import { LOCALIZED_SEO_PAGES } from "../../src/brightnews/seoLanguages.js";
+
 export const HOME_TITLE = "BrightNews | Positive News & Good News Today";
 export const HOME_DESCRIPTION = "Discover positive news with BrightNews: source-linked stories about science, health, communities and the planet. Read on the web or get the Android app.";
 
@@ -66,6 +68,7 @@ export const renderHomepageSnapshot = stories => `
     </article>`).join("\n")}</div></section>` : ""}
     <footer><h2>How BrightNews selects stories</h2><p>We collect articles from RSS feeds and news APIs, remove duplicates, and use topic filters and AI-assisted review to select constructive stories. Summaries are a starting point: follow the source for the full context.</p>
     <p>BrightNews is an independent news aggregator, not the original publisher. Our aim is to add balance to your news reading, not to replace wider reporting.</p>
-    <a href="https://play.google.com/store/apps/details?id=com.mateomustapic.brightnews">BrightNews for Android</a></footer>
+    <a href="https://play.google.com/store/apps/details?id=com.mateomustapic.brightnews">BrightNews for Android</a>
+    <nav aria-label="Languages">${LOCALIZED_SEO_PAGES.map(page => `<a href="${page.path}" hreflang="${page.locale}" lang="${page.locale}">${page.name}</a>`).join(" ")}</nav></footer>
   </main>
 </div>`;

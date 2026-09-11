@@ -10,6 +10,15 @@
     }
   ],
   "rewrites": [
+    { "source": "/positive-news", "destination": "/positive-news/index.html" },
+    { "source": "/pozitivne-vijesti", "destination": "/pozitivne-vijesti/index.html" },
+    { "source": "/pozitivne-vesti", "destination": "/pozitivne-vesti/index.html" },
+    { "source": "/bs/pozitivne-vijesti", "destination": "/bs/pozitivne-vijesti/index.html" },
+    { "source": "/pozitivne-novice", "destination": "/pozitivne-novice/index.html" },
+    { "source": "/positive-nachrichten", "destination": "/positive-nachrichten/index.html" },
+    { "source": "/bonnes-nouvelles", "destination": "/bonnes-nouvelles/index.html" },
+    { "source": "/noticias-positivas", "destination": "/noticias-positivas/index.html" },
+    { "source": "/ja/positive-news", "destination": "/ja/positive-news/index.html" },
     {
       "source": "/((?!.*\\.).*)",
       "destination": "/"

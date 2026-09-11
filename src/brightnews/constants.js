@@ -228,6 +228,11 @@ export const inferPreferredRegionCode = () => {
   return "world";
 };
 
+export const getRequestedAppLanguage = (search = "") => {
+  const language = new URLSearchParams(search).get("lang");
+  return language !== "all" && Object.hasOwn(LANGUAGE_META, language) ? language : null;
+};
+
 export const inferPreferredAppLanguage = () => {
   if (typeof navigator !== "undefined") {
     const localeCandidates = [navigator.language, ...(navigator.languages || [])]

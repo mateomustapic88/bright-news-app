@@ -45,6 +45,7 @@ import {
   PREMIUM_CHECKOUT_ENABLED,
   inferPreferredRegionCode,
   inferPreferredAppLanguage,
+  getRequestedAppLanguage,
   getLanguageFiltersForStories,
   getRegionsForCodes,
   getVisibleTabs,
@@ -245,7 +246,8 @@ const BrightNews = () => {
   const [category, setCategory]   = useState("all");
   const [storyFilter, setStoryFilter] = useState(DEFAULT_STORY_FILTER);
   const [feedMode, setFeedMode] = useState("standard");
-  const [appLanguage, setAppLanguage] = useState(() => readAppLanguage() || inferPreferredAppLanguage());
+  const [appLanguage, setAppLanguage] = useState(() =>
+    getRequestedAppLanguage(typeof window !== "undefined" ? window.location.search : "") || readAppLanguage() || inferPreferredAppLanguage());
   const [storyLanguageFilter, setStoryLanguageFilter] = useState(() => readAppLanguage() || inferPreferredAppLanguage());
   const [themePreference, setThemePreference] = useState(readThemePreference);
   const [systemPrefersDark, setSystemPrefersDark] = useState(() => (

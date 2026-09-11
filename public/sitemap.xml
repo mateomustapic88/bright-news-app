@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://brightnews.app/</loc>
     <changefreq>daily</changefreq>
@@ -7,6 +7,16 @@
   </url>
   <url>
     <loc>https://brightnews.app/positive-news</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://brightnews.app/positive-news" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://brightnews.app/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sr" href="https://brightnews.app/pozitivne-vesti" />
+    <xhtml:link rel="alternate" hreflang="bs" href="https://brightnews.app/bs/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sl" href="https://brightnews.app/pozitivne-novice" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://brightnews.app/positive-nachrichten" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://brightnews.app/bonnes-nouvelles" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://brightnews.app/noticias-positivas" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://brightnews.app/ja/positive-news" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brightnews.app/positive-news" />
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
   </url>
@@ -192,6 +202,126 @@
   </url>
   <url>
     <loc>https://brightnews.app/positive-news/india</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews.app/pozitivne-vijesti</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://brightnews.app/positive-news" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://brightnews.app/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sr" href="https://brightnews.app/pozitivne-vesti" />
+    <xhtml:link rel="alternate" hreflang="bs" href="https://brightnews.app/bs/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sl" href="https://brightnews.app/pozitivne-novice" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://brightnews.app/positive-nachrichten" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://brightnews.app/bonnes-nouvelles" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://brightnews.app/noticias-positivas" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://brightnews.app/ja/positive-news" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brightnews.app/positive-news" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews.app/pozitivne-vesti</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://brightnews.app/positive-news" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://brightnews.app/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sr" href="https://brightnews.app/pozitivne-vesti" />
+    <xhtml:link rel="alternate" hreflang="bs" href="https://brightnews.app/bs/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sl" href="https://brightnews.app/pozitivne-novice" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://brightnews.app/positive-nachrichten" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://brightnews.app/bonnes-nouvelles" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://brightnews.app/noticias-positivas" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://brightnews.app/ja/positive-news" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brightnews.app/positive-news" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews.app/bs/pozitivne-vijesti</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://brightnews.app/positive-news" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://brightnews.app/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sr" href="https://brightnews.app/pozitivne-vesti" />
+    <xhtml:link rel="alternate" hreflang="bs" href="https://brightnews.app/bs/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sl" href="https://brightnews.app/pozitivne-novice" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://brightnews.app/positive-nachrichten" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://brightnews.app/bonnes-nouvelles" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://brightnews.app/noticias-positivas" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://brightnews.app/ja/positive-news" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brightnews.app/positive-news" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews.app/pozitivne-novice</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://brightnews.app/positive-news" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://brightnews.app/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sr" href="https://brightnews.app/pozitivne-vesti" />
+    <xhtml:link rel="alternate" hreflang="bs" href="https://brightnews.app/bs/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sl" href="https://brightnews.app/pozitivne-novice" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://brightnews.app/positive-nachrichten" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://brightnews.app/bonnes-nouvelles" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://brightnews.app/noticias-positivas" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://brightnews.app/ja/positive-news" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brightnews.app/positive-news" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews.app/positive-nachrichten</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://brightnews.app/positive-news" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://brightnews.app/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sr" href="https://brightnews.app/pozitivne-vesti" />
+    <xhtml:link rel="alternate" hreflang="bs" href="https://brightnews.app/bs/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sl" href="https://brightnews.app/pozitivne-novice" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://brightnews.app/positive-nachrichten" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://brightnews.app/bonnes-nouvelles" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://brightnews.app/noticias-positivas" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://brightnews.app/ja/positive-news" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brightnews.app/positive-news" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews.app/bonnes-nouvelles</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://brightnews.app/positive-news" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://brightnews.app/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sr" href="https://brightnews.app/pozitivne-vesti" />
+    <xhtml:link rel="alternate" hreflang="bs" href="https://brightnews.app/bs/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sl" href="https://brightnews.app/pozitivne-novice" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://brightnews.app/positive-nachrichten" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://brightnews.app/bonnes-nouvelles" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://brightnews.app/noticias-positivas" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://brightnews.app/ja/positive-news" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brightnews.app/positive-news" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews.app/noticias-positivas</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://brightnews.app/positive-news" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://brightnews.app/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sr" href="https://brightnews.app/pozitivne-vesti" />
+    <xhtml:link rel="alternate" hreflang="bs" href="https://brightnews.app/bs/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sl" href="https://brightnews.app/pozitivne-novice" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://brightnews.app/positive-nachrichten" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://brightnews.app/bonnes-nouvelles" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://brightnews.app/noticias-positivas" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://brightnews.app/ja/positive-news" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brightnews.app/positive-news" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brightnews.app/ja/positive-news</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://brightnews.app/positive-news" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://brightnews.app/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sr" href="https://brightnews.app/pozitivne-vesti" />
+    <xhtml:link rel="alternate" hreflang="bs" href="https://brightnews.app/bs/pozitivne-vijesti" />
+    <xhtml:link rel="alternate" hreflang="sl" href="https://brightnews.app/pozitivne-novice" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://brightnews.app/positive-nachrichten" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://brightnews.app/bonnes-nouvelles" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://brightnews.app/noticias-positivas" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://brightnews.app/ja/positive-news" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brightnews.app/positive-news" />
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>

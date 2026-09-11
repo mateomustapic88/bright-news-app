@@ -15,6 +15,7 @@ import SectionLabel from "../components/SectionLabel";
 import StatusMessage from "../components/StatusMessage";
 import StoryCard from "../components/StoryCard";
 import RegionIcon from "../components/RegionIcon";
+import { LOCALIZED_SEO_PAGES } from "../seoLanguages.js";
 
 const FEATURED_POOL_SIZE = 12;
 const SEO_DISCOVERY_LINKS = [
@@ -474,6 +475,11 @@ const HomeTab = ({
             {SEO_DISCOVERY_LINKS.map(link => (
               <a key={link.href} href={link.href}>
                 {link.label}
+              </a>
+            ))}
+            {LOCALIZED_SEO_PAGES.map(page => (
+              <a key={page.locale} href={page.path} hrefLang={page.locale} lang={page.locale}>
+                {page.name}
               </a>
             ))}
           </nav>

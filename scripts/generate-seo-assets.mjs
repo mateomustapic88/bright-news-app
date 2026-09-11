@@ -1,11 +1,26 @@
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { SEO_ROUTES, SITE_URL, GOOGLE_PLAY_URL } from "../src/brightnews/seoRoutes.js";
+import { getLanguageAlternates, LOCALIZED_SEO_PAGES } from "../src/brightnews/seoLanguages.js";
+import { renderLocalizedSeoPage } from "./lib/localized-seo.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(__dirname, "..", "public");
 const ogImageUrl = `${SITE_URL}/brightnews-og.png`;
+
+// Static pages self-host the same font as the app without loading the Vite bundle.
+const fontDir = join(publicDir, "fonts", "seo");
+mkdirSync(fontDir, { recursive: true });
+const fontRules = [];
+for (const weight of [400, 600, 700, 800]) {
+  for (const subset of ["latin", "latin-ext"]) {
+    const file = `montserrat-${subset}-${weight}-normal.woff2`;
+    copyFileSync(join(__dirname, "..", "node_modules", "@fontsource", "montserrat", "files", file), join(fontDir, file));
+    fontRules.push(`@font-face{font-family:Montserrat;font-style:normal;font-weight:${weight};font-display:swap;src:url(./${file}) format('woff2');unicode-range:${subset === "latin" ? "U+0000-00FF,U+2000-206F,U+20AC,U+2122" : "U+0100-02FF,U+1E00-1EFF"}}`);
+  }
+}
+writeFileSync(join(fontDir, "fonts.css"), fontRules.join("\n"));
 
 const escapeHtml = value => String(value || "")
   .replaceAll("&", "&amp;")
@@ -222,6 +237,7 @@ const getFaqItems = route => ([
 ]);
 
 const renderSeoPage = route => {
+  if (route.locale) return renderLocalizedSeoPage(route, SITE_URL, GOOGLE_PLAY_URL);
   const canonicalUrl = `${SITE_URL}${route.path}`;
   const theme = getRouteTheme(route);
   const intro = getIntro(route);
@@ -670,6 +686,7 @@ const renderSeoPage = route => {
     </main>
     <footer class="wrap">
       <p>BrightNews is a positive-news aggregator for web and Android, focused on source-linked uplifting stories and constructive news.</p>
+      <nav aria-label="Languages">${LOCALIZED_SEO_PAGES.map(page => `<a href="${page.path}" hreflang="${page.locale}" lang="${page.locale}">${page.name}</a>`).join(" · ")}</nav>
     </footer>
   </body>
 </html>
@@ -684,10 +701,12 @@ const writeRoutePage = route => {
 
 const sitemap = [
   '<?xml version="1.0" encoding="UTF-8"?>',
-  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
   ...urls.map(url => [
     "  <url>",
     `    <loc>${url.loc}</loc>`,
+    ...(LOCALIZED_SEO_PAGES.some(page => `${SITE_URL}${page.path}` === url.loc)
+      ? getLanguageAlternates(SITE_URL).map(item => `    <xhtml:link rel="alternate" hreflang="${item.language}" href="${escapeHtml(item.url)}" />`) : []),
     `    <changefreq>${url.changefreq}</changefreq>`,
     `    <priority>${url.priority}</priority>`,
     "  </url>",
