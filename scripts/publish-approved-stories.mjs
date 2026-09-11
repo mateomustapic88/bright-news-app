@@ -220,7 +220,10 @@ export const run = async () => {
         "Failed to insert published stories",
         () => supabase
           .from("stories")
-          .insert(candidateRowsToInsert.map(buildStoryRow).filter(Boolean))
+          .upsert(candidateRowsToInsert.map(buildStoryRow).filter(Boolean), {
+            onConflict: "source_url",
+            ignoreDuplicates: true,
+          })
           .select("id, source_url"),
       );
 
@@ -229,9 +232,14 @@ export const run = async () => {
       logPublishStage(stage, { insertedStories: insertedStories.length });
     }
 
+    // An overlapping publisher may have inserted a row we skipped on conflict.
+    // Reconcile its ID without overwriting existing story content, saves or votes.
+    const concurrentStories = candidateRowsToInsert.length
+      ? await loadExistingStoriesBySourceUrl(candidateRowsToInsert.map(row => row.source_url)) : [];
     const publishedBySourceUrl = new Map([
       ...existingBySourceUrl.entries(),
       ...insertedStories.map(story => [story.source_url, story.id]),
+      ...concurrentStories.map(story => [story.source_url, story.id]),
     ]);
 
     stage = "mark_raw_articles_published";

@@ -6,6 +6,9 @@ Scheduled refreshes were starting, but seven consecutive runs after September 9 
 
 ## Safeguards
 
+- **Publish Approved Stories** independently drains up to 200 approvals every 30 minutes, with only Supabase credentials. It does not wait for ingestion, AI review, or the refresh workflow. GitHub may delay scheduled starts, so this is not an exact delivery-time guarantee.
+- `docs/supabase_story_publication_uniqueness.sql` adds a unique source-URL index. All publishing passes use conflict-ignore inserts and reconcile existing IDs, so overlapping publishers do not duplicate stories or overwrite their content and engagement data.
+
 - Publish existing approvals before ingestion, then publish again after review, even if either earlier stage fails.
 - Give ingestion 45 minutes, review 10 minutes, each publishing pass 10 minutes, and health checks 5 minutes. The overall 100-minute job leaves setup and cleanup headroom.
 - Review at most 40 candidates with a 30,000-token budget per run, reserving a conservative UTF-8-sized prompt estimate plus completion allowance before each attempt and reconciling reported usage afterward. The usual four scheduled runs budget at most 120,000 tokens in total, leaving room under the observed 200,000 daily quota. Other workloads and manual runs still share the provider quota.

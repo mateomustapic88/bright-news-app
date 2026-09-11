@@ -1,0 +1,41 @@
+name: Publish Approved Stories
+
+on:
+  schedule:
+    - cron: "7,37 * * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-approved.yml'
+      - 'scripts/publish-approved-stories.mjs'
+      - 'tests/publishing-queue.test.mjs'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-approved-independent
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Test duplicate-safe publication
+        run: node --test tests/publishing-queue.test.mjs
+      - name: Publish already-approved stories without ingestion or AI review
+        timeout-minutes: 10
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PUBLISH_APPROVED_LIMIT: '200'
+          PUBLISH_REPUBLISH_LIMIT: '0'
+        run: node scripts/publish-approved-stories.mjs
