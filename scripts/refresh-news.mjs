@@ -12,7 +12,9 @@ import { run as runRssIngest } from "./ingest-rss.mjs";
 import { run as runGroqReview } from "./review-pending-with-groq.mjs";
 import { run as runPublishApproved } from "./publish-approved-stories.mjs";
 
-export const run = async () => {
+export const run = async ({ ingestOnly = false } = {}) => {
+  // Drain completed reviews before slow feeds or AI outages can delay them again.
+  if (!ingestOnly) await runPublishApproved();
   const gnews = { skipped: false };
   const gdelt = { skipped: false };
   const guardian = { skipped: false };
@@ -64,6 +66,15 @@ export const run = async () => {
     rss.error = error.message;
   }
 
+  if (ingestOnly) {
+    const result = { gnews, gdelt, guardian, googleNewsRss, newsdata, rss };
+    console.log(JSON.stringify(result, null, 2));
+    if (Object.values(result).every(stage => stage.skipped || stage.fetched === 0)) {
+      throw new Error("All ingestion providers failed, were skipped, or returned no articles.");
+    }
+    return result;
+  }
+
   try {
     Object.assign(review, await runGroqReview());
   } catch (error) {
@@ -109,7 +120,7 @@ export const run = async () => {
 const isDirectRun = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 
 if (isDirectRun) {
-  run().catch(error => {
+  run({ ingestOnly: process.argv.includes("--ingest-only") }).catch(error => {
     console.error(error.message);
     process.exit(1);
   });

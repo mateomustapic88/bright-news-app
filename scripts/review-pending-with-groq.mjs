@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { pathToFileURL } from "node:url";
-import { DEFAULT_GROQ_REVIEW_MODEL, chooseReviewModel, balancePublishers, interleaveGroups, parseResetDelay } from "./lib/review-runtime.mjs";
+import { DEFAULT_GROQ_REVIEW_MODEL, chooseReviewModel, balancePublishers, interleaveGroups, getGroqRetryDelay, createReviewBudget, ReviewDeferredError } from "./lib/review-runtime.mjs";
 import {
   CATEGORY_CONFIG,
   REGION_CONFIG,
@@ -32,7 +32,7 @@ const supabaseUrl = getEnv("SUPABASE_URL") || getEnv("VITE_SUPABASE_URL");
 const supabaseServiceRoleKey = getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY");
 const groqApiKey = getEnv("GROQ_API_KEY");
 let groqModel = getEnv("GROQ_REVIEW_MODEL") || DEFAULT_GROQ_REVIEW_MODEL;
-const reviewLimit = Number(getEnv("AI_REVIEW_LIMIT") || 200);
+const reviewLimit = Math.min(40, Math.max(1, Number(getEnv("AI_REVIEW_LIMIT") || 40)));
 const reviewPerRegionLimit = Number(getEnv("AI_REVIEW_PER_REGION_LIMIT") || 12);
 const reviewDelayMs = Number(getEnv("AI_REVIEW_DELAY_MS") || 300);
 const maxRetries = Number(getEnv("AI_REVIEW_MAX_RETRIES") || 3);
@@ -186,7 +186,7 @@ const normalizeJsonText = text =>
     .replace(/\s*```$/i, "")
     .trim();
 
-const classifyWithGroq = async row => {
+const classifyWithGroq = async (row, budget) => {
   const articleInput = buildArticleInput(row);
   const jsonInstructions = [
     REVIEW_INSTRUCTIONS,
@@ -196,6 +196,9 @@ const classifyWithGroq = async row => {
   ].join(" ");
 
   for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
+    // Reserve for every attempt, including failed requests. UTF-8 size is conservative across languages.
+    const estimatedTokens = Buffer.byteLength(jsonInstructions + articleInput, "utf8") + 600;
+    budget.reserve(estimatedTokens);
     const response = await fetch(GROQ_API_URL, {
       method: "POST",
       signal: AbortSignal.timeout(30_000),
@@ -217,6 +220,7 @@ const classifyWithGroq = async row => {
     });
 
     const payload = await response.json();
+    budget.reconcile(estimatedTokens, payload.usage?.total_tokens);
 
     if (response.ok) {
       const outputText = normalizeJsonText(payload.choices?.[0]?.message?.content || "");
@@ -225,21 +229,17 @@ const classifyWithGroq = async row => {
       }
 
       const parsed = JSON.parse(outputText);
-      const remaining = Number(response.headers.get("x-ratelimit-remaining-tokens"));
-      if (response.headers.has("x-ratelimit-remaining-tokens") && remaining < 1800) {
-        const resetDelay = parseResetDelay(response.headers.get("x-ratelimit-reset-tokens"));
-        await sleep(Math.min(60_000, resetDelay + 1000));
-      }
       return parsed;
     }
 
     const message = payload?.error?.message || `Groq error ${response.status}`;
+    const retryDelay = response.status === 429 || response.status >= 500
+      ? getGroqRetryDelay(response, message, attempt) : 0;
     const shouldRetry = (response.status === 429 || response.status >= 500) && attempt < maxRetries;
 
     if (shouldRetry) {
-      const retryAfter = Number(response.headers.get("retry-after"));
-      const resetDelay = parseResetDelay(response.headers.get("x-ratelimit-reset-tokens"));
-      await sleep(Math.min(60_000, Math.max(1000 * (attempt + 1), resetDelay, Number.isFinite(retryAfter) ? retryAfter * 1000 : 0)));
+      budget.checkWait(retryDelay);
+      await sleep(retryDelay);
       continue;
     }
 
@@ -309,6 +309,7 @@ const buildUpdatePayload = (row, review) => {
 };
 
 export const run = async () => {
+  const budget = createReviewBudget();
   if (!groqApiKey) throw new Error("GROQ_API_KEY is missing; AI review cannot run.");
   const modelResponse = await fetch("https://api.groq.com/openai/v1/models", {
     headers: { Authorization: `Bearer ${groqApiKey}` },
@@ -327,15 +328,25 @@ export const run = async () => {
   let pending = 0;
   let rejected = 0;
   let aiFailures = 0;
+  let deferredReason = null;
+  let consecutiveFailures = 0;
+  let reviewed = 0;
 
   for (const row of rows || []) {
     let payload;
 
     try {
-      const review = await aiReviewer.classify(row);
+      const review = await aiReviewer.classify(row, budget);
       payload = buildUpdatePayload(row, review);
+      consecutiveFailures = 0;
     } catch (error) {
+      if (error instanceof ReviewDeferredError) {
+        deferredReason = error.message;
+        console.warn(deferredReason);
+        break;
+      }
       aiFailures += 1;
+      consecutiveFailures += 1;
       payload = {
         review_status: "pending",
         review_notes: `AI review error: ${String(error?.message || "unknown error").slice(0, 220)}`,
@@ -350,6 +361,7 @@ export const run = async () => {
       .is("published_story_id", null);
 
     if (updateError) throw new Error(updateError.message);
+    reviewed += 1;
 
     if (payload.review_status === "approved") approved += 1;
     if (payload.review_status === "pending") pending += 1;
@@ -357,12 +369,26 @@ export const run = async () => {
 
     if ((approved + pending + rejected) % 10 === 0) console.log(JSON.stringify({ stage: "review_progress", approved, pending, rejected, aiFailures }));
 
+    if (consecutiveFailures >= 3) {
+      deferredReason = "Stopped after three consecutive AI failures.";
+      break;
+    }
+
+    try {
+      budget.checkWait(reviewDelayMs);
+    } catch (error) {
+      deferredReason = error.message;
+      break;
+    }
     await sleep(reviewDelayMs);
   }
 
   const result = {
     skipped: false,
-    reviewed: rows?.length || 0,
+    reviewed,
+    deferred: (rows?.length || 0) - reviewed,
+    deferredReason,
+    tokensUsedOrReserved: budget.tokens,
     approved,
     pending,
     rejected,
@@ -382,7 +408,9 @@ export const run = async () => {
 const isDirectRun = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 
 if (isDirectRun) {
-  run().catch(error => {
+  run().then(result => {
+    if (result.aiFailures > 0 || /quota|cooldown/i.test(result.deferredReason || "")) process.exitCode = 1;
+  }).catch(error => {
     console.error(error.message);
     process.exit(1);
   });

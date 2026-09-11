@@ -1,6 +1,14 @@
 name: Refresh News
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/refresh-news.yml'
+      - 'scripts/refresh-news.mjs'
+      - 'scripts/review-pending-with-groq.mjs'
+      - 'scripts/publish-approved-stories.mjs'
+      - 'scripts/lib/review-runtime.mjs'
   schedule:
     - cron: "17 */6 * * *"
   workflow_dispatch:
@@ -10,12 +18,16 @@ permissions:
 
 concurrency:
   group: refresh-news
-  cancel-in-progress: false
+  # A deployed pipeline fix supersedes obsolete code; scheduled runs do not interrupt each other.
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 100
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
     steps:
       - name: Check out repository
@@ -31,9 +43,10 @@ jobs:
         run: npm ci
 
       - name: Test ingestion and publishing safeguards
-        run: node --test tests/ingestion-runtime.test.mjs tests/publishing-queue.test.mjs
+        run: node --test tests/ingestion-runtime.test.mjs tests/publishing-queue.test.mjs tests/news-health.test.mjs tests/review-batch.test.mjs
 
       - name: Validate required refresh environment variables
+        id: ready
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -43,7 +56,14 @@ jobs:
           test -n "$SUPABASE_SERVICE_ROLE_KEY" || (echo "Missing repository secret: SUPABASE_SERVICE_ROLE_KEY" && exit 1)
           test -n "$GROQ_API_KEY" || (echo "Missing repository secret: GROQ_API_KEY" && exit 1)
 
-      - name: Refresh BrightNews stories
+      - name: Publish previously approved stories
+        if: ${{ !cancelled() && steps.ready.outcome == 'success' }}
+        timeout-minutes: 10
+        run: node scripts/publish-approved-stories.mjs
+
+      - name: Ingest fresh articles
+        if: ${{ !cancelled() && steps.ready.outcome == 'success' }}
+        timeout-minutes: 45
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -75,4 +95,26 @@ jobs:
           INGEST_GDELT_MAX_RECORDS: ${{ vars.INGEST_GDELT_MAX_RECORDS }}
           INGEST_RSS_MAX_ITEMS_PER_FEED: ${{ vars.INGEST_RSS_MAX_ITEMS_PER_FEED }}
           INGEST_RSS_MAX_RETRIES: ${{ vars.INGEST_RSS_MAX_RETRIES }}
-        run: node scripts/refresh-news.mjs
+        run: node scripts/refresh-news.mjs --ingest-only
+
+      - name: Review a bounded batch with Groq
+        if: ${{ !cancelled() && steps.ready.outcome == 'success' }}
+        timeout-minutes: 10
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_REVIEW_MODEL: ${{ vars.GROQ_REVIEW_MODEL || 'qwen/qwen3.8-27b' }}
+          AI_REVIEW_LIMIT: '40'
+          AI_REVIEW_PER_REGION_LIMIT: '4'
+          AI_REVIEW_MAX_RETRIES: '2'
+          AI_REVIEW_MIN_CONFIDENCE: ${{ vars.AI_REVIEW_MIN_CONFIDENCE }}
+        run: node scripts/review-pending-with-groq.mjs
+
+      - name: Publish approvals even if ingestion or review failed
+        if: ${{ !cancelled() && steps.ready.outcome == 'success' }}
+        timeout-minutes: 10
+        run: node scripts/publish-approved-stories.mjs
+
+      - name: Check publication health for every country
+        if: ${{ !cancelled() && steps.ready.outcome == 'success' }}
+        timeout-minutes: 5
+        run: node scripts/check-news-health.mjs
