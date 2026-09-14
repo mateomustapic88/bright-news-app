@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { pathToFileURL } from "node:url";
-import { DEFAULT_GROQ_REVIEW_MODEL, chooseReviewModel, balancePublishers, interleaveGroups, getGroqRetryDelay, createReviewBudget, ReviewDeferredError } from "./lib/review-runtime.mjs";
+import { appendFileSync } from "node:fs";
+import { DEFAULT_GROQ_REVIEW_MODEL, chooseReviewModel, balancePublishers, interleaveGroups, getGroqRetryDelay, createReviewBudget, ReviewDeferredError, hasReviewFailure } from "./lib/review-runtime.mjs";
 import {
   CATEGORY_CONFIG,
   REGION_CONFIG,
@@ -238,11 +239,17 @@ const classifyWithGroq = async (row, budget) => {
     const shouldRetry = (response.status === 429 || response.status >= 500) && attempt < maxRetries;
 
     if (shouldRetry) {
-      budget.checkWait(retryDelay);
+      try {
+        budget.checkWait(retryDelay);
+      } catch (error) {
+        if (response.status >= 500) throw new Error(message, { cause: error });
+        throw error;
+      }
       await sleep(retryDelay);
       continue;
     }
 
+    if (response.status === 429) throw new ReviewDeferredError("Groq rate limit persists; deferring the remaining queue.");
     throw new Error(message);
   }
 };
@@ -402,6 +409,8 @@ export const run = async () => {
   };
 
   console.log(JSON.stringify(result, null, 2));
+  if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+    `## AI review\n\nReviewed: ${reviewed}; approved: ${approved}; rejected: ${rejected}; AI failures: ${aiFailures}.\n\nDeferred in this batch: ${result.deferred}. ${deferredReason || "Batch completed."}\n\nApproved articles remain available to the publishing steps. Quota and rate-limit pauses are expected; genuine errors still fail the review step.\n`);
   return result;
 };
 
@@ -409,7 +418,7 @@ const isDirectRun = process.argv[1] && import.meta.url === pathToFileURL(process
 
 if (isDirectRun) {
   run().then(result => {
-    if (result.aiFailures > 0 || /quota|cooldown/i.test(result.deferredReason || "")) process.exitCode = 1;
+    if (hasReviewFailure(result)) process.exitCode = 1;
   }).catch(error => {
     console.error(error.message);
     process.exit(1);

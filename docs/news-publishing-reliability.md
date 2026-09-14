@@ -20,7 +20,7 @@ Scheduled refreshes were starting, but seven consecutive runs after September 9 
 
 ## Operator Checks
 
-In GitHub Actions inspect **Refresh News** and **News Publishing Watchdog**. A review step may be red when quota is exhausted while the later publishing and health steps still succeed; this is intentional and keeps partial progress visible. Check the health step's country table before interpreting a fresh global feed as full country coverage.
+In GitHub Actions inspect **Refresh News**, **Publish Approved Stories**, and **News Publishing Watchdog**. Quota exhaustion, rate-limit cooldowns and bounded review-budget pauses are successful partial runs: the step summary records the deferred count and reason, remaining rows stay pending, and approved rows continue to publication. Authentication, malformed responses, service outages (including HTTP 5xx cooldowns), database failures, publishing failures and stale-feed checks still fail. A real AI error earlier in a batch is not hidden by a later quota pause. Check the health step's country table before interpreting a fresh global feed as full country coverage.
 
 For local verification with the existing private environment:
 

@@ -26,7 +26,10 @@ export const getGroqRetryDelay = (response, message, attempt, now = Date.now()) 
     ? Math.max(0, Date.parse(retryAfter) - now) : Number(retryAfter || 0) * 1000;
   const wait = Math.max(1000 * (attempt + 1), Number.isFinite(delay) ? delay : 0,
     parseResetDelay(response.headers.get("x-ratelimit-reset-tokens")));
-  if (wait > 30_000) throw new ReviewDeferredError("Groq requires a long cooldown; deferring the remaining queue.");
+  if (wait > 30_000) {
+    if (response.status === 429) throw new ReviewDeferredError("Groq requires a long cooldown; deferring the remaining queue.");
+    throw new Error(`Groq service error ${response.status} requires a long retry delay: ${message}`);
+  }
   return wait;
 };
 
@@ -82,12 +85,13 @@ export const balancePublishers = (rows, limit) => {
   return interleaveGroups([...groups.values()], limit);
 };
 
+export const hasReviewFailure = result => Boolean(result?.skipped || result?.fallback || result?.aiFailures > 0);
+
 export const getRefreshFailures = (result, latestPublishedAt, now = Date.now()) => {
   const failures = [];
   const ingestion = ["gnews", "gdelt", "guardian", "googleNewsRss", "newsdata", "rss"].map(key => result[key]).filter(Boolean);
   if (ingestion.length && ingestion.every(stage => stage.skipped || stage.fetched === 0)) failures.push("All ingestion providers were skipped, failed, or returned no articles.");
-  if (result.review?.skipped || result.review?.fallback || result.review?.aiFailures > 0) failures.push("AI review failed or used a degraded fallback.");
-  if (/quota|cooldown/i.test(result.review?.deferredReason || "")) failures.push(result.review.deferredReason);
+  if (hasReviewFailure(result.review)) failures.push("AI review failed or used a degraded fallback.");
   if (result.published?.skipped) failures.push("Publishing failed.");
   const date = Date.parse(latestPublishedAt);
   if (!Number.isFinite(date) || now - date > 48 * 60 * 60 * 1000) failures.push("The newest published story is over 48 hours old or missing.");

@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { getNewsHealthFailures, parseDatabaseDate } from "../scripts/lib/news-health.mjs";
-import { createReviewBudget, getGroqRetryDelay, ReviewDeferredError } from "../scripts/lib/review-runtime.mjs";
+import { createReviewBudget, getGroqRetryDelay, ReviewDeferredError, hasReviewFailure, getRefreshFailures } from "../scripts/lib/review-runtime.mjs";
 
 test("daily quotas stop immediately instead of retrying every article", () => {
   const response = new Response(null, { status: 429, headers: { "retry-after": "300" } });
@@ -16,6 +16,26 @@ test("short rate limits respect Retry-After without a premature capped retry", (
   assert.equal(getGroqRetryDelay(response, "minute limit", 0), 5000);
   const date = new Response(null, { status: 503, headers: { "retry-after": "Fri, 11 Sep 2026 12:00:10 GMT" } });
   assert.equal(getGroqRetryDelay(date, "unavailable", 0, Date.parse("2026-09-11T12:00:00Z")), 10000);
+});
+
+test("server errors with a long retry delay are failures, not healthy quota pauses", () => {
+  const response = new Response(null, { status: 503, headers: { "retry-after": "60" } });
+  assert.throws(() => getGroqRetryDelay(response, "Service unavailable", 0), error =>
+    !(error instanceof ReviewDeferredError) && /service error 503/.test(error.message));
+});
+
+test("expected deferrals succeed while real failures and stale feeds remain failures", () => {
+  const now = Date.parse("2026-09-14T12:00:00Z");
+  for (const deferredReason of ["Groq daily quota exhausted", "Groq requires a long cooldown", "Review token budget reached.", "Groq rate limit persists"]) {
+    const review = { aiFailures: 0, deferred: 30, deferredReason };
+    assert.equal(hasReviewFailure(review), false);
+    assert.deepEqual(getRefreshFailures({ review, published: {} }, new Date(now).toISOString(), now), []);
+    assert.equal(hasReviewFailure({ ...review, aiFailures: 1 }), true);
+    assert.equal(getRefreshFailures({ review: { ...review, aiFailures: 1 }, published: {} }, new Date(now).toISOString(), now).length, 1);
+    assert.equal(getRefreshFailures({ review, published: { skipped: true } }, new Date(now).toISOString(), now).length, 1);
+    assert.equal(getRefreshFailures({ review, published: {} }, "2026-09-01", now).length, 1);
+  }
+  assert.equal(hasReviewFailure({ skipped: true }), true);
 });
 
 test("token and time budgets bound the whole review stage", () => {
